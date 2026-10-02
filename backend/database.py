@@ -12,6 +12,13 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
     raise RuntimeError("DATABASE_URL is not set")
 
+# SQLAlchemy defaults to psycopg2 for `postgresql://`.
+# RIVA uses psycopg (v3), so normalize PostgreSQL URLs explicitly.
+if DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
+elif DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
+
 # `connect_args` for PostgreSQL at runtime. The dedicated test files build
 # their own SQLite engines, but anything reusing this module-level engine must
 # not receive Postgres-only connection args (e.g. `options`) — so they are only

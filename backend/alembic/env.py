@@ -11,6 +11,15 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL is not set")
+
+# RIVA uses psycopg (v3), so explicitly select the psycopg dialect.
+if DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
+elif DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

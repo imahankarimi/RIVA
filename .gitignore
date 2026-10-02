@@ -42,3 +42,4 @@ frontend-before-final/
 
 # Claude Code local configuration
 .claude/
+.vercel
