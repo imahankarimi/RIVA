@@ -1,0 +1,9 @@
+# Additional dependencies for production load testing
+
+# Load testing
+locust==2.15.1
+
+# Stress testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+requests==2.31.0

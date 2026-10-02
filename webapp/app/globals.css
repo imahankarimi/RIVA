@@ -1,0 +1,228 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* RIVA Design System — RGB triplets
+   Light values live on :root; .dark overrides the same variables.
+   Existing semantic classes such as bg-paper, text-ink, bg-signal-500
+   therefore inherit the RIVA brand automatically. */
+
+:root {
+  color-scheme: light;
+
+  /* RIVA — Warm White / Surface.
+     Light mode is designed around warm white paper with pure-white cards
+     lifting off it, so elevation reads without needing heavy shadows. */
+  --c-paper: 247 247 243;
+  --c-surface: 255 255 255;
+  --c-surface-muted: 244 244 240;
+  --c-surface-raised: 255 255 255;
+
+  /* RIVA — Deep Ink / Typography. ink-soft and ink-faint are slate/steel
+     cooled toward the brand but darkened until each clears WCAG AA on
+     --c-paper (5.29:1 and 3.81:1) — raw #607D94/#71879B measured 4.02
+     and 3.47, which failed for body and secondary label text. */
+  --c-ink: 16 19 26;
+  --c-ink-soft: 79 106 126;
+  --c-ink-faint: 107 128 147;
+
+  /* RIVA — Steel-tinted hairlines. Steel at full strength (#71879B) is a
+     3.47:1 border, far too loud for the ~74 `border-line` surfaces in the
+     app; these are steel mixed into warm white so structure whispers. */
+  --c-line: 217 223 228;
+  --c-line-soft: 231 235 238;
+
+  /* RIVA — Deep Navy signal system. 500 is the brand navy used as a solid
+     fill behind --c-on-signal text. */
+  --c-signal-50: 238 241 244;
+  --c-signal-100: 220 227 233;
+  --c-signal-300: 169 184 198;
+  --c-signal-400: 126 147 167;
+  --c-signal-500: 16 28 44;
+  --c-signal-600: 27 43 62;
+  --c-signal-700: 38 59 81;
+  --c-signal-900: 10 18 28;
+
+  /* Foreground for text/icons sitting on a signal-500/600/700 fill.
+     Tracks the theme so buttons and avatars stay legible in both. */
+  --c-on-signal: 255 255 255;
+
+  /* Semantic states — intentionally independent from brand palette */
+  --c-amber-100: 247 235 211;
+  --c-amber-500: 198 138 46;
+  --c-amber-700: 150 106 34;
+
+  --c-rose-100: 245 225 222;
+  --c-rose-500: 181 67 58;
+  --c-rose-700: 143 51 44;
+
+  --c-moss-100: 222 238 226;
+  --c-moss-500: 62 154 109;
+  --c-moss-700: 46 119 82;
+
+  /* Chart palette — 5 colours chosen from RIVA semantic tones so they
+     work naturally against both light and dark surfaces. */
+  --c-chart-1: 16 28 44;    /* signal-500 Deep Navy */
+  --c-chart-2: 62 154 109;  /* moss-500 */
+  --c-chart-3: 126 147 167; /* signal-400 Slate */
+  --c-chart-4: 198 138 46;  /* amber-500 */
+  --c-chart-5: 181 67 58;   /* rose-500 */
+
+  --c-scrollbar: 201 209 214;
+  --c-receipt-punch: 247 247 243;
+}
+
+.dark {
+  color-scheme: dark;
+
+  /* RIVA — Deep Ink page, Deep Navy cards. Dark mode is its own design,
+     not an inversion: the page is the near-black ink and cards step *up*
+     in navy, so elevation moves the same direction as in light mode. */
+  --c-paper: 16 19 26;
+  --c-surface: 16 28 44;
+  --c-surface-muted: 24 36 51;
+  --c-surface-raised: 31 43 58;
+
+  /* RIVA — Warm White / Steel typography. soft must stay brighter than
+     faint; the previous values had faint at 7.09:1 and soft at 4.99:1,
+     which inverted the emphasis ramp. */
+  --c-ink: 247 247 243;
+  --c-ink-soft: 169 188 204;
+  --c-ink-faint: 129 149 166;
+
+  /* RIVA — Steel mixed into navy. Full steel was *lighter* than the card
+     surface here, so every bordered card read as a glowing outline. */
+  --c-line: 41 54 70;
+  --c-line-soft: 31 43 58;
+
+  /* RIVA — Warm White becomes the primary dark-mode action. 500/600/700
+     are solid fills; --c-on-signal flips to deep ink so the ~22 files
+     using `bg-signal-500` + on-signal text keep 17:1 contrast instead of
+     the 1.07:1 that white-on-warm-white produced. */
+  --c-signal-50: 27 40 57;
+  --c-signal-100: 38 54 74;
+  --c-signal-300: 95 120 137;
+  --c-signal-400: 126 151 173;
+  --c-signal-500: 247 247 243;
+  --c-signal-600: 228 230 225;
+  --c-signal-700: 207 212 208;
+  --c-signal-900: 247 247 243;
+
+  --c-on-signal: 16 19 26;
+
+  /* Semantic states */
+  --c-amber-100: 58 47 24;
+  --c-amber-500: 217 160 76;
+  --c-amber-700: 235 191 122;
+
+  --c-rose-100: 56 30 28;
+  --c-rose-500: 214 100 90;
+  --c-rose-700: 232 140 131;
+
+  --c-moss-100: 24 45 33;
+  --c-moss-500: 88 181 133;
+  --c-moss-700: 133 202 165;
+
+  /* Chart palette (dark) — same mapping, slightly brighter for dark backgrounds. */
+  --c-chart-1: 247 247 243;  /* warm white — primary in dark mode */
+  --c-chart-2: 88 181 133;   /* moss-500 dark */
+  --c-chart-3: 126 151 173;  /* signal-400 dark */
+  --c-chart-4: 217 160 76;   /* amber-500 dark */
+  --c-chart-5: 214 100 90;   /* rose-500 dark */
+
+  --c-scrollbar: 54 70 89;
+  --c-receipt-punch: 16 19 26;
+}
+
+body {
+  background-color: rgb(var(--c-paper));
+  color: rgb(var(--c-ink));
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+/* Tabular figures for money — precision without shouting */
+.font-figures {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Hairline scrollbars, restrained */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--c-scrollbar)) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgb(var(--c-scrollbar));
+  border-radius: 999px;
+}
+
+/* Visible, deliberate focus ring everywhere */
+:focus-visible {
+  outline: 2px solid rgb(var(--c-signal-500));
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+[dir="rtl"] .flip-rtl {
+  transform: scaleX(-1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Receipt tear — signature transaction-card motif.
+   The punch color tracks the page background in both themes. */
+.receipt-tear {
+  background-image: radial-gradient(
+    circle at 6px 6px,
+    rgb(var(--c-receipt-punch)) 5px,
+    transparent 5.5px
+  );
+  background-size: 14px 12px;
+  background-repeat: repeat-x;
+  background-position: bottom;
+  height: 12px;
+  transition: background-image 180ms ease;
+}
+
+html[data-locale="fa"] {
+  --font-ui: var(--font-vazirmatn), system-ui, sans-serif;
+  --font-ui-display: var(--font-vazirmatn), system-ui, sans-serif;
+}
+
+html[data-locale="fa"] body {
+  font-family: var(--font-vazirmatn), system-ui, sans-serif;
+}
+
+html[data-locale="fa"] .font-display {
+  font-family: var(--font-vazirmatn), system-ui, sans-serif;
+}
+
+html[data-locale="en"] {
+  --font-ui: var(--font-inter), system-ui, sans-serif;
+  --font-ui-display: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
+}
+
+html[data-locale="en"] body {
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+html[data-locale="en"] .font-display {
+  font-family: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
+}

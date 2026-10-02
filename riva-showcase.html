@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RIVA - Financial Intelligence Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 80px 40px;
+        }
+
+        .showcase-container {
+            max-width: 1400px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .device-mockup {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            perspective: 1500px;
+        }
+
+        .laptop {
+            position: relative;
+            transform: rotateX(8deg) rotateY(-2deg);
+            transform-style: preserve-3d;
+        }
+
+        .laptop-screen {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            background: #1a1d29;
+            border-radius: 12px;
+            padding: 8px;
+            box-shadow:
+                0 30px 60px rgba(0, 0, 0, 0.15),
+                0 10px 20px rgba(0, 0, 0, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+        }
+
+        .screen-content {
+            width: 100%;
+            height: 100%;
+            border-radius: 6px;
+            overflow: hidden;
+            background: #0a0e1a;
+        }
+
+        .screen-content img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .laptop-base {
+            position: relative;
+            width: 105%;
+            height: 20px;
+            background: linear-gradient(180deg, #d4d7dc 0%, #c1c5cc 100%);
+            border-radius: 0 0 20px 20px;
+            margin: 0 auto;
+            transform: translateZ(-10px) translateY(-1px);
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .laptop-base::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 2px;
+        }
+
+        .camera-notch {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 40px 20px;
+            }
+
+            .laptop {
+                transform: rotateX(5deg) rotateY(0deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="showcase-container">
+        <div class="device-mockup">
+            <div class="laptop">
+                <div class="laptop-screen">
+                    <div class="camera-notch"></div>
+                    <div class="screen-content">
+                        <img src="/private/tmp/claude-501/-Users-mahan-Documents-AI-Projects-ledger-ai/5a001c85-5183-4638-85de-170b31b08cab/images/9.webp" alt="RIVA Dashboard">
+                    </div>
+                </div>
+                <div class="laptop-base"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
