@@ -45,7 +45,13 @@ export function AuthScreen() {
       setLocale(response.business.language);
       router.replace("/home");
     } catch (reason) {
-      setError(reason instanceof ApiError ? reason.message : t("auth.authUnavailable"));
+      if (reason instanceof ApiError) {
+        setError(reason.message);
+      } else if (reason instanceof TypeError && reason.message.includes('fetch')) {
+        setError(t("auth.networkError"));
+      } else {
+        setError(reason instanceof Error ? reason.message : t("auth.unknownError"));
+      }
     } finally {
       setLoading(false);
     }

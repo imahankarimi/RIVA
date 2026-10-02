@@ -433,6 +433,8 @@ const en = {
     signupAction: "Create your workspace",
     passwordMismatch: "Passwords do not match.",
     authUnavailable: "Authentication is not configured for this frontend yet.",
+    networkError: "Unable to connect to RIVA. Please check your connection and try again.",
+    unknownError: "An unexpected error occurred. Please try again.",
     connecting: "Connecting securely…",
     backToLogin: "Back to login",
   },
