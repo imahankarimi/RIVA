@@ -4,9 +4,10 @@ from decimal import Decimal
 
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response
+from fastapi.responses import JSONResponse, Response
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from rate_limiter import check_rate_limit, check_ai_rate_limit, rate_limit_middleware
 from timeout_middleware import timeout_middleware
@@ -74,24 +75,55 @@ from validation_service import validate_accounting_action
 
 app = FastAPI(title="RIVA AI API")
 
+# CORS origins configuration
+CORS_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:3002",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3001",
+    "http://127.0.0.1:3002",
+    "http://192.168.1.38:3001",
+    "https://riva-snowy-beta.vercel.app",
+    "https://riva-app-inky.vercel.app",
+]
+
 # Production middleware stack
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://localhost:3002",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:3001",
-        "http://127.0.0.1:3002",
-        "http://192.168.1.38:3001",
-        "https://riva-snowy-beta.vercel.app",
-        "https://riva-app-inky.vercel.app",
-    ],
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# CRITICAL FIX: Add exception handler to ensure CORS headers on HTTPException responses.
+# Without this, HTTPException responses bypass CORSMiddleware and lack CORS headers,
+# causing browser CORS errors even though origins are configured correctly.
+# See: https://github.com/tiangolo/fastapi/issues/775
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request: Request, exc: StarletteHTTPException) -> JSONResponse:
+    """Custom exception handler that ensures CORS headers are included in error responses."""
+    origin = request.headers.get("origin")
+
+    # Build response with exception details
+    response = JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
+    )
+
+    # Add CORS headers if origin is allowed
+    if origin and origin in CORS_ORIGINS:
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+
+    # Preserve any headers the exception specified (e.g., WWW-Authenticate)
+    if exc.headers:
+        for key, value in exc.headers.items():
+            response.headers[key] = value
+
+    return response
 
 # Add timeout middleware (before other middleware for proper timeout handling)
 @app.middleware("http")
