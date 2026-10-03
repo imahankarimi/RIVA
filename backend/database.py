@@ -41,7 +41,7 @@ if DATABASE_URL.startswith("postgresql"):
             "pool_pre_ping": True,  # Verify connection health before using
             "connect_args": {
                 "connect_timeout": 10,  # PostgreSQL connection timeout
-                "options": "-c statement_timeout=30000",  # 30s query timeout
+                # Note: statement_timeout removed because Neon Pooler rejects it in startup options
             },
         }
     )
