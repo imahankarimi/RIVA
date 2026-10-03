@@ -42,7 +42,6 @@ export function AuthScreen() {
     try {
       const response =
         mode === "login" ? await login(email, password) : await signup(email, password, businessName, baseCurrency);
-      setLocale(response.business.language);
       router.replace("/home");
     } catch (reason) {
       if (reason instanceof ApiError) {

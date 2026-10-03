@@ -298,7 +298,7 @@ def signup(request: Request, data: SignupRequest, db: Session = Depends(get_db))
         raise HTTPException(status_code=409, detail="An account with this email already exists")
 
     try:
-        business = Business(name=business_name, language="fa", base_currency=data.base_currency)
+        business = Business(name=business_name, language="en", base_currency=data.base_currency)
         db.add(business)
         db.flush()
         create_default_accounts(db=db, business=business)
