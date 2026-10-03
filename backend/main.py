@@ -117,6 +117,8 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException) 
     if origin and origin in CORS_ORIGINS:
         response.headers["Access-Control-Allow-Origin"] = origin
         response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Access-Control-Allow-Methods"] = "*"
+        response.headers["Access-Control-Allow-Headers"] = "*"
 
     # Preserve any headers the exception specified (e.g., WWW-Authenticate)
     if exc.headers:

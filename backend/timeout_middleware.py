@@ -5,7 +5,7 @@ Prevents slow requests from blocking workers and exhausting resources.
 
 import asyncio
 import time
-from fastapi import Request, HTTPException, status
+from fastapi import Request, status
 from fastapi.responses import JSONResponse
 
 
@@ -51,7 +51,7 @@ async def timeout_middleware(request: Request, call_next):
         return response
 
     except asyncio.TimeoutError:
-        return JSONResponse(
+        response = JSONResponse(
             status_code=status.HTTP_504_GATEWAY_TIMEOUT,
             content={
                 "error": "Request timeout",
@@ -59,3 +59,24 @@ async def timeout_middleware(request: Request, call_next):
                 "timeout": timeout,
             }
         )
+        # Add CORS headers if origin is present and allowed
+        origin = request.headers.get("origin")
+        if origin:
+            # Match CORS_ORIGINS from main.py
+            allowed_origins = {
+                "http://localhost:3000",
+                "http://localhost:3001",
+                "http://localhost:3002",
+                "http://127.0.0.1:3000",
+                "http://127.0.0.1:3001",
+                "http://127.0.0.1:3002",
+                "http://192.168.1.38:3001",
+                "https://riva-snowy-beta.vercel.app",
+                "https://riva-app-inky.vercel.app",
+            }
+            if origin in allowed_origins:
+                response.headers["Access-Control-Allow-Origin"] = origin
+                response.headers["Access-Control-Allow-Credentials"] = "true"
+                response.headers["Access-Control-Allow-Methods"] = "*"
+                response.headers["Access-Control-Allow-Headers"] = "*"
+        return response
