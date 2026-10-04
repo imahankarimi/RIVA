@@ -21,15 +21,15 @@ export default function AssistantPage() {
   const history = useChatHistory(business.id);
 
   return (
-    <div className="flex h-full flex-col md:min-h-0">
+    <div className="flex h-full min-h-0 flex-col">
       {/* Compact mobile header */}
-      <div className="shrink-0 px-4 pt-2 pb-1.5 sm:px-6 md:sticky md:top-0 md:z-10 md:bg-paper/95 md:backdrop-blur md:pb-2">
+      <div className="shrink-0 border-b border-line/50 bg-paper px-4 py-2 sm:px-6 md:sticky md:top-0 md:z-10 md:border-0 md:bg-paper/95 md:backdrop-blur">
         <div className="mx-auto flex w-full max-w-content items-center justify-end gap-1.5">
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={history.startNew}
-            className="flex h-8 items-center gap-1.5 rounded-lg border border-line bg-white/70 px-2.5 text-[12.5px] font-medium text-ink-soft backdrop-blur hover:text-ink"
+            className="flex h-8 items-center gap-1.5 rounded-lg border border-line bg-surface px-2.5 text-[12.5px] font-medium text-ink shadow-subtle backdrop-blur hover:bg-surface hover:shadow-card"
           >
             <Plus size={14} />
             {t("assistant.newChat")}
@@ -38,7 +38,7 @@ export default function AssistantPage() {
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => setHistoryOpen(true)}
-            className="flex h-8 items-center gap-1.5 rounded-lg border border-line bg-white/70 px-2.5 text-[12.5px] font-medium text-ink-soft backdrop-blur hover:text-ink"
+            className="flex h-8 items-center gap-1.5 rounded-lg border border-line bg-surface px-2.5 text-[12.5px] font-medium text-ink shadow-subtle backdrop-blur hover:bg-surface hover:shadow-card"
           >
             <HistoryIcon size={14} />
             {t("assistant.history")}

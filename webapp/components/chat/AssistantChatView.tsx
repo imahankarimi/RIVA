@@ -58,7 +58,7 @@ export function AssistantChatView({
   }, [messages, aiState]);
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full min-h-0 flex-col">
       {/* Scrollable messages container */}
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
         <div className="mx-auto flex min-h-full max-w-content flex-col px-4 py-5 sm:px-6 sm:py-7">
@@ -96,7 +96,7 @@ export function AssistantChatView({
               </motion.div>
             </motion.div>
           ) : (
-            <div className="flex flex-1 flex-col gap-5 pb-2">
+            <div className="flex flex-1 flex-col gap-5">
               {messages.map((message) => (
                 <ChatMessage
                   key={message.id}
@@ -113,11 +113,9 @@ export function AssistantChatView({
         </div>
       </div>
 
-      {/* Fixed composer above mobile tab bar */}
-      <div className="shrink-0 border-t border-line-soft bg-paper/95 backdrop-blur shadow-[0_-8px_16px_-12px_rgba(16,28,44,0.12)] md:shadow-none">
-        <div className="px-3 py-3 pb-[calc(env(safe-area-inset-bottom)+76px)] sm:px-6 md:pb-3">
-          <ChatInput onSend={sendMessage} disabled={aiState !== "idle"} />
-        </div>
+      {/* Fixed composer at bottom */}
+      <div className="shrink-0 border-t border-line-soft bg-paper px-3 py-3 sm:px-6 md:bg-paper/95 md:backdrop-blur">
+        <ChatInput onSend={sendMessage} disabled={aiState !== "idle"} />
       </div>
     </div>
   );

@@ -22,11 +22,11 @@ export default function ShellLayout({ children }: { children: React.ReactNode })
     <AuthGate>
       <AddIncomeProvider>
         <div className="flex min-h-dvh flex-col bg-paper font-sans text-ink antialiased md:h-screen">
-          <div className="flex h-full md:overflow-hidden">
+          <div className="flex min-h-0 flex-1 md:overflow-hidden">
             <WebappSidebar />
-            <div className="flex min-w-0 flex-1 flex-col">
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col">
               <WebappDesktopBar />
-              <main className="relative min-w-0 flex-1 overflow-y-auto overscroll-contain pt-[4.5rem] md:pb-10">
+              <main className="relative min-h-0 min-w-0 flex-1 pt-[4.5rem] pb-[calc(env(safe-area-inset-bottom)+80px)] md:overflow-y-auto md:overscroll-contain md:pb-10">
                 {children}
               </main>
             </div>
