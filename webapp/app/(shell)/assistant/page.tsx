@@ -21,36 +21,42 @@ export default function AssistantPage() {
   const history = useChatHistory(business.id);
 
   return (
-    <div className="flex min-h-[inherit] flex-col">
-      <div className="mx-auto flex w-full max-w-content items-center justify-end gap-1.5 px-4 pt-2 sm:px-6">
-        <motion.button
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={history.startNew}
-          className="flex h-8 items-center gap-1.5 rounded-lg border border-line bg-white/70 px-2.5 text-[12.5px] font-medium text-ink-soft backdrop-blur hover:text-ink"
-        >
-          <Plus size={14} />
-          {t("assistant.newChat")}
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={() => setHistoryOpen(true)}
-          className="flex h-8 items-center gap-1.5 rounded-lg border border-line bg-white/70 px-2.5 text-[12.5px] font-medium text-ink-soft backdrop-blur hover:text-ink"
-        >
-          <HistoryIcon size={14} />
-          {t("assistant.history")}
-        </motion.button>
+    <div className="flex h-full flex-col md:min-h-0">
+      {/* Compact mobile header */}
+      <div className="shrink-0 px-4 pt-2 pb-1.5 sm:px-6 md:sticky md:top-0 md:z-10 md:bg-paper/95 md:backdrop-blur md:pb-2">
+        <div className="mx-auto flex w-full max-w-content items-center justify-end gap-1.5">
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={history.startNew}
+            className="flex h-8 items-center gap-1.5 rounded-lg border border-line bg-white/70 px-2.5 text-[12.5px] font-medium text-ink-soft backdrop-blur hover:text-ink"
+          >
+            <Plus size={14} />
+            {t("assistant.newChat")}
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => setHistoryOpen(true)}
+            className="flex h-8 items-center gap-1.5 rounded-lg border border-line bg-white/70 px-2.5 text-[12.5px] font-medium text-ink-soft backdrop-blur hover:text-ink"
+          >
+            <HistoryIcon size={14} />
+            {t("assistant.history")}
+          </motion.button>
+        </div>
       </div>
 
-      <AssistantChatView
-        key={`${business.id}-wapp-assistant`}
-        businessId={business.id}
-        initialMessages={history.activeMessages}
-        conversationId={history.activeId}
-        onConversationId={history.onConversationId}
-        selectionKey={history.selectionKey}
-      />
+      {/* Chat fills remaining space */}
+      <div className="min-h-0 flex-1">
+        <AssistantChatView
+          key={`${business.id}-wapp-assistant`}
+          businessId={business.id}
+          initialMessages={history.activeMessages}
+          conversationId={history.activeId}
+          onConversationId={history.onConversationId}
+          selectionKey={history.selectionKey}
+        />
+      </div>
 
       <ChatHistoryPanel
         open={historyOpen}
