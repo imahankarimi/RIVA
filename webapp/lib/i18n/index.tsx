@@ -52,12 +52,13 @@ function resolve(dict: Dictionary, path: string): string {
 const STORAGE_KEY = "ledgerai.locale";
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("en");
-
-  useEffect(() => {
-    const stored = typeof window !== "undefined" ? window.localStorage.getItem(STORAGE_KEY) : null;
-    if (stored === "en" || stored === "fa") setLocaleState(stored);
-  }, []);
+  const [locale, setLocaleState] = useState<Locale>(() => {
+    if (typeof window !== "undefined") {
+      const stored = window.localStorage.getItem(STORAGE_KEY);
+      if (stored === "en" || stored === "fa") return stored;
+    }
+    return "en";
+  });
 
   const setLocale = useCallback((l: Locale) => {
     setLocaleState(l);

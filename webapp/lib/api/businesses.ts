@@ -31,7 +31,7 @@ export function listBusinesses(): Promise<Business[]> {
   return apiRequest<BackendBusiness[]>("/api/businesses").then((rows) => rows.map(normalizeBusiness));
 }
 
-export function createBusiness(name: string, baseCurrency: BackendCurrency, language: "en" | "fa" = "fa") {
+export function createBusiness(name: string, baseCurrency: BackendCurrency, language: "en" | "fa" = "en") {
   return apiRequest<BackendBusiness>("/api/businesses", {
     method: "POST",
     body: { name, base_currency: baseCurrency, language },
