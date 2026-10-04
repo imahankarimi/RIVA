@@ -73,7 +73,7 @@ export function ChatInput({
         onKeyDown={handleKeyDown}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-        className="max-h-[120px] min-h-[40px] flex-1 resize-none bg-transparent py-2.5 text-[16px] leading-normal text-ink placeholder:text-ink-faint focus:outline-none"
+        className="max-h-[120px] min-h-[44px] flex-1 resize-none bg-transparent py-2 text-base leading-6 text-ink placeholder:text-ink-faint focus:outline-none"
       />
 
       <button
