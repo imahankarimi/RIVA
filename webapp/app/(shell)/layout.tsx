@@ -21,12 +21,12 @@ export default function ShellLayout({ children }: { children: React.ReactNode })
   return (
     <AuthGate>
       <AddIncomeProvider>
-        <div className="min-h-screen bg-paper font-sans text-ink antialiased md:h-screen">
-          <div className="flex min-h-screen md:h-screen md:overflow-hidden">
+        <div className="flex min-h-dvh flex-col bg-paper font-sans text-ink antialiased md:h-screen">
+          <div className="flex h-full md:overflow-hidden">
             <WebappSidebar />
-            <div className="flex min-w-0 flex-1 flex-col md:min-h-0">
+            <div className="flex min-w-0 flex-1 flex-col">
               <WebappDesktopBar />
-              <main className="min-w-0 flex-1 pb-36 pt-[4.5rem] md:overflow-y-auto md:pb-10 md:pt-[4.5rem]">
+              <main className="relative min-w-0 flex-1 overflow-y-auto overscroll-contain pt-[4.5rem] md:pb-10">
                 {children}
               </main>
             </div>
