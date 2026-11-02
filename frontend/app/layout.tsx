@@ -73,14 +73,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       dir="ltr"
-      data-locale="en"
       suppressHydrationWarning
+      className={`${inter.variable} ${manrope.variable} ${jetbrainsMono.variable} ${vazirmatn.variable} ${ibmPlexSans.variable}`}
     >
       <head>
         {/* Sets .dark on <html> before paint so there's no light->dark flash. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} />
       </head>
-      <body className={`${inter.variable} ${manrope.variable} ${jetbrainsMono.variable} ${vazirmatn.variable} ${ibmPlexSans.variable} font-sans`}>
+      <body className="font-sans">
         <Providers>{children}</Providers>
         <ServiceWorkerRegistration />
         <LiquidLensInstaller />
