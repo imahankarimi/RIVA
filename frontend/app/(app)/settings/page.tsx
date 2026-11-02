@@ -4,7 +4,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   User, Shield, Palette, Globe, HardDrive, ChevronRight, Lock, Plus,
-  Trash2, Pencil, LogOut, Sun, Moon, Monitor, Check, Loader2, Sparkle,
+  Trash2, Pencil, LogOut, Sun, Moon, Monitor, Check, Loader2, Sparkle, Eye, EyeOff,
 } from "lucide-react";
 import { Topbar } from "@/components/layout/Topbar";
 import { Button } from "@/components/ui/Button";
@@ -21,6 +21,8 @@ import { BusinessContextSection } from "@/components/settings/BusinessContextSec
 import { ImportExportModal } from "@/components/settings/ImportExportModal";
 import { useI18n, localeMeta, type Locale } from "@/lib/i18n";
 import { useBusiness, useAuth } from "@/app/providers";
+import { changePassword } from "@/lib/api/auth";
+import { ApiError } from "@/lib/api/client";
 import { useTheme } from "@/lib/theme/ThemeProvider";
 import { useRouter } from "next/navigation";
 import { usePreferences } from "@/lib/preferences/PreferencesProvider";
@@ -52,7 +54,7 @@ function SectionCard({
       variants={staggerItem}
       initial="hidden"
       animate="show"
-      className={cn("rounded-xl border border-line bg-surface", className)}
+      className={cn("rounded-xl border border-line bg-surface shadow-subtle transition-all duration-240 hover:shadow-card hover:border-signal-200/50 dark:hover:border-signal-800/40", className)}
     >
       <div className="flex items-baseline justify-between gap-4 border-b border-line-soft px-5 py-4">
         <div className="min-w-0">
@@ -74,6 +76,13 @@ function ProfileTab() {
   const [firstName, setFirstName] = useState(user?.firstName ?? "");
   const [lastName, setLastName] = useState(user?.lastName ?? "");
   const [saving, setSaving] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
 
   const displayName = user ? [user.firstName, user.lastName].filter(Boolean).join(" ") : "";
   const initials = displayName ? displayName.split(" ").map(n => n[0]).join("").toUpperCase() : (user?.email?.[0] ?? "?").toUpperCase();
@@ -88,6 +97,35 @@ function ProfileTab() {
     } catch {
       toast(locale === "fa" ? "ذخیره‌سازی ناموفق بود." : "Could not save profile.", { variant: "error" });
     } finally { setSaving(false); }
+  };
+
+  const handleChangePassword = async () => {
+    setPasswordError("");
+    if (newPassword !== confirmNewPassword) {
+      setPasswordError(t("auth.passwordMismatch"));
+      return;
+    }
+    if (newPassword.length < 8) {
+      setPasswordError(locale === "fa" ? "رمز عبور باید حداقل ۸ کاراکتر باشد." : "Password must be at least 8 characters.");
+      return;
+    }
+    setChangingPassword(true);
+    try {
+      await changePassword(currentPassword, newPassword);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmNewPassword("");
+      toast(t("auth.changePasswordSuccess"), { variant: "success" });
+      toast(t("auth.changePasswordOtherSessions"), { variant: "default" });
+    } catch (reason) {
+      if (reason instanceof ApiError) {
+        setPasswordError(reason.message || (locale === "fa" ? "تغییر رمز عبور ناموفق بود." : "Could not change password."));
+      } else {
+        setPasswordError(locale === "fa" ? "خطای غیرمنتظره." : "An unexpected error occurred.");
+      }
+    } finally {
+      setChangingPassword(false);
+    }
   };
 
   return (
@@ -112,6 +150,70 @@ function ProfileTab() {
         ) : (
           <Button variant="outline" onClick={() => { setFirstName(user?.firstName ?? ""); setLastName(user?.lastName ?? ""); setEditing(true); }}><Pencil size={14} />{t("common.edit")}</Button>
         )}
+      </SectionCard>
+
+      <SectionCard title={t("auth.changePassword")} description={t("auth.changePasswordBody")}>
+        <div className="space-y-3">
+          <div className="space-y-1.5">
+            <Label>{t("auth.currentPassword")}</Label>
+            <div className="relative">
+              <Input
+                type={showCurrentPassword ? "text" : "password"}
+                autoComplete="current-password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                className="pe-10"
+              />
+              <button
+                type="button"
+                tabIndex={-1}
+                onClick={() => setShowCurrentPassword((v) => !v)}
+                className="glass-lens absolute end-2 top-1/2 -translate-y-1/2 rounded p-1 text-ink-faint hover:text-ink transition-colors"
+                aria-label={showCurrentPassword ? t("common.off") : t("common.on")}
+              >
+                {showCurrentPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+              </button>
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label>{t("auth.newPassword")}</Label>
+            <div className="relative">
+              <Input
+                type={showNewPassword ? "text" : "password"}
+                autoComplete="new-password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="pe-10"
+              />
+              <button
+                type="button"
+                tabIndex={-1}
+                onClick={() => setShowNewPassword((v) => !v)}
+                className="glass-lens absolute end-2 top-1/2 -translate-y-1/2 rounded p-1 text-ink-faint hover:text-ink transition-colors"
+                aria-label={showNewPassword ? t("common.off") : t("common.on")}
+              >
+                {showNewPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+              </button>
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label>{t("auth.confirmPassword")}</Label>
+            <Input
+              type={showNewPassword ? "text" : "password"}
+              autoComplete="new-password"
+              value={confirmNewPassword}
+              onChange={(e) => setConfirmNewPassword(e.target.value)}
+            />
+          </div>
+          {passwordError && <Alert variant="destructive">{passwordError}</Alert>}
+          <Button
+            onClick={handleChangePassword}
+            disabled={changingPassword || !currentPassword || !newPassword || !confirmNewPassword}
+          >
+            {changingPassword && <Loader2 size={14} className="animate-spin" />}
+            {t("auth.changePasswordAction")}
+          </Button>
+        </div>
       </SectionCard>
 
       <SectionCard title={t("settings.logout")}><Button variant="ghost" onClick={logout} className="gap-2 text-rose-700 hover:bg-rose-100/50 hover:text-rose-700"><LogOut size={14} />{t("settings.logout")}</Button></SectionCard>
@@ -176,12 +278,12 @@ function BusinessTab() {
               <div className="flex items-center gap-1.5">
                 {b.id !== business.id && <Button size="sm" variant="ghost" onClick={() => setBusinessId(b.id)}>{t("settings.switchTo", { name: b.name })}</Button>}
                 {b.id === business.id && <span className="rounded-full bg-moss-100 px-2.5 py-1 text-[11px] font-medium text-moss-700">Active</span>}
-                {businesses.length > 1 && <button onClick={() => setPendingDeleteId(b.id)} className="rounded-md p-1.5 text-ink-faint hover:bg-rose-100/50 hover:text-rose-700"><Trash2 size={13} /></button>}
+                {businesses.length > 1 && <button onClick={() => setPendingDeleteId(b.id)} className="glass-lens rounded-md p-1.5 text-ink-faint hover:bg-rose-100/50 hover:text-rose-700"><Trash2 size={13} /></button>}
               </div>
             </div>
           ))}
         </div>
-        <button onClick={() => { setNewName(""); setNewCurrency(defaultCurrencyFor(locale)); setCreateOpen(true); }} className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-line py-2.5 text-[12.5px] font-medium text-ink-faint transition-colors hover:border-signal-300 hover:text-signal-700"><Plus size={13} />{t("settings.addBusiness")}</button>
+        <button onClick={() => { setNewName(""); setNewCurrency(defaultCurrencyFor(locale)); setCreateOpen(true); }} className="glass-lens mt-3 flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-line py-2.5 text-[12.5px] font-medium text-ink-faint transition-colors hover:border-signal-300 hover:text-signal-700"><Plus size={13} />{t("settings.addBusiness")}</button>
       </SectionCard>
 
       <Modal open={createOpen} onClose={() => setCreateOpen(false)} title={t("settings.createBusinessTitle")}>
@@ -330,7 +432,7 @@ export default function SettingsPage() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={cn(
-                    "flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium transition-colors duration-150 text-left",
+                    "glass-lens flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium transition-colors duration-150 text-left",
                     activeTab === tab.id
                       ? "bg-surfaceMuted text-ink"
                       : "text-ink-soft hover:bg-surfaceMuted/60 hover:text-ink"
@@ -344,7 +446,7 @@ export default function SettingsPage() {
             <Separator className="my-2" />
             <button
               onClick={() => { logout(); router.replace("/login"); }}
-              className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium text-rose-700 hover:bg-rose-100/40"
+              className="glass-lens flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium text-rose-700 hover:bg-rose-100/40"
             >
               <LogOut size={15} strokeWidth={1.8} />
               {t("settings.logout")}
@@ -360,7 +462,7 @@ export default function SettingsPage() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={cn(
-                    "flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-[12px] font-medium transition-colors whitespace-nowrap",
+                    "glass-lens flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-[12px] font-medium transition-colors whitespace-nowrap",
                     activeTab === tab.id
                       ? "bg-surfaceMuted text-ink"
                       : "text-ink-faint hover:bg-surfaceMuted/50 hover:text-ink"

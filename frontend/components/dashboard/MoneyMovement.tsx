@@ -75,7 +75,7 @@ export function MoneyMovement({
               key={o.value}
               onClick={() => setRange(o.value)}
               className={cn(
-                "h-full rounded-[5px] px-2.5 text-[11px] font-medium transition-all",
+                "glass-lens h-full rounded-[5px] px-2.5 text-[11px] font-medium transition-all",
                 range === o.value
                   ? "bg-background text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"

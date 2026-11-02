@@ -35,7 +35,7 @@ export function Switch({
       disabled={disabled}
       onClick={() => onChange(!checked)}
       className={cn(
-        "relative h-6 w-11 shrink-0 rounded-full border transition-colors duration-200",
+        "glass-lens relative h-6 w-11 shrink-0 rounded-full border transition-colors duration-200",
         checked ? "border-signal-500 bg-signal-500" : "border-line bg-surfaceMuted",
         disabled && "opacity-40 pointer-events-none"
       )}

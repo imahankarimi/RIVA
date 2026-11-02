@@ -105,7 +105,7 @@ function ToastContainer({
             <span className={cn("flex-1 text-[13px] leading-snug", textMap[t.variant])}>{t.message}</span>
             <button
               onClick={() => onDismiss(t.id)}
-              className={cn("shrink-0 mt-0.5 rounded p-0.5 transition-colors hover:bg-black/5", textMap[t.variant])}
+              className={cn("glass-lens shrink-0 mt-0.5 rounded p-0.5 transition-colors hover:bg-black/5", textMap[t.variant])}
               aria-label="Dismiss"
             >
               <X size={13} />

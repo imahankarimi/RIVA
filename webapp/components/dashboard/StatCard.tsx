@@ -43,24 +43,45 @@ export function StatCard({
   const t = toneStyles[tone];
 
   return (
-    <AnimatedCard delay={delay} className="relative overflow-hidden p-3.5 sm:p-4">
+    <AnimatedCard delay={delay} className="group relative overflow-hidden p-3.5 transition-all duration-240 hover:shadow-card hover:-translate-y-0.5 sm:p-4">
       {/* Subtle tonal accent at the top edge — ties the KPI to its semantic tone. */}
       <span
         aria-hidden
         className={cn(
-          "absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r to-transparent",
-          t.bar
+          "absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r to-transparent transition-all duration-300 group-hover:opacity-100 group-hover:h-[2.5px]",
+          t.bar,
+          "opacity-75"
         )}
       />
 
-      <div className="flex items-center justify-between gap-2">
+      {/* Inner glass reflection on hover */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-6 rounded-t-[inherit] bg-gradient-to-b from-white/30 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-white/8"
+      />
+
+      {/* Hover glow effect */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 transition-opacity duration-400 group-hover:opacity-100"
+        style={{
+          background: `radial-gradient(400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${
+            tone === 'positive' ? 'rgba(62,154,109,0.08)' :
+            tone === 'negative' ? 'rgba(181,67,58,0.08)' :
+            'rgba(113,135,155,0.06)'
+          }, transparent 40%)`
+        }}
+      />
+
+      <div className="relative flex items-center justify-between gap-2">
         <span className="text-[11px] font-semibold uppercase tracking-wider text-ink-faint">{label}</span>
 
         <motion.span
-          whileHover={{ scale: 1.08 }}
-          transition={{ type: "spring", stiffness: 400, damping: 20 }}
+          whileHover={{ scale: 1.08, rotate: 5 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 500, damping: 25 }}
           className={cn(
-            "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg",
+            "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg shadow-sm transition-all duration-300 group-hover:shadow-md",
             t.tile
           )}
         >
@@ -72,30 +93,33 @@ export function StatCard({
         value={value}
         format={format}
         className={cn(
-          "mt-3 block font-mono font-figures text-[16px] font-semibold tracking-tight sm:text-[18px]",
-          tone === "positive" && "text-moss-700",
-          tone === "negative" && "text-rose-700",
+          "relative mt-3 block font-mono font-figures text-[16px] font-semibold tracking-tight transition-colors duration-300 sm:text-[18px]",
+          tone === "positive" && "text-moss-700 dark:text-moss-500",
+          tone === "negative" && "text-rose-700 dark:text-rose-500",
           tone === "default" && "text-ink"
         )}
       />
 
-      {hasTrend && (
-        <div className="mt-2 flex items-center gap-1 text-[10.5px]">
-          <motion.span
-            initial={{ opacity: 0, x: -4 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: delay + 0.15 }}
-            className={cn(
-              "flex items-center gap-0.5 rounded-full px-1.5 py-0.5 font-semibold",
-              trendFavorable ? "bg-moss-100/70 text-moss-700" : "bg-rose-100/70 text-rose-700"
-            )}
-          >
-            {trendUp ? <ArrowUpRight size={11} strokeWidth={2.5} /> : <ArrowDownRight size={11} strokeWidth={2.5} />}
-            {Math.abs(trendPct as number).toFixed(1)}%
-          </motion.span>
-          {trendLabel && <span className="text-ink-faint">{trendLabel}</span>}
-        </div>
-      )}
+      {/* Always reserve space for trend to maintain consistent card heights across all metrics */}
+      <div className="mt-2 flex min-h-[24px] items-center gap-1 text-[10.5px]">
+        {hasTrend && (
+          <>
+            <motion.span
+              initial={{ opacity: 0, x: -4 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: delay + 0.15 }}
+              className={cn(
+                "flex items-center gap-0.5 rounded-full px-1.5 py-0.5 font-semibold",
+                trendFavorable ? "bg-moss-100/70 text-moss-700" : "bg-rose-100/70 text-rose-700"
+              )}
+            >
+              {trendUp ? <ArrowUpRight size={11} strokeWidth={2.5} /> : <ArrowDownRight size={11} strokeWidth={2.5} />}
+              {Math.abs(trendPct as number).toFixed(1)}%
+            </motion.span>
+            {trendLabel && <span className="text-ink-faint">{trendLabel}</span>}
+          </>
+        )}
+      </div>
     </AnimatedCard>
   );
 }

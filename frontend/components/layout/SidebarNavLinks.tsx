@@ -47,7 +47,7 @@ function NavLink({
       href={item.href}
       onClick={onNavigate}
       className={cn(
-        "group relative flex h-9 items-center gap-2.5 rounded-md px-3 text-[13px] font-medium",
+        "glass-lens group relative flex h-9 items-center gap-2.5 rounded-md px-3 text-[13px] font-medium",
         "transition-colors duration-150",
         collapsed && "justify-center px-0",
         active

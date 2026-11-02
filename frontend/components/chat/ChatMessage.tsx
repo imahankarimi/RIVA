@@ -56,7 +56,7 @@ export function ChatMessage({ message, onConfirm, onCancel, onChoice, isSubmitti
                         // ignore download failures — user keeps the chat intact
                       })
                     }
-                    className="flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-[12.5px] font-medium text-ink-soft transition-colors hover:border-signal-300 hover:text-signal-700"
+                    className="glass-lens flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-[12.5px] font-medium text-ink-soft transition-colors hover:border-signal-300 hover:text-signal-700"
                   >
                     <Download size={13} />
                     {exp.filename}

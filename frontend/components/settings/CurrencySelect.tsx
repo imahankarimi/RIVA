@@ -30,7 +30,7 @@ export function CurrencySelect({
           type="button"
           onClick={() => setOpen((v) => !v)}
           onBlur={() => setTimeout(() => setOpen(false), 120)}
-          className="flex h-11 w-full items-center justify-between rounded-md border border-line bg-surface px-3 text-[14px] text-ink outline-none transition focus:border-signal-500 focus:ring-2 focus:ring-signal-100"
+          className="glass-lens flex h-11 w-full items-center justify-between rounded-md border border-line bg-surface px-3 text-[14px] text-ink outline-none transition focus:border-signal-500 focus:ring-2 focus:ring-signal-100"
         >
           <span className="flex items-center gap-2">
             <span aria-hidden>{meta.flag}</span>
@@ -59,7 +59,7 @@ export function CurrencySelect({
                     setOpen(false);
                   }}
                   className={cn(
-                    "flex w-full items-center justify-between px-3 py-2.5 text-start text-[13.5px] transition-colors duration-150 hover:bg-surfaceMuted",
+                    "glass-lens flex w-full items-center justify-between px-3 py-2.5 text-start text-[13.5px] transition-colors duration-150 hover:bg-surfaceMuted",
                     c === value ? "text-signal-700" : "text-ink-soft"
                   )}
                 >

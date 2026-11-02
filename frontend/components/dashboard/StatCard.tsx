@@ -79,23 +79,26 @@ export function StatCard({
         )}
       />
 
-      {hasTrend && (
-        <div className="mt-2 flex items-center gap-1 text-[11.5px]">
-          <motion.span
-            initial={{ opacity: 0, x: -4 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: delay + 0.15 }}
-            className={cn(
-              "flex items-center gap-0.5 rounded-full px-1.5 py-0.5 font-medium",
-              trendFavorable ? "bg-moss-100/70 text-moss-700" : "bg-rose-100/70 text-rose-700"
-            )}
-          >
-            {trendUp ? <ArrowUpRight size={12} strokeWidth={2.4} /> : <ArrowDownRight size={12} strokeWidth={2.4} />}
-            {Math.abs(trendPct as number).toFixed(1)}%
-          </motion.span>
-          {trendLabel && <span className="text-ink-faint">{trendLabel}</span>}
-        </div>
-      )}
+      {/* Always reserve space for trend to maintain consistent card heights */}
+      <div className="mt-2 flex min-h-[26px] items-center gap-1 text-[11.5px]">
+        {hasTrend && (
+          <>
+            <motion.span
+              initial={{ opacity: 0, x: -4 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: delay + 0.15 }}
+              className={cn(
+                "flex items-center gap-0.5 rounded-full px-1.5 py-0.5 font-medium",
+                trendFavorable ? "bg-moss-100/70 text-moss-700" : "bg-rose-100/70 text-rose-700"
+              )}
+            >
+              {trendUp ? <ArrowUpRight size={12} strokeWidth={2.4} /> : <ArrowDownRight size={12} strokeWidth={2.4} />}
+              {Math.abs(trendPct as number).toFixed(1)}%
+            </motion.span>
+            {trendLabel && <span className="text-ink-faint">{trendLabel}</span>}
+          </>
+        )}
+      </div>
     </AnimatedCard>
   );
 }

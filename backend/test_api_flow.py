@@ -59,7 +59,7 @@ class ApiFlowTests(unittest.TestCase):
         self.email = f"owner-{uuid.uuid4().hex[:8]}@example.com"
         r = self.client.post("/api/auth/signup", json={
             "email": self.email,
-            "password": "password123",
+            "password": "RivaTest123",
             "business_name": self.signup_biz,
             "base_currency": "IRR",
         })

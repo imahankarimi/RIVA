@@ -55,7 +55,7 @@ export function ImportExportModal({
           <button
             key={id}
             onClick={() => setTab(id)}
-            className={`flex-1 rounded-md py-2 text-[13px] font-medium transition-colors duration-150 ${
+            className={`glass-lens flex-1 rounded-md py-2 text-[13px] font-medium transition-colors duration-150 ${
               tab === id ? "bg-surface text-ink shadow-subtle" : "text-ink-faint hover:text-ink-soft"
             }`}
           >
@@ -315,7 +315,7 @@ function ImportPanel() {
               <p className="text-[11.5px] text-ink-faint">{fileMeta.sizeKb} KB</p>
             </div>
           </div>
-          <button onClick={reset} className="text-[12px] font-medium text-signal-600 hover:text-signal-700">
+          <button onClick={reset} className="glass-lens text-[12px] font-medium text-signal-600 hover:text-signal-700">
             {t("common.close")}
           </button>
         </div>

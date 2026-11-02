@@ -50,7 +50,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         whileTap={disabled ? undefined : { scale: 0.97 }}
         transition={SPRING_SNAPPY}
         className={cn(
-          "inline-flex items-center justify-center font-medium transition-colors duration-150 ease-out",
+          "glass-lens inline-flex items-center justify-center font-medium transition-colors duration-150 ease-out",
           "disabled:opacity-40 disabled:pointer-events-none",
           "min-h-[44px] sm:min-h-0", // touch target on small screens
           variants[variant],

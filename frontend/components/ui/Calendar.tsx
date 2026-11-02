@@ -159,7 +159,7 @@ function Calendar({
                 onMouseEnter={() => setHovered(day)}
                 onMouseLeave={() => setHovered(null)}
                 className={cn(
-                  "relative flex h-8 items-center justify-center text-[12px] tabular-nums transition-colors duration-100",
+                  "glass-lens relative flex h-8 items-center justify-center text-[12px] tabular-nums transition-colors duration-100",
                   inSel && "bg-signal-50 text-ink",
                   start && "rounded-l-md bg-signal-500 text-onSignal",
                   end && "rounded-r-md bg-signal-500 text-onSignal",
@@ -193,7 +193,7 @@ function Calendar({
           type="button"
           aria-label="Previous month"
           onClick={() => setMonthIndex((m) => Math.max(0, m - 1))}
-          className="flex h-8 w-8 items-center justify-center rounded-md text-ink-soft transition-colors hover:bg-surfaceMuted hover:text-ink"
+          className="glass-lens flex h-8 w-8 items-center justify-center rounded-md text-ink-soft transition-colors hover:bg-surfaceMuted hover:text-ink"
         >
           {dir === "rtl" ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
         </button>
@@ -208,7 +208,7 @@ function Calendar({
           aria-label="Next month"
           onClick={() => setMonthIndex((m) => m + 1)}
           className={cn(
-            "flex h-8 w-8 items-center justify-center rounded-md text-ink-soft transition-colors hover:bg-surfaceMuted hover:text-ink",
+            "glass-lens flex h-8 w-8 items-center justify-center rounded-md text-ink-soft transition-colors hover:bg-surfaceMuted hover:text-ink",
             !canNext && "pointer-events-none opacity-40"
           )}
         >

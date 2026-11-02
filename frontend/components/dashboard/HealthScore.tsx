@@ -258,7 +258,7 @@ function FactorDetail({ factor, onClose }: { factor: HealthFactor; onClose: () =
             </span>
           </div>
         </div>
-        <button type="button" onClick={onClose} className="rounded-full p-1 hover:bg-muted">
+        <button type="button" onClick={onClose} className="glass-lens rounded-full p-1 hover:bg-muted">
           <XIcon className="size-3.5 text-muted-foreground" />
         </button>
       </div>
@@ -334,7 +334,7 @@ export function HealthScoreCard({ stats }: { stats: OverviewStats }) {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.6 + i * 0.06 }}
                         onClick={() => setSelectedFactor(factor)}
-                        className="flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-muted/50"
+                        className="glass-lens flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-muted/50"
                       >
                         <div className={cn("flex size-6 shrink-0 items-center justify-center rounded-md", cfg.bg, cfg.text)}>
                           {factorIcons[factor.id]}

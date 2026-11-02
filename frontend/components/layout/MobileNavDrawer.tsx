@@ -37,7 +37,7 @@ export function MobileNavDrawer() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
             onClick={closeMobile}
-            className="fixed inset-0 z-40 bg-ink/20 backdrop-blur-[1px] lg:hidden"
+            className="fixed inset-0 z-40 bg-ink/25 backdrop-blur-md dark:bg-ink/35 lg:hidden"
             aria-hidden
           />
           <motion.aside
@@ -61,7 +61,7 @@ export function MobileNavDrawer() {
               </div>
               <button
                 onClick={closeMobile}
-                className="flex h-8 w-8 items-center justify-center rounded-md text-ink-faint hover:bg-surfaceMuted hover:text-ink"
+                className="glass-lens flex h-8 w-8 items-center justify-center rounded-md text-ink-faint hover:bg-surfaceMuted hover:text-ink"
                 aria-label={t("common.close")}
               >
                 <X size={16} />
@@ -107,7 +107,7 @@ export function MobileNavDrawer() {
               </Link>
               <button
                 onClick={handleLogout}
-                className="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-start text-[13px] text-rose-700 transition-colors duration-150 hover:bg-rose-100/50"
+                className="glass-lens flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-start text-[13px] text-rose-700 transition-colors duration-150 hover:bg-rose-100/50"
               >
                 <LogOut size={14} />
                 {t("settings.logout")}

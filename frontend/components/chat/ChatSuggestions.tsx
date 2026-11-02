@@ -13,7 +13,7 @@ export function ChatSuggestions({ onPick }: { onPick: (text: string) => void }) 
         <button
           key={key}
           onClick={() => onPick(t(`assistant.suggestions.${key}`))}
-          className="flex min-h-[38px] items-center gap-1.5 rounded-full border border-line bg-surface px-3.5 text-[13px] font-medium text-ink-soft transition-colors duration-150 hover:border-signal-300 hover:text-signal-700"
+          className="glass-lens flex min-h-[38px] items-center gap-1.5 rounded-full border border-line bg-surface px-3.5 text-[13px] font-medium text-ink-soft transition-colors duration-150 hover:border-signal-300 hover:text-signal-700"
         >
           <Sparkle size={13} className="text-signal-500" />
           {t(`assistant.suggestions.${key}`)}

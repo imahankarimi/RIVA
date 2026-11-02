@@ -6,7 +6,9 @@
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start -p 3001",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "design:check": "node ../design-system/validate.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",

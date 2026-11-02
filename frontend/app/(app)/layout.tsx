@@ -1,3 +1,5 @@
+"use client";
+
 import { Sidebar } from "@/components/layout/Sidebar";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { MobileNavDrawer } from "@/components/layout/MobileNavDrawer";
@@ -14,7 +16,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="flex h-screen overflow-hidden bg-paper">
             <Sidebar />
             <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-              <main className="flex min-w-0 flex-1 flex-col overflow-y-auto pb-16 lg:pb-0">
+              {/*
+                Bottom padding clears the FLOATING navigation bar rather than a
+                static one. The bar is ~64px tall and floats
+                `max(env(safe-area-inset-bottom), 12px)` above the bottom edge,
+                so 80px + the safe area guarantees the last row of a list is
+                never hidden behind it. Desktop (`lg`) has a sidebar, not a bar,
+                so it needs no padding.
+              */}
+              <main className="flex min-w-0 flex-1 flex-col overflow-y-auto pb-[calc(env(safe-area-inset-bottom)+80px)] lg:pb-0">
                 {children}
               </main>
             </div>

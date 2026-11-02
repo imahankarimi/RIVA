@@ -49,8 +49,12 @@ export default function AnalyticsPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <Topbar title={t("analytics.title")} subtitle={t("analytics.subtitle")} />
-      <div className="mx-auto w-full max-w-content flex-1 px-4 py-6 sm:px-6">
-        {usingDemoData && <Alert variant="warning" className="mb-4">{t("common.demoDataNotice")}</Alert>}
+      <div className="relative mx-auto w-full max-w-content flex-1 px-4 py-6 sm:px-6">
+        {/* Subtle ambient gradient for analytics context */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[350px] bg-gradient-to-b from-signal-50/25 via-transparent to-transparent dark:from-signal-950/18" />
+
+        <div className="relative">
+          {usingDemoData && <Alert variant="warning" className="mb-4">{t("common.demoDataNotice")}</Alert>}
         {status === "loading" && <LoadingState label={t("common.loading")} />}
         {status === "error" && <ErrorState title={t("reports.loadErrorTitle")} body={error ?? t("reports.loadErrorBody")} onRetry={refetch} retryLabel={t("common.retry")} />}
 
@@ -69,16 +73,16 @@ export default function AnalyticsPage() {
               <span className="text-[12px] font-medium text-ink-faint">
                 {t("analytics.period")}:
               </span>
-              <div className="flex gap-1 rounded-lg bg-surfaceMuted p-1">
+              <div className="flex gap-1 rounded-lg bg-surfaceMuted p-1 shadow-sm">
                 {PERIOD_OPTIONS.map((p) => (
                   <button
                     key={p}
                     onClick={() => setPeriod(p)}
                     className={cn(
-                      "rounded-md px-2.5 py-1.5 text-[12px] font-medium transition-all",
+                      "rounded-md px-2.5 py-1.5 text-[12px] font-medium transition-all duration-180",
                       p === period
                         ? "bg-surface text-ink shadow-subtle"
-                        : "text-ink-soft hover:text-ink"
+                        : "text-ink-soft hover:bg-surface/50 hover:text-ink"
                     )}
                   >
                     {t(PERIOD_LABEL_KEY[p])}
@@ -103,6 +107,7 @@ export default function AnalyticsPage() {
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

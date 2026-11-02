@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RIVA Sidebar Bug Reproduction - Real Component</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/framer-motion@11/dist/framer-motion.js"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <style>
+    /* Load the ACTUAL compiled CSS from the dev server */
+    @import url('http://localhost:3002/_next/static/css/app/layout.css');
+  </style>
+</head>
+<body>
+  <div style="position: fixed; top: 10px; right: 10px; z-index: 1000;">
+    <button onclick="document.documentElement.classList.toggle('dark')"
+            style="padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer;">
+      Toggle Dark Mode
+    </button>
+  </div>
+
+  <div style="position: fixed; bottom: 10px; right: 10px; background: rgba(0,0,0,0.9); color: white; padding: 16px; border-radius: 8px; max-width: 400px; font-size: 12px; z-index: 1000;">
+    <strong>Actual Bug Reproduction:</strong><br><br>
+    1. Click different navigation items to trigger the selection animation<br>
+    2. Look for:<br>
+    &nbsp;&nbsp;• Does the selected item protrude beyond others?<br>
+    &nbsp;&nbsp;• Is there a dot in Light Mode?<br>
+    &nbsp;&nbsp;• Does the animation work smoothly?<br>
+    3. Toggle Dark Mode - does the dot disappear?
+  </div>
+
+  <!-- This will be replaced with actual Sidebar content via fetch -->
+  <div id="sidebar-mount"></div>
+
+  <script>
+    // Fetch the actual overview page and extract the Sidebar
+    fetch('http://localhost:3002/overview')
+      .then(r => r.text())
+      .then(html => {
+        // This won't work due to auth, but let's try a different approach
+        console.log('Could not fetch authenticated page');
+        document.getElementById('sidebar-mount').innerHTML = `
+          <p style="padding: 20px; color: red;">
+            Cannot access authenticated Sidebar without login.<br><br>
+            Testing approach: I need to either:<br>
+            1. Create a test user in the backend<br>
+            2. Temporarily disable auth middleware<br>
+            3. Extract the Sidebar component and render it standalone<br><br>
+            Without access to the actual authenticated Sidebar,<br>
+            I cannot reproduce the real bug the user is seeing.
+          </p>
+        `;
+      })
+      .catch(e => {
+        console.error('Fetch failed:', e);
+        document.getElementById('sidebar-mount').innerHTML = '<p style="padding: 20px;">Auth blocked</p>';
+      });
+  </script>
+</body>
+</html>

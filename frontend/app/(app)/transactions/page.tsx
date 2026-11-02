@@ -49,7 +49,9 @@ export default function TransactionsPage() {
     <div className="flex min-h-screen flex-col">
       <Topbar title={t("transactions.title")} subtitle={t("transactions.subtitle")} />
 
-      <div className="mx-auto w-full max-w-content flex-1 px-4 py-6 sm:px-6">
+      <div className="relative mx-auto w-full max-w-content flex-1 px-4 py-6 sm:px-6">
+        {/* Subtle ambient gradient */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[300px] bg-gradient-to-b from-signal-50/20 to-transparent dark:from-signal-950/15" />
         {usingDemoData && status !== "loading" && (
           <Alert variant="warning" className="mb-3">{t("common.demoDataNotice")}</Alert>
         )}
@@ -91,7 +93,7 @@ export default function TransactionsPage() {
           </div>
         </div>
 
-        <Card className="mt-3 overflow-hidden p-0">
+        <Card className="relative mt-3 overflow-hidden p-0 transition-all duration-240 hover:shadow-card hover:ring-signal-200/50 dark:hover:ring-signal-800/40">
           {status === "loading" && <LoadingState label={t("common.loading")} />}
 
           {status === "error" && (

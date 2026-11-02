@@ -104,7 +104,7 @@ function DialogHeader({
       <button
         onClick={onClose ?? ctxOnClose}
         aria-label="Close"
-        className="flex h-8 w-8 items-center justify-center rounded-md text-ink-faint hover:bg-surfaceMuted hover:text-ink"
+        className="glass-lens flex h-8 w-8 items-center justify-center rounded-md text-ink-faint hover:bg-surfaceMuted hover:text-ink"
       >
         <X size={16} />
       </button>

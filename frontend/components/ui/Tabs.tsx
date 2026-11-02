@@ -83,7 +83,7 @@ function TabsTrigger({
       disabled={disabled}
       onClick={() => setActiveTab(value)}
       className={cn(
-        "relative inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5",
+        "glass-lens relative inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5",
         "text-[13px] font-medium transition-colors duration-150",
         isActive ? "bg-surface text-ink shadow-subtle" : "text-ink-soft hover:text-ink",
         "disabled:opacity-40 disabled:pointer-events-none",

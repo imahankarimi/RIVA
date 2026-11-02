@@ -51,15 +51,17 @@ function NavLink({
   const active =
     pathname === item.href || pathname?.startsWith(`${item.href}/`);
   const Icon = item.icon;
+  const showSoon = "soon" in item && item.soon;
 
   return (
     <Link
       href={item.href}
       onClick={onNavigate}
       className={cn(
-        "group relative flex h-9 items-center gap-2.5 rounded-lg px-3 text-[13px] font-medium",
+        "glass-lens group relative flex h-9 items-center gap-2.5 rounded-lg px-3 text-[13px] font-medium",
         "transition-colors duration-150",
         collapsed && "justify-center px-0",
+        !collapsed && showSoon && "justify-between",
         active
           ? "text-deep-ink dark:text-warm-white"
           : "text-deep-ink/60 hover:bg-white/50 hover:text-deep-ink dark:text-warm-white/60 dark:hover:bg-white/10 dark:hover:text-warm-white"
@@ -73,20 +75,38 @@ function NavLink({
         />
       )}
 
-      <Icon
-        size={16}
-        strokeWidth={2}
-        className={cn(
-          "relative shrink-0 transition-colors duration-150",
-          active
-            ? "text-signal-600"
-            : "text-deep-ink/50 group-hover:text-deep-ink dark:text-warm-white/50 dark:group-hover:text-warm-white"
-        )}
-      />
-
       {!collapsed && (
-        <span className="relative whitespace-pre text-[13px] font-medium">
-          {t(item.labelKey)}
+        <span className="relative flex items-center gap-2.5 whitespace-pre">
+          <Icon
+            size={16}
+            strokeWidth={2}
+            className={cn(
+              "relative shrink-0 transition-colors duration-150",
+              active
+                ? "text-signal-600"
+                : "text-deep-ink/50 group-hover:text-deep-ink dark:text-warm-white/50 dark:group-hover:text-warm-white"
+            )}
+          />
+          <span className="text-[13px] font-medium">{t(item.labelKey)}</span>
+        </span>
+      )}
+
+      {collapsed && (
+        <Icon
+          size={16}
+          strokeWidth={2}
+          className={cn(
+            "relative shrink-0 transition-colors duration-150",
+            active
+              ? "text-signal-600"
+              : "text-deep-ink/50 group-hover:text-deep-ink dark:text-warm-white/50 dark:group-hover:text-warm-white"
+          )}
+        />
+      )}
+
+      {!collapsed && showSoon && (
+        <span className="relative inline-flex items-center rounded-full border border-deep-ink/10 bg-white/50 px-2 py-0.5 text-[10px] font-medium leading-none text-deep-ink/50 dark:border-warm-white/15 dark:bg-white/10 dark:text-warm-white/50">
+          {t("common.soon")}
         </span>
       )}
     </Link>

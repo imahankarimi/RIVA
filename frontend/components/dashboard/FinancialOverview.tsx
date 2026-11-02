@@ -74,7 +74,7 @@ export function FinancialOverview({
   }, [data]);
 
   return (
-    <Card className="min-h-0">
+    <Card className="min-h-0 transition-all duration-240 hover:shadow-card hover:ring-signal-200/60 hover:-translate-y-0.5 dark:hover:ring-signal-800/40">
       <CardHeader className="flex flex-col gap-3 space-y-0 pb-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
           <CardTitle className="text-base font-semibold">
@@ -82,7 +82,7 @@ export function FinancialOverview({
           </CardTitle>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
             <span className="flex items-center gap-1.5">
-              <span className="size-2 rounded-full bg-primary" />
+              <span className="size-2 rounded-full bg-primary shadow-[0_0_4px_rgba(113,135,155,0.4)]" />
               {t("overview.revenue")}
               <span className="font-medium text-foreground">
                 {formatCurrency(totals.current, currency, locale)}

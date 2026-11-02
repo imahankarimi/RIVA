@@ -66,7 +66,7 @@ class ConfirmFeedbackTests(unittest.TestCase):
 
     def _signup(self, email, name, currency):
         r = self.client.post("/api/auth/signup", json={
-            "email": email, "password": "password123",
+            "email": email, "password": "RivaTest123",
             "business_name": name, "base_currency": currency,
         })
         self.assertEqual(r.status_code, 201)

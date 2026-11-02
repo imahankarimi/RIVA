@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RIVA PWA Icon Generator</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    h1 { color: #0B0D40; }
+    .converter {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    canvas {
+      border: 1px solid #ddd;
+      margin: 10px 0;
+      display: block;
+    }
+    button {
+      background: #0B0D40;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover { background: #1a1f6e; }
+    button:disabled { background: #ccc; cursor: not-allowed; }
+    .preview { margin: 20px 0; }
+    .status { padding: 10px; border-radius: 4px; margin: 10px 0; }
+    .status.success { background: #d4edda; color: #155724; }
+    .status.error { background: #f8d7da; color: #721c24; }
+    .icon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .icon-card {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .icon-card canvas {
+      margin: 10px auto;
+    }
+    code {
+      background: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎨 RIVA PWA Icon Generator</h1>
+
+  <div class="converter">
+    <h2>Generate Centered Icons</h2>
+    <p>This tool converts the SVG source files to properly sized PNG icons for the PWA manifest.</p>
+
+    <div id="status"></div>
+
+    <button onclick="generateAllIcons()">Generate All Icons</button>
+    <button onclick="downloadAll()">Download All PNGs</button>
+
+    <div class="icon-grid">
+      <div class="icon-card">
+        <h3>icon-192.png</h3>
+        <canvas id="canvas-192" width="192" height="192"></canvas>
+        <button onclick="downloadIcon('192')">Download</button>
+      </div>
+
+      <div class="icon-card">
+        <h3>icon-512.png</h3>
+        <canvas id="canvas-512" width="512" height="512"></canvas>
+        <button onclick="downloadIcon('512')">Download</button>
+      </div>
+
+      <div class="icon-card">
+        <h3>icon-512-maskable.png</h3>
+        <canvas id="canvas-512-maskable" width="512" height="512"></canvas>
+        <button onclick="downloadIcon('512-maskable')">Download</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const svgSources = {
+      '192': '/icons/icon-192-source.svg',
+      '512': '/icons/icon-512-source.svg',
+      '512-maskable': '/icons/icon-512-maskable-source.svg'
+    };
+
+    const generatedImages = {};
+
+    function showStatus(message, isError = false) {
+      const statusDiv = document.getElementById('status');
+      statusDiv.className = `status ${isError ? 'error' : 'success'}`;
+      statusDiv.textContent = message;
+      setTimeout(() => statusDiv.textContent = '', 5000);
+    }
+
+    async function loadAndRenderSVG(svgPath, canvasId, size) {
+      try {
+        const response = await fetch(svgPath);
+        const svgText = await response.text();
+
+        const canvas = document.getElementById(`canvas-${canvasId}`);
+        const ctx = canvas.getContext('2d');
+
+        const img = new Image();
+        const blob = new Blob([svgText], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+
+        return new Promise((resolve, reject) => {
+          img.onload = () => {
+            ctx.clearRect(0, 0, size, size);
+            ctx.drawImage(img, 0, 0, size, size);
+            URL.revokeObjectURL(url);
+
+            canvas.toBlob((blob) => {
+              generatedImages[canvasId] = blob;
+              resolve();
+            }, 'image/png');
+          };
+          img.onerror = reject;
+          img.src = url;
+        });
+      } catch (error) {
+        console.error(`Error loading ${svgPath}:`, error);
+        throw error;
+      }
+    }
+
+    async function generateAllIcons() {
+      try {
+        showStatus('Generating icons...');
+
+        await loadAndRenderSVG(svgSources['192'], '192', 192);
+        await loadAndRenderSVG(svgSources['512'], '512', 512);
+        await loadAndRenderSVG(svgSources['512-maskable'], '512-maskable', 512);
+
+        showStatus('✅ All icons generated successfully!');
+      } catch (error) {
+        showStatus('❌ Error generating icons: ' + error.message, true);
+      }
+    }
+
+    function downloadIcon(canvasId) {
+      const canvas = document.getElementById(`canvas-${canvasId}`);
+      const link = document.createElement('a');
+      link.download = `icon-${canvasId}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    async function downloadAll() {
+      if (Object.keys(generatedImages).length === 0) {
+        await generateAllIcons();
+      }
+
+      downloadIcon('192');
+      setTimeout(() => downloadIcon('512'), 100);
+      setTimeout(() => downloadIcon('512-maskable'), 200);
+
+      showStatus('📥 Downloading all icons...');
+    }
+
+    // Auto-generate on page load
+    window.addEventListener('load', () => {
+      setTimeout(generateAllIcons, 500);
+    });
+  </script>
+</body>
+</html>

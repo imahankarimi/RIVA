@@ -20,12 +20,15 @@ export default function AssistantPage() {
     <div className="flex min-h-screen flex-col">
       <Topbar title={t("assistant.title")} subtitle={t("assistant.subtitle")} />
 
-      <div className="mx-auto flex w-full max-w-content items-center justify-end gap-1.5 px-4 pt-3 sm:px-6">
+      <div className="relative mx-auto flex w-full max-w-content items-center justify-end gap-1.5 px-4 pt-3 sm:px-6">
+        {/* Subtle ambient gradient for AI context */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[400px] bg-[radial-gradient(ellipse_at_top,rgba(113,135,155,0.06),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top,rgba(113,135,155,0.1),transparent_60%)]" />
+
         <motion.button
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
           onClick={history.startNew}
-          className="flex h-8 items-center gap-1.5 rounded-md px-2.5 text-[12.5px] font-medium text-ink-soft hover:bg-surfaceMuted hover:text-ink"
+          className="glass-lens relative flex h-8 items-center gap-1.5 rounded-md px-2.5 text-[12.5px] font-medium text-ink-soft transition-all duration-180 hover:bg-surfaceMuted hover:text-ink hover:shadow-sm"
         >
           <Plus size={14} />
           {t("assistant.newChat")}
@@ -34,7 +37,7 @@ export default function AssistantPage() {
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
           onClick={() => setHistoryOpen(true)}
-          className="flex h-8 items-center gap-1.5 rounded-md px-2.5 text-[12.5px] font-medium text-ink-soft hover:bg-surfaceMuted hover:text-ink"
+          className="glass-lens relative flex h-8 items-center gap-1.5 rounded-md px-2.5 text-[12.5px] font-medium text-ink-soft transition-all duration-180 hover:bg-surfaceMuted hover:text-ink hover:shadow-sm"
         >
           <HistoryIcon size={14} />
           {t("assistant.history")}

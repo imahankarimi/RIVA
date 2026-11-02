@@ -95,6 +95,11 @@ RATE_LIMITS = {
     # bursts, tight enough to deter a single-IP credential spray.
     "auth_login": (20, 300),  # 20 attempts per 5 minutes per IP (was 5)
     "auth_signup": (20, 3600),  # 20 signups per hour per IP (was 3)
+    # Password reset: throttle by IP (all requests) AND by normalized account
+    # (so one victim's inbox can't be mail-bombed from a single identifier).
+    "auth_pwreset_request": (10, 900),  # 10 reset requests per 15 min per IP
+    "auth_pwreset_account": (3, 900),  # 3 reset requests per 15 min per account
+    "auth_pwreset_complete": (10, 900),  # 10 submissions per 15 min per IP
     # AI: burst protection for spam, sustained cap for cost control. The burst
     # window must tolerate a human rapidly sending a few messages (typing +
     # retries), while still rejecting programmatic fire-and-forget loops.
@@ -109,17 +114,26 @@ RATE_LIMITS = {
 # ---------------------------------------------------------------------------
 
 def get_client_ip(request: Request) -> str:
-    """Extract client IP from request headers (handles proxies)."""
-    # Check common proxy headers
-    forwarded = request.headers.get("X-Forwarded-For")
-    if forwarded:
-        return forwarded.split(",")[0].strip()
+    """Extract client IP, honoring forwarded headers ONLY behind a trusted proxy.
 
-    real_ip = request.headers.get("X-Real-IP")
-    if real_ip:
-        return real_ip.strip()
+    Security: `X-Forwarded-For` / `X-Real-IP` are attacker-controlled when the
+    app is directly reachable. Trusting them unconditionally lets a client
+    rotate a fake XFF value on every request and bypass every IP-based rate
+    limit. They are therefore read only when TRUST_PROXY_HEADERS=true — set
+    that only when the app sits behind a proxy/load balancer that overwrites
+    these headers (e.g. Render). Default is secure (direct client host).
+    """
+    if os.getenv("TRUST_PROXY_HEADERS", "false").lower() == "true":
+        # Left-most entry is the original client as recorded by the proxy.
+        forwarded = request.headers.get("X-Forwarded-For")
+        if forwarded:
+            return forwarded.split(",")[0].strip()
 
-    # Fallback to direct client
+        real_ip = request.headers.get("X-Real-IP")
+        if real_ip:
+            return real_ip.strip()
+
+    # Direct client (default / untrusted-proxy path).
     if request.client:
         return request.client.host
 
@@ -131,6 +145,32 @@ def rate_limit_key(request: Request, user_id: str | None = None) -> str:
     if user_id:
         return f"user:{user_id}"
     return f"ip:{get_client_ip(request)}"
+
+
+def _enforce_rate_limit(
+    limit_type: str,
+    key: str,
+    max_requests: int,
+    window_seconds: int,
+    info: dict,
+) -> None:
+    """Raise the canonical 429 when a limit is exceeded."""
+    retry_after = info.get("retry_after", window_seconds)
+    raise HTTPException(
+        status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+        detail={
+            "error": "Rate limit exceeded",
+            "retry_after": retry_after,
+            "limit": max_requests,
+            "window": window_seconds,
+        },
+        headers={
+            "Retry-After": str(retry_after),
+            "X-RateLimit-Limit": str(max_requests),
+            "X-RateLimit-Remaining": "0",
+            "X-RateLimit-Reset": str(info["reset"]),
+        },
+    )
 
 
 def check_rate_limit(
@@ -165,22 +205,26 @@ def check_rate_limit(
     request.state.rate_limit_reset = info.get("reset", 0)
 
     if not allowed:
-        retry_after = info.get("retry_after", window_seconds)
-        raise HTTPException(
-            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail={
-                "error": "Rate limit exceeded",
-                "retry_after": retry_after,
-                "limit": max_requests,
-                "window": window_seconds,
-            },
-            headers={
-                "Retry-After": str(retry_after),
-                "X-RateLimit-Limit": str(max_requests),
-                "X-RateLimit-Remaining": "0",
-                "X-RateLimit-Reset": str(info["reset"]),
-            },
-        )
+        _enforce_rate_limit(limit_type, key, max_requests, window_seconds, info)
+
+
+def check_rate_limit_by_identifier(limit_type: str, identifier: str) -> None:
+    """Rate-limit keyed by an explicit identifier (e.g. a normalized email).
+
+    Used alongside the IP check so an account-identifier limit cannot be
+    bypassed by rotating source IPs, and vice versa. The identifier is
+    normalized by the caller (lowercased) so it never leaks existence — the
+    same bucket is used whether or not the account exists.
+    """
+    if limit_type not in RATE_LIMITS:
+        return
+
+    max_requests, window_seconds = RATE_LIMITS[limit_type]
+    key = f"{limit_type}:id:{identifier.lower()}"
+
+    allowed, info = _limiter.check_rate_limit(key, max_requests, window_seconds)
+    if not allowed:
+        _enforce_rate_limit(limit_type, key, max_requests, window_seconds, info)
 
 
 # ---------------------------------------------------------------------------

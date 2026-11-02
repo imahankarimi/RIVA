@@ -154,7 +154,7 @@ function DateRangePicker({
                 onMouseEnter={() => setHovered(day)}
                 onMouseLeave={() => setHovered(null)}
                 className={cn(
-                  "relative flex h-7 items-center justify-center text-[11px] font-medium transition-all duration-100 rounded-sm",
+                  "glass-lens relative flex h-7 items-center justify-center text-[11px] font-medium transition-all duration-100 rounded-sm",
                   inSel && "bg-primary/15 text-foreground",
                   start && "rounded-l-md bg-primary text-primary-foreground",
                   end && "rounded-r-md bg-primary text-primary-foreground",
@@ -188,7 +188,7 @@ function DateRangePicker({
           type="button"
           aria-label="Previous month"
           onClick={() => setMonthIndex((m) => Math.max(0, m - 1))}
-          className="flex h-8 px-3 items-center justify-center rounded-md border border-border text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className="glass-lens flex h-8 px-3 items-center justify-center rounded-md border border-border text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           ← Earlier
         </button>
@@ -205,7 +205,7 @@ function DateRangePicker({
           type="button"
           aria-label="Next month"
           onClick={() => setMonthIndex((m) => m + 1)}
-          className="flex h-8 px-3 items-center justify-center rounded-md border border-border text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className="glass-lens flex h-8 px-3 items-center justify-center rounded-md border border-border text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           Next →
         </button>

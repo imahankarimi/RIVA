@@ -43,3 +43,10 @@ frontend-before-final/
 # Claude Code local configuration
 .claude/
 .vercel
+
+# Database backups
+backend/backups/
+*.dump
+
+# Temporary files
+*.stray

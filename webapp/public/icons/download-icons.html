@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Download RIVA Icons</title>
+  <style>
+    body { font-family: system-ui; max-width: 900px; margin: 40px auto; padding: 20px; }
+    h1 { color: #0B0D40; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin: 30px 0; }
+    .card { background: #f9f9f9; padding: 20px; border-radius: 12px; text-align: center; }
+    canvas { border: 2px solid #ddd; margin: 15px 0; display: block; margin-left: auto; margin-right: auto; }
+    button { background: #0B0D40; color: white; border: none; padding: 12px 24px; 
+             border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; }
+    button:hover { background: #1a1f6e; }
+    .status { padding: 15px; border-radius: 8px; margin: 20px 0; background: #d4edda; color: #155724; }
+    .instructions { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; }
+  </style>
+</head>
+<body>
+  <h1>📱 RIVA PWA Icon Generator</h1>
+  
+  <div class="instructions">
+    <strong>Instructions:</strong>
+    <ol>
+      <li>Click "Generate All Icons" below</li>
+      <li>Right-click each canvas and select "Save Image As..."</li>
+      <li>Save with the exact filename shown (icon-192.png, etc.)</li>
+      <li>Move files to <code>webapp/public/icons/</code></li>
+    </ol>
+  </div>
+
+  <button onclick="generateAll()" style="margin-bottom: 20px;">Generate All Icons</button>
+  
+  <div id="status"></div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>icon-192.png</h3>
+      <p>192 × 192 pixels</p>
+      <canvas id="canvas-192" width="192" height="192"></canvas>
+    </div>
+
+    <div class="card">
+      <h3>icon-512.png</h3>
+      <p>512 × 512 pixels</p>
+      <canvas id="canvas-512" width="512" height="512" style="width: 192px; height: 192px;"></canvas>
+    </div>
+
+    <div class="card">
+      <h3>icon-512-maskable.png</h3>
+      <p>512 × 512 pixels (maskable)</p>
+      <canvas id="canvas-maskable" width="512" height="512" style="width: 192px; height: 192px;"></canvas>
+    </div>
+  </div>
+
+  <script>
+    async function loadSVG(path, canvasId, size) {
+      const response = await fetch(path);
+      const svgText = await response.text();
+      const blob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.getElementById(canvasId);
+          const ctx = canvas.getContext('2d');
+          ctx.clearRect(0, 0, size, size);
+          ctx.drawImage(img, 0, 0, size, size);
+          URL.revokeObjectURL(url);
+          resolve();
+        };
+        img.onerror = reject;
+        img.src = url;
+      });
+    }
+
+    async function generateAll() {
+      const status = document.getElementById('status');
+      status.textContent = 'Generating icons...';
+      status.className = 'status';
+
+      try {
+        await loadSVG('icon-192-source.svg', 'canvas-192', 192);
+        await loadSVG('icon-512-source.svg', 'canvas-512', 512);
+        await loadSVG('icon-512-maskable-source.svg', 'canvas-maskable', 512);
+        
+        status.textContent = '✅ Icons generated! Right-click each canvas above and "Save Image As..." with the exact filename shown.';
+      } catch (error) {
+        status.textContent = '❌ Error: ' + error.message;
+        status.style.background = '#f8d7da';
+        status.style.color = '#721c24';
+      }
+    }
+
+    // Auto-generate on load
+    window.addEventListener('load', () => setTimeout(generateAll, 500));
+  </script>
+</body>
+</html>

@@ -78,7 +78,7 @@ export function TransactionCard({ action, status, onConfirm, onCancel, isSubmitt
       <div className="px-4 py-3">
         <button
           onClick={() => setShowDetails((v) => !v)}
-          className="flex items-center gap-1 text-[12px] font-medium text-ink-faint hover:text-ink-soft"
+          className="glass-lens flex items-center gap-1 text-[12px] font-medium text-ink-faint hover:text-ink-soft"
         >
           {showDetails ? t("assistant.hideAccountingDetails") : t("assistant.accountingDetails")}
           <ChevronDown size={13} className={cn("transition-transform duration-150", showDetails && "rotate-180")} />

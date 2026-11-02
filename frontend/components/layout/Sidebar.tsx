@@ -160,7 +160,7 @@ export function Sidebar() {
             }}
             title={displayedCollapsed ? business.name : undefined}
             className={cn(
-              "relative mb-1 flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-start transition-colors duration-150 hover:bg-sidebar-accent",
+              "glass-lens relative mb-1 flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-start transition-colors duration-150 hover:bg-sidebar-accent",
               displayedCollapsed && "justify-center px-0"
             )}
           >
@@ -217,7 +217,7 @@ export function Sidebar() {
                   setTimeout(() => setAccountOpen(false), 120)
                 }
                 className={cn(
-                  "relative flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-start transition-colors duration-150 hover:bg-sidebar-accent",
+                  "glass-lens relative flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-start transition-colors duration-150 hover:bg-sidebar-accent",
                   displayedCollapsed && "justify-center px-0"
                 )}
               >
@@ -279,7 +279,7 @@ export function Sidebar() {
 
                     <button
                       onMouseDown={handleLogout}
-                      className="flex w-full items-center gap-2 px-3 py-2 text-start text-[13px] text-rose-700 transition-colors duration-150 hover:bg-rose-100/50"
+                      className="glass-lens flex w-full items-center gap-2 px-3 py-2 text-start text-[13px] text-rose-700 transition-colors duration-150 hover:bg-rose-100/50"
                     >
                       <LogOut size={14} />
                       {t("settings.logout")}

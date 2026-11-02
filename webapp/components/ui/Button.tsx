@@ -34,10 +34,10 @@ const variants: Record<Variant, string> = {
 };
 
 const sizes: Record<Size, string> = {
-  sm: "h-8 px-3 text-[12px] gap-1.5 rounded-lg",
-  md: "h-10 px-4 text-[13px] gap-2 rounded-lg",
-  lg: "h-12 px-5 text-[14px] gap-2 rounded-xl",
-  icon: "size-9 rounded-lg",
+  sm: "h-8 px-3 text-[13px] gap-1.5 rounded-md",
+  md: "h-10 px-4 text-sm gap-2 rounded-md",
+  lg: "h-12 px-5 text-[15px] gap-2 rounded-lg",
+  icon: "size-9 rounded-md",
 };
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -50,7 +50,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         whileTap={disabled ? undefined : { scale: 0.97 }}
         transition={SPRING_SNAPPY}
         className={cn(
-          "inline-flex items-center justify-center font-medium transition-colors duration-150 ease-out",
+          "glass-lens inline-flex items-center justify-center font-medium transition-colors duration-150 ease-out",
           "disabled:opacity-40 disabled:pointer-events-none",
           "min-h-[44px] sm:min-h-0", // touch target on small screens
           variants[variant],

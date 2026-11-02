@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sidebar Test - Light/Dark Mode</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --c-sidebar: 255, 255, 255;
+      --c-sidebar-foreground: 30, 41, 59;
+      --c-sidebar-accent: 241, 245, 249;
+      --c-sidebar-accent-foreground: 15, 23, 42;
+      --c-signal-500: 59, 130, 246;
+      --c-warm-white: 247, 247, 243;
+      --c-deep-ink: 15, 23, 42;
+      --c-ink-soft: 100, 116, 139;
+      --c-ink-faint: 148, 163, 184;
+      --c-line: 226, 232, 240;
+      --dur-moderate: 0.18s;
+      --ease-riva: cubic-bezier(0.25, 0.1, 0.25, 1);
+      --shadow-raised: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    }
+
+    .dark {
+      --c-sidebar: 30, 41, 59;
+      --c-sidebar-foreground: 241, 245, 249;
+      --c-sidebar-accent: 51, 65, 85;
+      --c-sidebar-accent-foreground: 248, 250, 252;
+      --c-warm-white: 247, 247, 243;
+      --c-deep-ink: 15, 23, 42;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    .glass-lens {
+      --lens-x: 50%;
+      --lens-y: 50%;
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      transition:
+        transform var(--dur-moderate) var(--ease-riva),
+        box-shadow var(--dur-moderate) var(--ease-riva),
+        background-color var(--dur-moderate) var(--ease-riva),
+        color var(--dur-moderate) var(--ease-riva);
+    }
+
+    .glass-lens::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      pointer-events: none;
+      background:
+        radial-gradient(
+          160px circle at var(--lens-x) var(--lens-y),
+          rgba(255, 255, 255, 0.48) 0%,
+          rgba(255, 255, 255, 0.16) 28%,
+          rgba(255, 255, 255, 0.04) 48%,
+          transparent 68%
+        ),
+        linear-gradient(
+          145deg,
+          rgba(255, 255, 255, 0.14) 0%,
+          rgba(255, 255, 255, 0.03) 46%,
+          rgba(255, 255, 255, 0.01) 100%
+        );
+      opacity: 0;
+      transform: scale(1.02);
+      transition: opacity 140ms var(--ease-riva);
+      z-index: 0;
+    }
+
+    .glass-lens::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.28),
+        inset 0 -12px 24px rgba(255, 255, 255, 0.03);
+      opacity: 0;
+      transition: opacity 140ms var(--ease-riva);
+      z-index: 0;
+    }
+
+    .glass-lens > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .glass-lens:hover::before,
+    .glass-lens:focus-visible::before {
+      opacity: 1;
+    }
+
+    .glass-lens:hover::after,
+    .glass-lens:focus-visible::after {
+      opacity: 1;
+    }
+
+    .glass-lens:hover {
+      transform: translateY(-1px) scale(1.01);
+      box-shadow: var(--shadow-raised);
+    }
+
+    .glass-lens:active {
+      transform: translateY(0) scale(0.99);
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+      height: 2.25rem;
+      padding: 0 0.75rem;
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 0.375rem;
+      color: rgb(var(--c-ink-soft));
+      transition: background-color 0.15s, color 0.15s;
+    }
+
+    .nav-link:hover {
+      background-color: rgb(var(--c-sidebar-accent) / 0.8);
+      color: rgb(var(--c-sidebar-accent-foreground));
+    }
+
+    .nav-link.active {
+      background-color: rgb(var(--c-signal-500));
+      color: white;
+      box-shadow: 0 12px 28px rgba(16,28,44,0.22), inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+
+    .dark .nav-link.active {
+      background-color: rgb(var(--c-warm-white));
+      color: rgb(var(--c-deep-ink));
+      box-shadow: 0 12px 28px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.9);
+    }
+
+    .active-indicator {
+      position: absolute;
+      inset: 0;
+      border-radius: 0.375rem;
+      background-color: rgb(var(--c-signal-500));
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .dark .active-indicator {
+      background-color: rgb(var(--c-warm-white));
+    }
+
+    .sidebar-container {
+      width: 248px;
+      height: 100vh;
+      background-color: rgb(var(--c-sidebar));
+      color: rgb(var(--c-sidebar-foreground));
+      padding: 0.75rem;
+    }
+
+    .nav-section {
+      margin-bottom: 1rem;
+    }
+
+    .nav-items {
+      display: flex;
+      flex-direction: column;
+      gap: 0.28rem;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      padding: 0.5rem 1rem;
+      background: rgb(var(--c-sidebar-accent));
+      border: none;
+      border-radius: 0.375rem;
+      cursor: pointer;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" onclick="document.documentElement.classList.toggle('dark')">
+    Toggle Dark Mode
+  </button>
+
+  <div class="sidebar-container">
+    <div class="nav-section">
+      <div class="nav-items">
+        <a href="#" class="glass-lens nav-link active">
+          <div class="active-indicator"></div>
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+          <span>Overview</span>
+        </a>
+
+        <a href="#" class="glass-lens nav-link">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+          <span>Transactions</span>
+        </a>
+
+        <a href="#" class="glass-lens nav-link">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+          <span>Reports</span>
+        </a>
+
+        <a href="#" class="glass-lens nav-link">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+          <span>Assistant</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div style="position: fixed; bottom: 1rem; right: 1rem; background: rgba(0,0,0,0.8); color: white; padding: 1rem; border-radius: 0.5rem; font-size: 12px;">
+    <strong>Look for:</strong><br>
+    1. Does the selected "Overview" item protrude beyond other items?<br>
+    2. Is there a small dot visible in Light Mode next to "Overview"?<br>
+    3. Switch to Dark Mode - does the dot disappear?
+  </div>
+</body>
+</html>

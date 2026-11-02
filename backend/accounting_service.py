@@ -74,6 +74,27 @@ def create_journal_entry(
         total_debit += line.debit
         total_credit += line.credit
 
+    # 3b. Cross-tenant guard: every account_id on every line must belong to
+    #     the business this entry is posted to. Routes authorize the caller
+    #     against data.business_id; this ties the lines to that same business
+    #     so no caller (API, AI confirm, future code) can attach lines to
+    #     another business's accounts and corrupt its balances/reports.
+    #     Runs before any write, so a rejection leaves no partial ledger state.
+    account_ids = {line.account_id for line in data.lines}
+    owned_account_ids = {
+        row[0]
+        for row in db.query(Account.id)
+        .filter(
+            Account.id.in_(account_ids),
+            Account.business_id == data.business_id,
+        )
+        .all()
+    }
+    if owned_account_ids != account_ids:
+        raise ValueError(
+            "All journal-line accounts must belong to this business."
+        )
+
     # 4. Double-entry rule - validate BEFORE any database writes
     if total_debit != total_credit:
         raise ValueError(

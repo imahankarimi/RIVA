@@ -49,7 +49,7 @@ export function StatefulButton({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "relative flex h-12 w-full items-center justify-center overflow-hidden",
+        "glass-lens relative flex h-12 w-full items-center justify-center overflow-hidden",
         "rounded-lg text-[15px] font-semibold text-onSignal",
         "shadow-subtle transition-colors duration-150",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal-500/40 focus-visible:ring-offset-1",

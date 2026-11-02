@@ -5,7 +5,9 @@ PROJECT="/Users/mahan/Documents/AI Projects/ledger ai"
 echo "🚀 Starting RIVA..."
 
 # Backend
-osascript -e 'tell application "Terminal" to do script "cd \"'"$PROJECT"'/backend\" && source .venv/bin/activate && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"'
+# Invoke the venv interpreter directly instead of relying on `activate`, which
+# silently no-ops in some shells and leaves the wrong Python (Anaconda) on PATH.
+osascript -e 'tell application "Terminal" to do script "cd \"'"$PROJECT"'/backend\" && ./run-backend.sh"'
 
 # Main
 osascript -e 'tell application "Terminal" to do script "cd \"'"$PROJECT"'/frontend\" && npm run dev"'

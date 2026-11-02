@@ -75,7 +75,7 @@ export function ChatHistoryPanel({
               <h2 className="font-display text-[15px] font-bold text-ink">{t("assistant.history")}</h2>
               <button
                 onClick={onClose}
-                className="flex h-8 w-8 items-center justify-center rounded-md text-ink-faint hover:bg-surfaceMuted hover:text-ink"
+                className="glass-lens flex h-8 w-8 items-center justify-center rounded-md text-ink-faint hover:bg-surfaceMuted hover:text-ink"
                 aria-label={t("common.close")}
               >
                 <X size={16} />
@@ -90,7 +90,7 @@ export function ChatHistoryPanel({
                   onNew();
                   onClose();
                 }}
-                className="flex w-full items-center justify-center gap-1.5 rounded-md bg-signal-500 px-3 py-2.5 text-[13px] font-medium text-onSignal hover:bg-signal-600"
+                className="glass-lens flex w-full items-center justify-center gap-1.5 rounded-md bg-signal-500 px-3 py-2.5 text-[13px] font-medium text-onSignal hover:bg-signal-600"
               >
                 <Plus size={15} strokeWidth={2.4} />
                 {t("assistant.newChat")}
@@ -130,7 +130,7 @@ export function ChatHistoryPanel({
                                   onClose();
                                 }}
                                 className={cn(
-                                  "flex w-full items-center gap-2 rounded-md px-2.5 py-2.5 pe-9 text-start text-[13px] transition-colors duration-150",
+                                  "glass-lens flex w-full items-center gap-2 rounded-md px-2.5 py-2.5 pe-9 text-start text-[13px] transition-colors duration-150",
                                   conv.id === activeId
                                     ? "bg-signal-50 text-signal-700"
                                     : "text-ink-soft hover:bg-surfaceMuted hover:text-ink"
@@ -145,7 +145,7 @@ export function ChatHistoryPanel({
                                   onRemove(conv.id);
                                 }}
                                 aria-label={t("assistant.historyDelete")}
-                                className="absolute end-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-ink-faint opacity-0 transition-opacity duration-150 hover:bg-rose-100 hover:text-rose-700 focus-visible:opacity-100 group-hover:opacity-100"
+                                className="glass-lens absolute end-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-ink-faint opacity-0 transition-opacity duration-150 hover:bg-rose-100 hover:text-rose-700 focus-visible:opacity-100 group-hover:opacity-100"
                               >
                                 <Trash2 size={13} />
                               </button>

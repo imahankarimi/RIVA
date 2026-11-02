@@ -61,7 +61,7 @@ export function ChatInput({
           type="button"
           disabled
           title={t("common.comingSoon")}
-          className="mb-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-ink-faint opacity-40 cursor-not-allowed"
+          className="glass-lens mb-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-ink-faint opacity-40 cursor-not-allowed"
           aria-label={`${t("assistant.attach")} (${t("common.comingSoon")})`}
         >
           <Paperclip size={18} />
@@ -87,7 +87,7 @@ export function ChatInput({
           type="button"
           disabled
           title={t("common.comingSoon")}
-          className="mb-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-ink-faint opacity-40 cursor-not-allowed"
+          className="glass-lens mb-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-ink-faint opacity-40 cursor-not-allowed"
           aria-label={`${t("assistant.voice")} (${t("common.comingSoon")})`}
         >
           <Mic size={18} />
@@ -102,7 +102,7 @@ export function ChatInput({
           whileTap={canSend ? { scale: 0.95 } : undefined}
           transition={{ type: "spring", stiffness: 400, damping: 24 }}
           className={cn(
-            "mb-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors duration-150",
+            "glass-lens mb-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors duration-150",
             canSend ? "bg-signal-500 text-onSignal hover:bg-signal-600" : "bg-surfaceMuted text-ink-faint"
           )}
         >

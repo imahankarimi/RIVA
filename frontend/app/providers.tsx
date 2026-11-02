@@ -7,6 +7,7 @@ import { PreferencesProvider } from "@/lib/preferences/PreferencesProvider";
 import {
   getCurrentUser,
   login as loginRequest,
+  logout as logoutRequest,
   signup as signupRequest,
   updateProfile as updateProfileRequest,
   type AuthResponse,
@@ -18,7 +19,13 @@ import {
   updateBusiness as updateBusinessRequest,
   switchBusiness as switchBusinessRequest,
 } from "@/lib/api/businesses";
-import { getStoredToken, setStoredToken, clearStoredToken } from "@/lib/api/client";
+import {
+  getStoredToken,
+  setStoredToken,
+  clearStoredToken,
+  setStoredRefreshToken,
+  clearStoredRefreshToken,
+} from "@/lib/api/client";
 import { ToastProvider } from "@/components/ui/Toast";
 import type { Business } from "@/lib/types";
 import type { BackendCurrency } from "@/lib/currency";
@@ -86,6 +93,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const clear = useCallback(() => {
     clearStoredToken();
+    clearStoredRefreshToken();
     setUser(null);
     setBusiness(null);
     setBusinesses([]);
@@ -111,6 +119,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const applyAuthResponse = useCallback((response: AuthResponse) => {
     setStoredToken(response.access_token);
+    setStoredRefreshToken(response.refresh_token);
     setUser(toUser(response.user));
     setBusiness(toBusiness(response.business, response.business.id));
     setBusinesses([toBusiness(response.business, response.business.id)]);
@@ -131,7 +140,12 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       signup: async (email, password, businessName, baseCurrency) => {
         return applyAuthResponse(await signupRequest(email, password, businessName, baseCurrency));
       },
-      logout: clear,
+      logout: () => {
+        // Revoke the server-side session (best-effort) before clearing local
+        // state — deleting client tokens alone is not a server-side logout.
+        void logoutRequest().catch(() => undefined);
+        clear();
+      },
       updateProfile: async (firstName, lastName) => {
         const response = await updateProfileRequest(firstName, lastName);
         const applied = applyCurrentUserResponse(response);

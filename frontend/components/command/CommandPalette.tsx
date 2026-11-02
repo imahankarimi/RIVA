@@ -148,7 +148,7 @@ export function CommandPalette() {
                     key={item.href}
                     type="button"
                     onClick={() => navigate(item.href)}
-                    className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-start text-[13px] text-ink-soft transition-colors hover:bg-surfaceMuted hover:text-ink"
+                    className="glass-lens flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-start text-[13px] text-ink-soft transition-colors hover:bg-surfaceMuted hover:text-ink"
                   >
                     <Icon
                       size={16}
@@ -178,7 +178,7 @@ export function CommandPalette() {
             type="button"
             onClick={toggleTheme}
             className={cn(
-              "flex items-center gap-2 rounded-md px-2 py-1.5 text-[11px]",
+              "glass-lens flex items-center gap-2 rounded-md px-2 py-1.5 text-[11px]",
               "text-ink-faint transition-colors hover:bg-surfaceMuted hover:text-ink"
             )}
           >

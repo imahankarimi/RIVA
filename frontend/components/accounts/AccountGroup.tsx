@@ -36,7 +36,7 @@ export function AccountGroup({
       <motion.button
         whileTap={{ scale: 0.995 }}
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between px-5 py-3.5 transition-colors duration-150 hover:bg-surfaceMuted/60"
+        className="glass-lens flex w-full items-center justify-between px-5 py-3.5 transition-colors duration-150 hover:bg-surfaceMuted/60"
       >
         <span className="flex items-center gap-2.5">
           <span className="flex h-7 w-7 items-center justify-center rounded-md bg-surfaceMuted text-ink-soft">

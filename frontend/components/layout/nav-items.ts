@@ -30,10 +30,10 @@ export const insightNavItems = [
 ] as const;
 
 export const planningNavItems = [
-  { href: "/budgets", labelKey: "nav.budgets", icon: PiggyBank },
-  { href: "/goals", labelKey: "nav.goals", icon: Target },
-  { href: "/debts", labelKey: "nav.debts", icon: CreditCard },
-  { href: "/subscriptions", labelKey: "nav.subscriptions", icon: RefreshCw },
+  { href: "/budgets", labelKey: "nav.budgets", icon: PiggyBank, soon: true },
+  { href: "/goals", labelKey: "nav.goals", icon: Target, soon: true },
+  { href: "/debts", labelKey: "nav.debts", icon: CreditCard, soon: true },
+  { href: "/subscriptions", labelKey: "nav.subscriptions", icon: RefreshCw, soon: true },
   { href: "/calendar", labelKey: "nav.calendar", icon: Calendar },
 ] as const;
 
@@ -43,7 +43,7 @@ export const supportNavItems = [
 ] as const;
 
 export const advisorNavItems = [
-  { href: "/advisor", labelKey: "nav.advisor", icon: BrainCircuit },
+  { href: "/advisor", labelKey: "nav.advisor", icon: BrainCircuit, soon: true },
 ] as const;
 
 /**
@@ -63,10 +63,26 @@ export const secondaryNavItems = [
   ...supportNavItems,
 ] as const;
 
-export const mobileNavItems = [
-  primaryNavItems[0],
-  primaryNavItems[2],
-  primaryNavItems[1],
-  primaryNavItems[3],
-  supportNavItems[1],
+/**
+ * The five destinations shown in the floating mobile navigation bar.
+ *
+ * Design-system rules (docs/DESIGN_SYSTEM.md → Navigation):
+ *   - Exactly five items. A sixth does not fit the width of a small phone at
+ *     readable label size.
+ *   - The RIVA Assistant MUST be the centre item and is flagged `hero: true`,
+ *     which renders it as the raised, inverted focal tab.
+ *   - This is the shortcut row only. Everything else — RIVA Advisor, Reports,
+ *     Income, Expenses, Budgets, Goals, Debts, Subscriptions, Calendar, Help —
+ *     is reached through `MobileNavDrawer`, which reuses the same grouped
+ *     collections as the desktop sidebar so the two can never disagree.
+ */
+export const MOBILE_NAV = [
+  { href: "/overview", labelKey: "nav.overview", icon: LayoutGrid, hero: false },
+  { href: "/transactions", labelKey: "nav.transactions", icon: ArrowLeftRight, hero: false },
+  { href: "/assistant", labelKey: "nav.assistant", icon: Sparkles, hero: true },
+  { href: "/accounts", labelKey: "nav.accounts", icon: BookOpen, hero: false },
+  { href: "/settings", labelKey: "nav.settings", icon: Settings, hero: false },
 ] as const;
+
+/** @deprecated Use `MOBILE_NAV`. Retained so existing imports keep working. */
+export const mobileNavItems = MOBILE_NAV;

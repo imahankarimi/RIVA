@@ -78,9 +78,13 @@ export default function OverviewPage() {
     <div className="flex min-h-screen flex-col">
       <Topbar title={t("nav.overview")} />
 
-      <main className="mx-auto w-full max-w-content flex-1 px-4 pb-10 pt-6 sm:px-6 xl:max-w-[1400px]">
-        <div className="space-y-6">
-          {/* Page heading */}
+      <main className="relative mx-auto w-full max-w-content flex-1 px-4 pb-10 pt-6 sm:px-6 xl:max-w-[1400px]">
+        {/* Layered ambient gradients for depth */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[500px] bg-gradient-to-b from-signal-50/35 via-signal-100/10 to-transparent dark:from-signal-950/20 dark:via-signal-900/8" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[300px] bg-[radial-gradient(ellipse_at_top,rgba(113,135,155,0.08),transparent_50%)] dark:bg-[radial-gradient(ellipse_at_top,rgba(113,135,155,0.12),transparent_60%)]" />
+
+        <div className="relative space-y-6">
+          {/* Page heading with refined hierarchy */}
           <motion.div
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
@@ -88,7 +92,12 @@ export default function OverviewPage() {
             className="flex flex-wrap items-end justify-between gap-4"
           >
             <div className="min-w-0">
-              <p className="text-[12.5px] font-medium text-ink-faint">
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.1, duration: 0.3 }}
+                className="text-[11px] font-semibold uppercase tracking-wider text-ink-faint"
+              >
                 {(() => {
                   const h = new Date().getHours();
                   if (h < 12) return t("overview.greetingMorning");
@@ -96,17 +105,22 @@ export default function OverviewPage() {
                   return t("overview.greetingEvening");
                 })()}
                 , {user?.firstName || business.name}
-              </p>
-              <h2 className="mt-0.5 font-display text-[21px] font-bold tracking-tight text-ink sm:text-[24px]">
+              </motion.p>
+              <h2 className="mt-1 font-display text-[24px] font-bold tracking-tight text-ink sm:text-[28px]">
                 {t("nav.overview")}
               </h2>
             </div>
 
-            <InteractiveHoverButton
-              text={t("overview.logTransaction")}
-              type="button"
-              onClick={openAddIncome}
-            />
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <InteractiveHoverButton
+                text={t("overview.logTransaction")}
+                type="button"
+                onClick={openAddIncome}
+              />
+            </motion.div>
           </motion.div>
 
           {usingDemoData && status !== "loading" && (
@@ -123,10 +137,8 @@ export default function OverviewPage() {
           ) : status === "loading" ? (
             <DashboardLoading />
           ) : (
-            <div className="flex flex-1 flex-col gap-4">
-              {/* KPI row — the reference's Financial Overview pill legend sits
-                  inside the chart card; keep the RIVA KPI row for the headline
-                  numbers these widgets drill into. */}
+            <div className="flex flex-1 flex-col gap-5">
+              {/* KPI row with enhanced visual hierarchy */}
               <StaggerContainer className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
                 <StaggerItem>
                   <StatCard
@@ -175,11 +187,8 @@ export default function OverviewPage() {
                 </StaggerItem>
               </StaggerContainer>
 
-              {/* Widget grid — 12-col grid with balanced row heights:
-                  Row 1: FinancialOverview (6) + HealthScoreCard (6)  — both ~350px
-                  Row 2: AccountCards (4) + MoneyMovement (4) + ExpenseBreakdown (4) — ~250/350/250
-                  Row 3: RecentTransactionsTable (12) */}
-              <div className="grid grid-cols-12 gap-4">
+              {/* Enhanced widget grid with refined spacing and visual rhythm */}
+              <div className="grid grid-cols-12 gap-4 sm:gap-5">
                 {/* Row 1 — two tall cards, equal split */}
                 <div className="col-span-12 lg:col-span-6">
                   {reports.isEmpty ? (

@@ -29,10 +29,10 @@ export const insightNavItems = [
 ] as const;
 
 export const planningNavItems = [
-  { href: "/budgets", labelKey: "nav.budgets", icon: PiggyBank },
-  { href: "/goals", labelKey: "nav.goals", icon: Target },
-  { href: "/debts", labelKey: "nav.debts", icon: CreditCard },
-  { href: "/subscriptions", labelKey: "nav.subscriptions", icon: RefreshCw },
+  { href: "/budgets", labelKey: "nav.budgets", icon: PiggyBank, soon: true },
+  { href: "/goals", labelKey: "nav.goals", icon: Target, soon: true },
+  { href: "/debts", labelKey: "nav.debts", icon: CreditCard, soon: true },
+  { href: "/subscriptions", labelKey: "nav.subscriptions", icon: RefreshCw, soon: true },
   { href: "/calendar", labelKey: "nav.calendar", icon: Calendar },
 ] as const;
 

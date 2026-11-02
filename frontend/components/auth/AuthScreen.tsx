@@ -1,23 +1,19 @@
 "use client";
 
-import Image from "next/image";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Eye, EyeOff, Loader2, Sparkle } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Label } from "@/components/ui/Label";
-import { Alert } from "@/components/ui/Alert";
-import { CurrencySelect, CurrencyLockWarning } from "@/components/settings/CurrencySelect";
 import { useI18n } from "@/lib/i18n";
 import { ApiError } from "@/lib/api/client";
+import { requestPasswordReset } from "@/lib/api/auth";
 import { useAuth } from "@/app/providers";
 import { defaultCurrencyFor, type BackendCurrency } from "@/lib/currency";
+import { CurrencySelect, CurrencyLockWarning } from "@/components/settings/CurrencySelect";
 
-type Mode = "login" | "signup";
+type Mode = "login" | "signup" | "forgot";
 
 export function AuthScreen() {
-  const { t, locale, setLocale } = useI18n();
+  const { t, locale } = useI18n();
   const { login, signup } = useAuth();
   const router = useRouter();
   const [mode, setMode] = useState<Mode>("login");
@@ -30,10 +26,23 @@ export function AuthScreen() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
+    if (mode === "forgot") {
+      setLoading(true);
+      try {
+        await requestPasswordReset(email);
+        setForgotSent(true);
+      } catch (reason) {
+        setError(reason instanceof Error ? reason.message : t("auth.unknownError"));
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
     if (mode === "signup" && password !== confirmPassword) {
       setError(t("auth.passwordMismatch"));
       return;
@@ -63,134 +72,229 @@ export function AuthScreen() {
     setConfirmPassword("");
   };
 
+  const goToForgot = () => {
+    setMode("forgot");
+    setError("");
+    setForgotSent(false);
+    setPassword("");
+    setConfirmPassword("");
+  };
+
+  const backToLogin = () => {
+    setMode("login");
+    setError("");
+    setForgotSent(false);
+  };
+
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-paper px-4 py-10">
-      <div className="pointer-events-none absolute -start-28 top-0 h-72 w-72 rounded-full bg-signal-100/70 blur-3xl" />
-      <div className="relative grid w-full max-w-4xl overflow-hidden rounded-2xl bg-card shadow-raised ring-1 ring-line animate-pop-in md:grid-cols-[1.05fr_.95fr]">
-        {/* Branding panel */}
-        <section className="hidden bg-signal-700 p-10 text-white md:flex md:flex-col md:justify-between">
-          <div className="relative h-8 w-28">
-            <Image src="/brand/riva-logo.svg" alt="RIVA" fill priority sizes="112px" className="object-contain object-left dark:hidden" />
-            <Image src="/brand/riva-logo.svg" alt="RIVA" fill priority sizes="112px" className="hidden object-contain object-left dark:block" />
+    <main className="liquid-glass-auth-page">
+      {/* Animated gradient background */}
+      <div className="liquid-glass-bg">
+        <div className="liquid-glass-gradient-1" />
+        <div className="liquid-glass-gradient-2" />
+        <div className="liquid-glass-gradient-3" />
+      </div>
+
+      {/* Glass panel container */}
+      <div className="liquid-glass-stage">
+        {/* Brand header */}
+        <section className="liquid-glass-intro">
+          <div className="liquid-glass-mark">
+            <Sparkle size={20} strokeWidth={2.5} className="text-white" />
           </div>
-          <div className="mt-auto space-y-4">
-            <p className="font-display text-[28px] font-bold leading-tight tracking-tight text-white dark:text-[#101C2C]">{t("auth.welcome")}</p>
-            <p className="max-w-[260px] text-[14px] leading-6 text-white/80 dark:text-[#101C2C]/80">{t("auth.welcomeBody")}</p>
-            <div className="mt-6 h-px w-12 bg-white/20" />
-          </div>
-          <div className="mt-6 text-[11px] font-medium uppercase tracking-widest text-white/30 dark:text-[#101C2C]/30">RIVA AI</div>
+          <h1 className="liquid-glass-title">
+            {mode === "login" ? t("auth.login") : mode === "signup" ? t("auth.signup") : t("auth.forgotTitle")}
+          </h1>
+          <p className="liquid-glass-subtitle">
+            {mode === "login" ? t("auth.welcomeBody") : mode === "signup" ? t("auth.signupSubtitle") : t("auth.forgotBody")}
+          </p>
         </section>
 
-        {/* Form panel */}
-        <section className="p-6 sm:p-10">
-          <div className="mb-8 flex items-center gap-2 md:hidden">
-            <span className="flex h-8 w-8 items-center justify-center rounded-md bg-signal-500 text-white"><Sparkle size={16} /></span>
-            <span className="font-display font-bold text-ink">RIVA AI</span>
+        {/* Forgot password success state */}
+        {mode === "forgot" && forgotSent ? (
+          <div className="space-y-6">
+            <div className="liquid-glass-success-message">
+              {t("auth.forgotSentGeneric")}
+            </div>
+            <button
+              type="button"
+              onClick={backToLogin}
+              className="liquid-glass-button glass-lens w-full"
+            >
+              {t("auth.backToLogin")}
+            </button>
           </div>
+        ) : (
+          <form className="liquid-glass-form" onSubmit={submit}>
+            <div className="liquid-glass-fields">
+              {/* Email */}
+              <label className="liquid-glass-field">
+                <span className="liquid-glass-field-label">{t("auth.email")}</span>
+                <input
+                  type="email"
+                  required
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="liquid-glass-input"
+                  placeholder={t("auth.emailPlaceholder")}
+                />
+              </label>
 
-          <h1 className="font-display text-2xl font-bold text-ink">
-            {mode === "login" ? t("auth.login") : t("auth.signup")}
-          </h1>
-          <p className="mt-2 text-[13.5px] text-ink-soft">
-            {mode === "login" ? t("auth.welcomeBody") : t("auth.welcome")}
-          </p>
+              {/* Business name (signup only) */}
+              {mode === "signup" && (
+                <label className="liquid-glass-field">
+                  <span className="liquid-glass-field-label">{t("auth.businessName")}</span>
+                  <input
+                    type="text"
+                    required
+                    minLength={1}
+                    maxLength={255}
+                    autoComplete="organization"
+                    value={businessName}
+                    onChange={(e) => setBusinessName(e.target.value)}
+                    className="liquid-glass-input"
+                    placeholder={t("auth.businessNamePlaceholder")}
+                  />
+                </label>
+              )}
 
-          <form className="mt-7 space-y-4" onSubmit={submit}>
-            {/* Email */}
-            <div className="space-y-1.5">
-              <Label htmlFor="auth-email">{t("auth.email")}</Label>
-              <Input id="auth-email" required type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+              {/* Currency (signup only) */}
+              {mode === "signup" && (
+                <div className="space-y-2">
+                  <CurrencySelect
+                    value={baseCurrency}
+                    onChange={setBaseCurrency}
+                    label={t("settings.baseCurrency")}
+                  />
+                  <CurrencyLockWarning
+                    title={t("settings.currencyChooseCarefullyTitle")}
+                    body={t("settings.currencyChooseCarefullyBody")}
+                  />
+                </div>
+              )}
+
+              {/* Password */}
+              {mode !== "forgot" && (
+                <label className="liquid-glass-field">
+                  <span className="liquid-glass-field-label">{t("auth.password")}</span>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      required
+                      minLength={8}
+                      autoComplete={mode === "login" ? "current-password" : "new-password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="liquid-glass-input pe-10"
+                      placeholder="••••••••"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute end-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/80 transition-colors"
+                      aria-label={showPassword ? t("common.off") : t("common.on")}
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                </label>
+              )}
+
+              {/* Confirm password (signup only) */}
+              {mode === "signup" && (
+                <label className="liquid-glass-field">
+                  <span className="liquid-glass-field-label">{t("auth.confirmPassword")}</span>
+                  <div className="relative">
+                    <input
+                      type={showConfirm ? "text" : "password"}
+                      required
+                      minLength={8}
+                      autoComplete="new-password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="liquid-glass-input pe-10"
+                      placeholder="••••••••"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirm(!showConfirm)}
+                      className="absolute end-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/80 transition-colors"
+                      aria-label={showConfirm ? t("common.off") : t("common.on")}
+                    >
+                      {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                </label>
+              )}
             </div>
 
-            {mode === "signup" && (
-              <>
-                <div className="space-y-1.5">
-                  <Label htmlFor="auth-biz">{t("auth.businessName")}</Label>
-                  <Input id="auth-biz" required minLength={1} maxLength={255} autoComplete="organization" value={businessName} onChange={(e) => setBusinessName(e.target.value)} />
-                </div>
-                <CurrencySelect value={baseCurrency} onChange={setBaseCurrency} label={t("settings.baseCurrency")} />
-                <CurrencyLockWarning title={t("settings.currencyChooseCarefullyTitle")} body={t("settings.currencyChooseCarefullyBody")} />
-              </>
+            {/* Error message */}
+            {error && (
+              <div className="liquid-glass-error">
+                {error}
+              </div>
             )}
 
-            {/* Password */}
-            <div className="space-y-1.5">
-              <Label htmlFor="auth-pw">{t("auth.password")}</Label>
-              <div className="relative">
-                <Input
-                  id="auth-pw"
-                  required
-                  minLength={8}
-                  type={showPassword ? "text" : "password"}
-                  autoComplete={mode === "login" ? "current-password" : "new-password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pe-10"
-                />
+            {/* Privacy note */}
+            <p className="liquid-glass-privacy-note">
+              {t("auth.privacyNote")}
+            </p>
+
+            {/* Submit button */}
+            <div className="liquid-glass-actions">
+              <button
+                type="submit"
+                disabled={loading}
+                className="liquid-glass-button glass-lens"
+              >
+                {loading ? (
+                  <Loader2 size={18} className="animate-spin" />
+                ) : (
+                  <>
+                    {mode === "login" ? t("auth.loginAction") : mode === "signup" ? t("auth.signupAction") : t("auth.forgotAction")}
+                    {mode !== "forgot" && <ArrowRight size={18} className="flip-rtl ms-2" />}
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* Footer actions */}
+        <div className="liquid-glass-footer">
+          {mode === "forgot" ? (
+            <button
+              type="button"
+              onClick={backToLogin}
+              className="liquid-glass-link"
+            >
+              {t("auth.backToLogin")}
+            </button>
+          ) : (
+            <>
+              <p className="text-white/60 text-[13px]">
+                {mode === "login" ? t("auth.noAccount") : t("auth.hasAccount")}{" "}
                 <button
                   type="button"
-                  tabIndex={-1}
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute end-2 top-1/2 -translate-y-1/2 rounded p-1 text-ink-faint hover:text-ink transition-colors"
-                  aria-label={showPassword ? t("common.on") : t("common.off")}
+                  onClick={switchMode}
+                  className="liquid-glass-link"
                 >
-                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                  {mode === "login" ? t("auth.signup") : t("auth.login")}
                 </button>
-              </div>
-            </div>
-
-            {mode === "signup" && (
-              <div className="space-y-1.5">
-                <Label htmlFor="auth-pw2">{t("auth.confirmPassword")}</Label>
-                <div className="relative">
-                  <Input
-                    id="auth-pw2"
-                    required
-                    minLength={8}
-                    type={showConfirm ? "text" : "password"}
-                    autoComplete="new-password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="pe-10"
-                  />
-                  <button
-                    type="button"
-                    tabIndex={-1}
-                    onClick={() => setShowConfirm((v) => !v)}
-                    className="absolute end-2 top-1/2 -translate-y-1/2 rounded p-1 text-ink-faint hover:text-ink transition-colors"
-                    aria-label={showConfirm ? t("common.on") : t("common.off")}
-                  >
-                    {showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Error */}
-            {error && (
-              <Alert variant="destructive">{error}</Alert>
-            )}
-
-            {/* Submit */}
-            <Button className="w-full" type="submit" size="lg" disabled={loading}>
-              {loading ? (
-                <Loader2 size={17} className="animate-spin" />
-              ) : (
-                <>
-                  {mode === "login" ? t("auth.loginAction") : t("auth.signupAction")}
-                  <ArrowRight size={17} className="flip-rtl" />
-                </>
+              </p>
+              {mode === "login" && (
+                <button
+                  type="button"
+                  onClick={goToForgot}
+                  className="liquid-glass-link text-[13px]"
+                >
+                  {t("auth.forgotPassword")}
+                </button>
               )}
-            </Button>
-          </form>
-
-          <p className="mt-6 text-center text-[13px] text-ink-soft">
-            {mode === "login" ? t("auth.noAccount") : t("auth.hasAccount")}{" "}
-            <button type="button" onClick={switchMode} className="font-semibold text-signal-700 hover:text-signal-500 transition-colors">
-              {mode === "login" ? t("auth.signup") : t("auth.login")}
-            </button>
-          </p>
-        </section>
+            </>
+          )}
+        </div>
       </div>
     </main>
   );

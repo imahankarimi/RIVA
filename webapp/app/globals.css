@@ -1,148 +1,39 @@
+/* ============================================================================
+   RIVA — RIVA Web global stylesheet
+   ----------------------------------------------------------------------------
+   The colour, radius, shadow, spacing and motion tokens are NOT defined here.
+   They live in the shared design system at `design-system/tokens.css`, which
+   is the single source of truth for RIVA Main and RIVA Web alike:
+
+     1. Brand foundation   Warm White / Deep Navy / Deep Ink / Steel / Slate
+     2. Semantic layer     surfaces, text, borders, status, financial, Advisor
+     3. Non-colour tokens  elevation, radius, spacing, motion, layout
+     4. Dark theme         every token above, re-declared under `.dark`
+
+   Because each token is an RGB triplet, Tailwind can apply alpha to it
+   (`rgb(var(--c-x) / <alpha-value>)`), which is how `bg-signal-500`,
+   `text-ink-faint`, `border-line` etc. theme correctly in light and dark with
+   no per-component `dark:` variant.
+
+   Full specification: docs/DESIGN_SYSTEM.md
+   ========================================================================== */
+@import "../../design-system/tokens.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* RIVA Design System — RGB triplets
-   Light values live on :root; .dark overrides the same variables.
-   Existing semantic classes such as bg-paper, text-ink, bg-signal-500
-   therefore inherit the RIVA brand automatically. */
-
-:root {
-  color-scheme: light;
-
-  /* RIVA — Warm White / Surface.
-     Light mode is designed around warm white paper with pure-white cards
-     lifting off it, so elevation reads without needing heavy shadows. */
-  --c-paper: 247 247 243;
-  --c-surface: 255 255 255;
-  --c-surface-muted: 244 244 240;
-  --c-surface-raised: 255 255 255;
-
-  /* RIVA — Deep Ink / Typography. ink-soft and ink-faint are slate/steel
-     cooled toward the brand but darkened until each clears WCAG AA on
-     --c-paper (5.29:1 and 3.81:1) — raw #607D94/#71879B measured 4.02
-     and 3.47, which failed for body and secondary label text. */
-  --c-ink: 16 19 26;
-  --c-ink-soft: 79 106 126;
-  --c-ink-faint: 107 128 147;
-
-  /* RIVA — Steel-tinted hairlines. Steel at full strength (#71879B) is a
-     3.47:1 border, far too loud for the ~74 `border-line` surfaces in the
-     app; these are steel mixed into warm white so structure whispers. */
-  --c-line: 217 223 228;
-  --c-line-soft: 231 235 238;
-
-  /* RIVA — Deep Navy signal system. 500 is the brand navy used as a solid
-     fill behind --c-on-signal text. */
-  --c-signal-50: 238 241 244;
-  --c-signal-100: 220 227 233;
-  --c-signal-300: 169 184 198;
-  --c-signal-400: 126 147 167;
-  --c-signal-500: 16 28 44;
-  --c-signal-600: 27 43 62;
-  --c-signal-700: 38 59 81;
-  --c-signal-900: 10 18 28;
-
-  /* Foreground for text/icons sitting on a signal-500/600/700 fill.
-     Tracks the theme so buttons and avatars stay legible in both. */
-  --c-on-signal: 255 255 255;
-
-  /* Semantic states — intentionally independent from brand palette */
-  --c-amber-100: 247 235 211;
-  --c-amber-500: 198 138 46;
-  --c-amber-700: 150 106 34;
-
-  --c-rose-100: 245 225 222;
-  --c-rose-500: 181 67 58;
-  --c-rose-700: 143 51 44;
-
-  --c-moss-100: 222 238 226;
-  --c-moss-500: 62 154 109;
-  --c-moss-700: 46 119 82;
-
-  /* Chart palette — 5 colours chosen from RIVA semantic tones so they
-     work naturally against both light and dark surfaces. */
-  --c-chart-1: 16 28 44;    /* signal-500 Deep Navy */
-  --c-chart-2: 62 154 109;  /* moss-500 */
-  --c-chart-3: 126 147 167; /* signal-400 Slate */
-  --c-chart-4: 198 138 46;  /* amber-500 */
-  --c-chart-5: 181 67 58;   /* rose-500 */
-
-  --c-scrollbar: 201 209 214;
-  --c-receipt-punch: 247 247 243;
-}
-
-.dark {
-  color-scheme: dark;
-
-  /* RIVA — Deep Ink page, Deep Navy cards. Dark mode is its own design,
-     not an inversion: the page is the near-black ink and cards step *up*
-     in navy, so elevation moves the same direction as in light mode. */
-  --c-paper: 16 19 26;
-  --c-surface: 16 28 44;
-  --c-surface-muted: 24 36 51;
-  --c-surface-raised: 31 43 58;
-
-  /* RIVA — Warm White / Steel typography. soft must stay brighter than
-     faint; the previous values had faint at 7.09:1 and soft at 4.99:1,
-     which inverted the emphasis ramp. */
-  --c-ink: 247 247 243;
-  --c-ink-soft: 169 188 204;
-  --c-ink-faint: 129 149 166;
-
-  /* RIVA — Steel mixed into navy. Full steel was *lighter* than the card
-     surface here, so every bordered card read as a glowing outline. */
-  --c-line: 41 54 70;
-  --c-line-soft: 31 43 58;
-
-  /* RIVA — Warm White becomes the primary dark-mode action. 500/600/700
-     are solid fills; --c-on-signal flips to deep ink so the ~22 files
-     using `bg-signal-500` + on-signal text keep 17:1 contrast instead of
-     the 1.07:1 that white-on-warm-white produced. */
-  --c-signal-50: 27 40 57;
-  --c-signal-100: 38 54 74;
-  --c-signal-300: 95 120 137;
-  --c-signal-400: 126 151 173;
-  --c-signal-500: 247 247 243;
-  --c-signal-600: 228 230 225;
-  --c-signal-700: 207 212 208;
-  --c-signal-900: 247 247 243;
-
-  --c-on-signal: 16 19 26;
-
-  /* Semantic states */
-  --c-amber-100: 58 47 24;
-  --c-amber-500: 217 160 76;
-  --c-amber-700: 235 191 122;
-
-  --c-rose-100: 56 30 28;
-  --c-rose-500: 214 100 90;
-  --c-rose-700: 232 140 131;
-
-  --c-moss-100: 24 45 33;
-  --c-moss-500: 88 181 133;
-  --c-moss-700: 133 202 165;
-
-  /* Chart palette (dark) — same mapping, slightly brighter for dark backgrounds. */
-  --c-chart-1: 247 247 243;  /* warm white — primary in dark mode */
-  --c-chart-2: 88 181 133;   /* moss-500 dark */
-  --c-chart-3: 126 151 173;  /* signal-400 dark */
-  --c-chart-4: 217 160 76;   /* amber-500 dark */
-  --c-chart-5: 214 100 90;   /* rose-500 dark */
-
-  --c-scrollbar: 54 70 89;
-  --c-receipt-punch: 16 19 26;
-}
 
 body {
   background-color: rgb(var(--c-paper));
   color: rgb(var(--c-ink));
   font-feature-settings: "cv11", "ss01";
   -webkit-font-smoothing: antialiased;
-  transition: background-color 180ms ease, color 180ms ease;
+  transition: background-color var(--dur-base) ease, color var(--dur-base) ease;
 }
 
-/* Tabular figures for money — precision without shouting */
+/* Tabular figures for money — precision without shouting.
+   Pair with `font-mono` for the monospace money treatment; `font-figures`
+   alone is correct for dense tables where a monospace face would crowd. */
 .font-figures {
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
@@ -161,16 +52,19 @@ body {
 
 *::-webkit-scrollbar-thumb {
   background-color: rgb(var(--c-scrollbar));
-  border-radius: 999px;
+  border-radius: var(--r-pill);
 }
 
-/* Visible, deliberate focus ring everywhere */
+/* Visible, deliberate focus ring everywhere. `--c-ring` inverts with the theme,
+   so the ring stays visible on both warm-white and near-black surfaces. */
 :focus-visible {
-  outline: 2px solid rgb(var(--c-signal-500));
+  outline: 2px solid rgb(var(--c-ring));
   outline-offset: 2px;
-  border-radius: 6px;
+  border-radius: var(--r-xs);
 }
 
+/* Directional icons (arrows, chevrons, trends) mirror under RTL.
+   Add `flip-rtl` to any glyph whose meaning depends on direction. */
 [dir="rtl"] .flip-rtl {
   transform: scaleX(-1);
 }
@@ -186,8 +80,12 @@ body {
   }
 }
 
-/* Receipt tear — signature transaction-card motif.
-   The punch color tracks the page background in both themes. */
+/* Receipt tear — RIVA's signature transaction-card motif.
+   A quiet perforated-edge divider between the amount and the accounting
+   details disclosure. The punch colour tracks the page background in both
+   themes via `--c-receipt-punch`. This is the ONE place the design takes a
+   visible risk; everything around it stays deliberately quiet so the motif
+   and the AI conversation carry the personality. */
 .receipt-tear {
   background-image: radial-gradient(
     circle at 6px 6px,
@@ -198,7 +96,30 @@ body {
   background-repeat: repeat-x;
   background-position: bottom;
   height: 12px;
-  transition: background-image 180ms ease;
+  transition: background-image var(--dur-base) ease;
+}
+
+/* ============================================================================
+   Typography — locale-driven font switching
+   ----------------------------------------------------------------------------
+   `--font-ui` and `--font-ui-display` are the seam that keeps `font-sans` and
+   `font-display` correct in both languages. Tailwind's `fontFamily.sans` and
+   `.display` resolve through these, so a component never hardcodes Vazirmatn:
+   doing so would fight English typography and leave numeric contexts without a
+   Persian fallback.
+
+     fa → Vazirmatn (RTL-native Persian face) for both UI and display
+     en → Inter for UI, Manrope for display, JetBrains Mono for money
+
+   `html[data-locale]` is written client-side by `lib/i18n/index.tsx`; the
+   values are also declared on `:root` so the first paint before hydration is
+   already correct.
+   ========================================================================== */
+
+:root,
+html[data-locale="en"] {
+  --font-ui: var(--font-inter), system-ui, sans-serif;
+  --font-ui-display: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
 }
 
 html[data-locale="fa"] {
@@ -206,23 +127,527 @@ html[data-locale="fa"] {
   --font-ui-display: var(--font-vazirmatn), system-ui, sans-serif;
 }
 
-html[data-locale="fa"] body {
-  font-family: var(--font-vazirmatn), system-ui, sans-serif;
-}
-
-html[data-locale="fa"] .font-display {
-  font-family: var(--font-vazirmatn), system-ui, sans-serif;
-}
-
-html[data-locale="en"] {
-  --font-ui: var(--font-inter), system-ui, sans-serif;
-  --font-ui-display: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
-}
-
 html[data-locale="en"] body {
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-ui);
 }
 
 html[data-locale="en"] .font-display {
-  font-family: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-ui-display);
+}
+
+html[data-locale="fa"] body {
+  font-family: var(--font-ui);
+}
+
+html[data-locale="fa"] .font-display {
+  font-family: var(--font-ui-display);
+}
+
+/* ============================================================================
+   Liquid Lens — pointer-tracked glass highlight
+   ----------------------------------------------------------------------------
+   A radial gradient that follows the pointer across interactive glass elements
+   (navigation items, glass buttons). Creates a premium lensing effect without
+   overwhelming the restrained RIVA aesthetic.
+
+   Adapted from the liquid-glass reference but tuned for RIVA:
+     - Softer gradients (no harsh white)
+     - Warmer in dark mode (Warm White #F7F7F3, not pure white)
+     - Uses RIVA's motion tokens
+     - Navigation-focused (not sprayed across content)
+
+   Usage: Add `glass-lens` class to interactive glass elements. The liquidLens
+   utility (lib/motion/liquidLens.ts) tracks pointer position and sets
+   --lens-x / --lens-y CSS custom properties.
+   ========================================================================== */
+
+.glass-lens {
+  --lens-x: 50%;
+  --lens-y: 50%;
+
+  /* Light mode gradients — enhanced for visibility on light surfaces */
+  --lens-gradient-light: radial-gradient(
+    140px circle at var(--lens-x) var(--lens-y),
+    rgba(16, 28, 44, 0.14),
+    rgba(16, 28, 44, 0.09) 24%,
+    rgba(113, 135, 155, 0.06) 44%,
+    transparent 68%
+  );
+  --lens-base-gradient-light: linear-gradient(
+    145deg,
+    rgba(16, 28, 44, 0.10) 0%,
+    rgba(113, 135, 155, 0.05) 46%,
+    transparent 100%
+  );
+  --lens-inner-light: inset 0 1px 0 rgba(255, 255, 255, 0.5),
+                      inset 0 -1px 0 rgba(16, 28, 44, 0.08),
+                      inset 0 0 0 1px rgba(113, 135, 155, 0.16),
+                      0 2px 8px rgba(16, 28, 44, 0.04);
+
+  /* Dark mode gradients */
+  --lens-gradient-dark: radial-gradient(
+    160px circle at var(--lens-x) var(--lens-y),
+    rgba(247, 247, 243, 0.28),
+    rgba(247, 247, 243, 0.12) 40%,
+    transparent 70%
+  );
+  --lens-base-gradient-dark: linear-gradient(
+    135deg,
+    rgba(247, 247, 243, 0.05) 0%,
+    transparent 60%
+  );
+  --lens-inner-dark: inset 0 1px 0 rgba(247, 247, 243, 0.22),
+                     inset 0 -0.5px 0 rgba(0, 0, 0, 0.08);
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition:
+    transform var(--dur-base) var(--ease-riva),
+    box-shadow var(--dur-base) var(--ease-riva),
+    background-color var(--dur-base) var(--ease-riva),
+    border-color var(--dur-base) var(--ease-riva),
+    color var(--dur-base) var(--ease-riva);
+}
+
+.glass-lens::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    var(--lens-gradient-light),
+    var(--lens-base-gradient-light);
+  opacity: 0;
+  transform: scale(1.02);
+  transition: opacity var(--dur-fast) var(--ease-riva);
+  z-index: 0;
+}
+
+.dark .glass-lens::before {
+  background:
+    var(--lens-gradient-dark),
+    var(--lens-base-gradient-dark);
+}
+
+.glass-lens::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: var(--lens-inner-light);
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-riva);
+  z-index: 0;
+}
+
+.dark .glass-lens::after {
+  box-shadow: var(--lens-inner-dark);
+}
+
+.glass-lens > * {
+  position: relative;
+  z-index: 1;
+}
+
+.glass-lens.is-lens-active::before,
+.glass-lens:hover::before,
+.glass-lens:focus-visible::before {
+  opacity: 1;
+}
+
+.glass-lens.is-lens-active::after,
+.glass-lens:hover::after,
+.glass-lens:focus-visible::after {
+  opacity: 1;
+}
+
+.glass-lens.is-lens-active,
+.glass-lens:hover {
+  transform: translateY(-1px) scale(1.005);
+}
+
+.glass-lens:active {
+  transform: translateY(0) scale(0.995);
+}
+
+/* Touch devices: disable hover lift, keep only active press */
+@media (hover: none), (pointer: coarse) {
+  .glass-lens:hover {
+    transform: none;
+  }
+
+  .glass-lens.is-lens-active {
+    transform: none;
+  }
+
+  .glass-lens:active {
+    transform: scale(0.98);
+  }
+}
+
+/* ============================================================================
+   Liquid Glass Animations
+   ----------------------------------------------------------------------------
+   Entrance animations for glass surfaces. Kept restrained: RIVA is a business
+   tool, not a marketing site. These are shorter and subtler than the reference
+   liquid-glass animations.
+   ========================================================================== */
+
+@keyframes liquidRise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0) scale(0.99);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes liquidFlow {
+  from {
+    opacity: 0;
+    transform: translate3d(12px, 8px, 0) scale(0.99);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.liquid-rise {
+  animation: liquidRise var(--dur-moderate) var(--ease-riva) both;
+}
+
+.liquid-flow {
+  animation: liquidFlow var(--dur-moderate) var(--ease-riva) both;
+}
+
+/* ============================================================================
+   Liquid Glass Authentication Page
+   ----------------------------------------------------------------------------
+   Complete visual redesign of the auth screen matching the liquid-glass
+   reference project, adapted to RIVA's brand colors and typography.
+   ========================================================================== */
+
+.liquid-glass-auth-page {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: max(1.25rem, env(safe-area-inset-top))
+           max(1rem, env(safe-area-inset-right))
+           max(1.75rem, env(safe-area-inset-bottom))
+           max(1rem, env(safe-area-inset-left));
+  overflow: hidden;
+  color: rgb(var(--c-ink));
+}
+
+/* Animated gradient background */
+.liquid-glass-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(135deg, rgb(var(--liquid-bg-dark-1)) 0%, rgb(var(--liquid-bg-dark-2)) 50%, rgb(var(--liquid-bg-dark-3)) 100%);
+}
+
+.liquid-glass-gradient-1 {
+  position: absolute;
+  top: -20%;
+  left: -10%;
+  width: 60%;
+  height: 60%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(16, 28, 44, 0.6) 0%, transparent 70%);
+  filter: blur(80px);
+  animation: float 20s ease-in-out infinite;
+}
+
+.liquid-glass-gradient-2 {
+  position: absolute;
+  bottom: -20%;
+  right: -10%;
+  width: 50%;
+  height: 50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(113, 135, 155, 0.4) 0%, transparent 70%);
+  filter: blur(90px);
+  animation: float 25s ease-in-out infinite reverse;
+}
+
+.liquid-glass-gradient-3 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40%;
+  height: 40%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(96, 125, 148, 0.3) 0%, transparent 70%);
+  filter: blur(100px);
+  animation: pulse 15s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -30px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+
+/* Glass panel stage */
+.liquid-glass-stage {
+  width: min(100%, 28rem);
+  display: grid;
+  gap: 1.6rem;
+  padding: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 28px;
+  background: rgba(12, 16, 24, 0.48);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  animation: liquidRise var(--dur-slow) var(--ease-riva) both;
+}
+
+.dark .liquid-glass-stage {
+  background: rgba(16, 20, 30, 0.52);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Brand mark */
+.liquid-glass-mark {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: grid;
+  place-items: center;
+  margin-bottom: 0.75rem;
+  border-radius: 999px;
+  background: linear-gradient(145deg, rgb(var(--c-signal-500)) 0%, rgb(var(--c-signal-600)) 48%, rgb(var(--c-signal-400)) 100%);
+  box-shadow:
+    0 10px 24px rgba(16, 28, 44, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Typography */
+.liquid-glass-intro {
+  margin-bottom: 0.5rem;
+}
+
+.liquid-glass-title {
+  margin: 0;
+  font-size: clamp(1.7rem, 6vw, 2rem);
+  font-weight: 650;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: #fff;
+  font-family: var(--font-ui-display);
+}
+
+.liquid-glass-subtitle {
+  margin: 0.5rem 0 0;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Form structure */
+.liquid-glass-form {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.liquid-glass-fields {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.liquid-glass-field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.liquid-glass-field-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: -0.01em;
+}
+
+/* Glass inputs */
+.liquid-glass-input {
+  width: 100%;
+  min-height: 3.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  padding: 0.85rem 0.95rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 16px;
+  transition:
+    border-color var(--dur-fast) var(--ease-riva),
+    box-shadow var(--dur-fast) var(--ease-riva),
+    background-color var(--dur-fast) var(--ease-riva);
+}
+
+.liquid-glass-input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.liquid-glass-input:hover {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.liquid-glass-input:focus {
+  outline: none;
+  border-color: rgba(16, 28, 44, 0.8);
+  box-shadow:
+    0 0 0 4px rgba(16, 28, 44, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Error message */
+.liquid-glass-error {
+  padding: 0.875rem 1rem;
+  border-radius: 12px;
+  background: rgba(181, 67, 58, 0.15);
+  border: 1px solid rgba(181, 67, 58, 0.3);
+  color: rgb(var(--c-rose-100));
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.liquid-glass-success-message {
+  padding: 0.875rem 1rem;
+  border-radius: 12px;
+  background: rgba(62, 154, 109, 0.15);
+  border: 1px solid rgba(62, 154, 109, 0.3);
+  color: rgb(var(--c-moss-100));
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* Privacy note */
+.liquid-glass-privacy-note {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* Actions area */
+.liquid-glass-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+/* Glass button */
+.liquid-glass-button {
+  min-width: 7rem;
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  padding: 0 1.5rem;
+  background: linear-gradient(180deg, rgb(var(--c-signal-600)), rgb(var(--c-signal-500)));
+  color: #fff;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  box-shadow:
+    0 10px 24px rgba(16, 28, 44, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition:
+    transform var(--dur-base) var(--ease-riva),
+    box-shadow var(--dur-base) var(--ease-riva),
+    filter var(--dur-base) var(--ease-riva);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.liquid-glass-button:hover:not(:disabled) {
+  transform: translateY(-1px) scale(1.02);
+  filter: brightness(1.05);
+  box-shadow:
+    0 14px 30px rgba(16, 28, 44, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.liquid-glass-button:active:not(:disabled) {
+  transform: translateY(0) scale(0.99);
+}
+
+.liquid-glass-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Footer */
+.liquid-glass-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.liquid-glass-link {
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 600;
+  transition: color var(--dur-fast) ease;
+  cursor: pointer;
+}
+
+.liquid-glass-link:hover {
+  color: #fff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .liquid-glass-stage {
+    padding: 1.5rem;
+    gap: 1.25rem;
+  }
+
+  .liquid-glass-title {
+    font-size: 1.5rem;
+  }
+
+  .liquid-glass-button {
+    width: 100%;
+  }
 }

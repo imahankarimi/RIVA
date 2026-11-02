@@ -202,7 +202,7 @@ export function AddIncomeModal({ open, onClose, onSaved }: { open: boolean; onCl
               <h2 className="font-display text-[16px] font-bold text-ink">{title}</h2>
               <button
                 onClick={handleClose}
-                className="flex h-8 w-8 items-center justify-center rounded-md text-ink-faint hover:bg-surfaceMuted hover:text-ink"
+                className="glass-lens flex h-8 w-8 items-center justify-center rounded-md text-ink-faint hover:bg-surfaceMuted hover:text-ink"
                 aria-label={t("common.close")}
               >
                 <X size={16} />

@@ -40,7 +40,7 @@ export function Modal({
             exit={{ opacity: 0 }}
             transition={{ duration: DURATION.base }}
             onClick={onClose}
-            className="absolute inset-0 bg-ink/25 backdrop-blur-[1px]"
+            className="absolute inset-0 bg-ink/30 backdrop-blur-md dark:bg-ink/40"
             aria-hidden
           />
           <motion.div

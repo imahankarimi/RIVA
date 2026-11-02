@@ -66,7 +66,7 @@ class AssistantFlowTests(unittest.TestCase):
         cls.client = TestClient(cls.app)
         cls.signup = cls.client.post("/api/auth/signup", json={
             "email": "cafe@example.com",
-            "password": "password123",
+            "password": "RivaTest123",
             "business_name": "Cafe Shop",
             "base_currency": "USD",
         })

@@ -16,6 +16,7 @@ const en = {
     amount: "Amount",
     status: "Status",
     seeAll: "See all",
+    soon: "Soon",
     comingSoon: "Coming soon",
     demoDataNotice: "Showing sample data until this business has real transactions.",
     retry: "Try again",
@@ -398,6 +399,45 @@ const en = {
     selectExpenseAccountRequired: "Choose the expense account",
     selectPaidFromAccountRequired: "Choose where the money is paid from",
   },
+  /**
+   * Localised names for the free-text `category` and `account` values the
+   * backend derives from a transaction description. `lib/i18n/labels.ts` maps
+   * a raw value to one of these keys and returns the raw value unchanged when
+   * there is no mapping — so an unknown category still renders legibly
+   * instead of leaking a dotted key path into the UI.
+   *
+   * Keep this in sync with `CATEGORY_KEYS` / `ACCOUNT_KEYS` in labels.ts, and
+   * with the expense buckets the backend resolves in
+   * `backend/transaction_recorder.py`.
+   */
+  labels: {
+    categories: {
+      food: "Food & supplies",
+      salary: "Salary & wages",
+      transport: "Transport",
+      housing: "Housing",
+      rent: "Rent",
+      utilities: "Utilities",
+      shopping: "Shopping",
+      marketing: "Marketing",
+      entertainment: "Entertainment",
+      health: "Health",
+      education: "Education",
+      supplies: "Office supplies",
+      software: "Software",
+      telecom: "Telecom",
+      travel: "Travel",
+      other: "Other",
+    },
+    accounts: {
+      cash: "Cash",
+      bank: "Bank",
+      card: "Card",
+      income: "Income",
+      expense: "Expenses",
+      other: "Other",
+    },
+  },
   comingSoon: {
     body: "This section isn't built yet — it's here so navigation feels complete while the rest of RIVA AI catches up.",
     debtsDesc: "Track loans, credit lines, and repayment schedules — never miss a due date.",
@@ -444,10 +484,13 @@ const en = {
     welcomeBody: "A quieter, clearer view of your business finances.",
     login: "Log in",
     signup: "Create account",
+    signupSubtitle: "Start managing your business finances with AI-powered insights.",
     email: "Email address",
+    emailPlaceholder: "you@company.com",
     password: "Password",
     confirmPassword: "Confirm password",
     businessName: "Business name",
+    businessNamePlaceholder: "Your Company Ltd",
     noAccount: "New to RIVA AI?",
     hasAccount: "Already have an account?",
     loginAction: "Log in to your workspace",
@@ -458,6 +501,32 @@ const en = {
     unknownError: "An unexpected error occurred. Please try again.",
     connecting: "Connecting securely…",
     backToLogin: "Back to login",
+    forgotPassword: "Forgot password?",
+    forgotTitle: "Reset your password",
+    forgotBody: "Enter your email and we'll send you a reset link.",
+    forgotAction: "Send reset link",
+    forgotSentGeneric: "If that email is registered, a password reset link has been sent. Check your inbox.",
+    newPassword: "New password",
+    currentPassword: "Current password",
+    resetTitle: "Choose a new password",
+    resetAction: "Reset password",
+    resetSuccess: "Your password has been reset. You can now log in.",
+    resetInvalidToken: "This reset link is invalid or has expired.",
+    verifyTitle: "Verifying your email",
+    verifySuccess: "Your email has been verified.",
+    verifyInvalidToken: "This verification link is invalid or has expired.",
+    verifyAlready: "Your email is already verified.",
+    goToLogin: "Go to login",
+    resendVerification: "Resend verification email",
+    resendVerificationSent: "Verification email sent.",
+    emailUnverified: "Your email isn't verified yet.",
+    changePassword: "Change password",
+    changePasswordBody: "Update the password you use to sign in.",
+    changePasswordAction: "Update password",
+    changePasswordSuccess: "Password updated.",
+    changePasswordOtherSessions: "Other devices have been signed out.",
+    currentPasswordIncorrect: "Current password is incorrect.",
+    privacyNote: "Your data is encrypted and never shared with third parties.",
   },
 };
 

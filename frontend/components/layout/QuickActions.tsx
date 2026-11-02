@@ -19,7 +19,7 @@ export function QuickActions({
   const { openAddIncome } = useAddIncome();
 
   const itemClass = cn(
-    "group flex h-8 items-center gap-2.5 rounded-md px-3 text-[12.5px] font-medium",
+    "glass-lens group flex h-8 items-center gap-2.5 rounded-md px-3 text-[12.5px] font-medium",
     "text-ink-soft transition-colors duration-150",
     "hover:bg-surfaceMuted hover:text-ink",
     collapsed && "justify-center px-0"

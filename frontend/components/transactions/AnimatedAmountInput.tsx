@@ -79,6 +79,17 @@ export function AnimatedAmountInput({
   const [focused, setFocused] = useState(false);
   const [touched, setTouched] = useState(false);
 
+  // Ensure the input receives focus after the modal animation completes
+  useEffect(() => {
+    if (autoFocus && inputRef.current) {
+      // Delay to allow modal animation to complete
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [autoFocus]);
+
   const showLayer = focused || touched || value !== "";
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {

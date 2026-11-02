@@ -1,15 +1,24 @@
 import json
-from datetime import datetime
+import os
+import base64
+import secrets
+from datetime import datetime, timedelta
 from decimal import Decimal
 
-from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi import Body, Depends, FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from rate_limiter import check_rate_limit, check_ai_rate_limit, rate_limit_middleware
+from rate_limiter import (
+    check_rate_limit,
+    check_rate_limit_by_identifier,
+    check_ai_rate_limit,
+    get_client_ip,
+    rate_limit_middleware,
+)
 from timeout_middleware import timeout_middleware
 
 from account_service import create_default_accounts
@@ -21,7 +30,19 @@ from ai_service import (
 )
 from language_detect import detect_language
 from ai_provider import is_configured as ai_is_configured
-from auth import create_access_token, get_current_user, hash_password, verify_password
+from permissions import Permission, require_business_access, get_user_role
+from auth import (
+    _expires_in_minutes,
+    _refresh_expires_in_days,
+    decode_refresh_token,
+    get_access_payload,
+    get_current_user,
+    hash_password,
+    revoke_session,
+    rotate_session,
+    start_session,
+    verify_password,
+)
 from conversation_service import (
     add_message,
     create_conversation as create_conversation_svc,
@@ -37,10 +58,13 @@ from financial_periods import parse_period, default_period
 from models import (
     Account,
     Business,
+    BusinessMember,
     ChatConversation,
     ChatMessageRow,
     JournalEntry,
     User,
+    UserSession,
+    AuditLog,
 )
 from report_service import (
     build_report_data,
@@ -65,7 +89,11 @@ from schemas import (
     CurrentUserResponse,
     JournalEntryInput,
     LoginRequest,
+    PasswordChange,
+    PasswordResetComplete,
+    PasswordResetRequest,
     ProfileUpdate,
+    RefreshRequest,
     ReportExportRequest,
     SignupRequest,
     SwitchBusinessRequest,
@@ -152,18 +180,52 @@ def health_check():
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _owned_business(db: Session, user: User, business_id: str | None) -> Business:
+def _owned_business(
+    db: Session,
+    user: User,
+    business_id: str | None,
+    permission: Permission | None = None,
+) -> Business:
+    """Get a business the user has access to, with optional permission check.
+
+    Authorization model (Phase 2):
+    - Resolves membership via BusinessMember (or legacy owner_id for backward compatibility)
+    - If `permission` is provided, enforces that the user's role grants it
+    - If `permission` is None, only verifies membership (any role)
+
+    Returns:
+        The business object if authorized.
+
+    Raises:
+        HTTPException(404) if business not found or user has no membership.
+        HTTPException(403) if user lacks the required permission.
+    """
     business = db.query(Business).filter(Business.id == business_id).first() if business_id else None
-    if not business or business.owner_id != user.id:
+    if not business:
         raise HTTPException(status_code=404, detail="Business not found")
+
+    if permission is not None:
+        # Enforce the specific permission (raises 404/403 as appropriate)
+        require_business_access(db, user, business, permission)
+    else:
+        # Just verify membership exists (any role)
+        role = get_user_role(db, user, business)
+        if role is None:
+            raise HTTPException(status_code=404, detail="Business not found")
+
     return business
 
 
-def _owned_conversation(db: Session, user: User, conversation_id: str) -> ChatConversation:
+def _owned_conversation(
+    db: Session,
+    user: User,
+    conversation_id: str,
+    permission: Permission | None = None,
+) -> ChatConversation:
     conversation = db.query(ChatConversation).filter(ChatConversation.id == conversation_id).first()
     if not conversation:
         raise HTTPException(status_code=404, detail="Conversation not found")
-    _owned_business(db, user, conversation.business_id)
+    _owned_business(db, user, conversation.business_id, permission)
     return conversation
 
 
@@ -247,6 +309,7 @@ def _current_user_response(db: Session, user: User) -> dict:
         "email": user.email,
         "first_name": user.first_name,
         "last_name": user.last_name,
+        "is_verified": user.is_verified,
         "business": {
             "id": user.business.id,
             "name": user.business.name,
@@ -257,24 +320,41 @@ def _current_user_response(db: Session, user: User) -> dict:
     }
 
 
-def _auth_response(user: User) -> dict:
-    """Serialize only safe user and business information for auth endpoints."""
-    return {
-        "access_token": create_access_token(user.id),
-        "token_type": "bearer",
-        "user": {
-            "id": user.id,
-            "email": user.email,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-        },
-        "business": {
-            "id": user.business.id,
-            "name": user.business.name,
-            "language": user.business.language,
-            "base_currency": user.business.base_currency,
-        },
-    }
+def _audit_log(
+    db: Session,
+    user: User,
+    business: Business | None,
+    action: str,
+    resource_type: str,
+    resource_id: str | None = None,
+    previous_value: str | None = None,
+    new_value: str | None = None,
+    metadata: dict | None = None,
+) -> AuditLog:
+    """Create an audit log entry.
+
+    Append-only: logs are never deleted by ordinary users.
+    Critical financial mutations are always logged.
+    """
+    import json as _json
+
+    metadata_json = _json.dumps(metadata) if metadata else None
+
+    log_entry = AuditLog(
+        user_id=user.id,
+        business_id=business.id if business else None,
+        action=action,
+        resource_type=resource_type,
+        resource_id=resource_id,
+        previous_value=previous_value,
+        new_value=new_value,
+        metadata_json=metadata_json,
+    )
+
+    db.add(log_entry)
+    db.commit()
+    db.refresh(log_entry)
+    return log_entry
 
 
 # ---------------------------------------------------------------------------
@@ -286,6 +366,8 @@ def signup(request: Request, data: SignupRequest, db: Session = Depends(get_db))
     # Rate limit: 3 signups per hour per IP (prevent abuse).
     # Sync rate-limit check — FastAPI runs sync `def` endpoints in a threadpool,
     # so the blocking in-memory limiter and DB/DB writes stay off the event loop.
+    from password_policy import validate_password, PasswordValidationError
+
     check_rate_limit(request, "auth_signup")
     email = str(data.email).lower()
     business_name = data.business_name.strip()
@@ -294,6 +376,13 @@ def signup(request: Request, data: SignupRequest, db: Session = Depends(get_db))
         raise HTTPException(status_code=422, detail="Business name cannot be empty")
     if data.base_currency not in SUPPORTED_CURRENCIES:
         raise HTTPException(status_code=422, detail=f"Unsupported currency: {data.base_currency}")
+
+    # Validate password policy
+    try:
+        validate_password(data.password)
+    except PasswordValidationError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+
     if db.query(User).filter(User.email == email).first():
         raise HTTPException(status_code=409, detail="An account with this email already exists")
 
@@ -319,7 +408,32 @@ def signup(request: Request, data: SignupRequest, db: Session = Depends(get_db))
         db.rollback()
         raise
 
-    return _auth_response(user)
+    # Audit log business creation
+    _audit_log(
+        db=db,
+        user=user,
+        business=business,
+        action="business_create",
+        resource_type="business",
+        resource_id=business.id,
+        previous_value=None,
+        new_value=json.dumps({
+            "name": business.name,
+            "base_currency": business.base_currency,
+        }),
+        metadata={"ip": user.id, "action": "account_creation"},
+    )
+
+    # Signup is an authentication event: create a server-side session and
+    # issue the same access + refresh pair login does.
+    _, access_token, refresh_token = start_session(
+        db,
+        user.id,
+        user_agent=request.headers.get("user-agent"),
+        ip_address=get_client_ip(request),
+    )
+    db.commit()
+    return _auth_response_with_tokens(user, access_token, refresh_token)
 
 
 @app.post("/api/auth/login", response_model=AuthResponse)
@@ -334,8 +448,73 @@ def login(request: Request, data: LoginRequest, db: Session = Depends(get_db)):
             detail="Invalid email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return _auth_response(user)
+    # Server-side session + access/refresh pair (rotation happens at /refresh)
+    _, access_token, refresh_token = start_session(
+        db,
+        user.id,
+        user_agent=request.headers.get("user-agent"),
+        ip_address=get_client_ip(request),
+    )
+    db.commit()
+    return _auth_response_with_tokens(user, access_token, refresh_token)
 
+
+def _auth_response_with_tokens(user: User, access_token: str, refresh_token: str) -> AuthResponse:
+    """Build auth response with both access and refresh tokens."""
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "expires_in": _expires_in_minutes() * 60,
+        "refresh_token": refresh_token,
+        "refresh_expires_in": _refresh_expires_in_days() * 24 * 60 * 60,
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "is_verified": user.is_verified,
+        },
+        "business": {
+            "id": user.business.id,
+            "name": user.business.name,
+            "language": user.business.language,
+            "base_currency": user.business.base_currency,
+        },
+    }
+
+
+@app.post("/api/auth/refresh", response_model=AuthResponse, include_in_schema=False)
+def refresh_session(data: RefreshRequest, db: Session = Depends(get_db)):
+    """Exchange a refresh token for a new access + refresh pair (rotation).
+
+    Deliberately requires NO access token and no Authorization header — this
+    is the only path that can recover from an expired access token. The old
+    refresh token is single-use: models.UserSession (not process memory) is
+    the authority for revocation and rotation across all workers.
+    """
+    payload = decode_refresh_token(data.refresh_token)
+    user, access_token, refresh_token = rotate_session(db, payload)
+    return _auth_response_with_tokens(user, access_token, refresh_token)
+
+@app.post("/api/auth/logout", response_model=dict)
+def logout(
+    db: Session = Depends(get_db),
+    payload: dict = Depends(get_access_payload),
+):
+    """Revoke the server-side session bound to this access token.
+
+    Access-token authentication is required because access tokens are issued
+    with a `sid` claim binding them to their session — that is what makes the
+    paired refresh session reliably revocable server-side. The refresh token
+    of a revoked session can no longer be exchanged. Legacy tokens without
+    `sid` return revoked=false (the client still clears local state).
+    """
+    sid = payload.get("sid")
+    revoked = bool(sid) and revoke_session(db, sid, "logout")
+    return {
+        "message": "Successfully logged out",
+        "revoked": revoked,
+    }
 
 @app.get("/api/auth/me", response_model=CurrentUserResponse)
 def current_user(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
@@ -349,6 +528,304 @@ def update_profile(data: ProfileUpdate, db: Session = Depends(get_db), user: Use
     db.commit()
     db.refresh(user)
     return _current_user_response(db, user)
+
+
+@app.post("/api/auth/switch-business", response_model=CurrentUserResponse)
+def switch_business(
+    data: SwitchBusinessRequest, db: Session = Depends(get_db), user: User = Depends(get_current_user)
+):
+    business = _owned_business(db, user, data.business_id)
+    user.business_id = business.id
+    db.commit()
+    db.refresh(user)
+    return _current_user_response(db, user)
+
+
+# ---------------------------------------------------------------------------
+# Email Verification & Password Reset (Phase 2B)
+# ---------------------------------------------------------------------------
+
+
+@app.post("/api/auth/resend-verification", response_model=dict)
+def resend_verification_email(
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """Resend email verification link (authenticated).
+
+    Rate-limited to prevent abuse.
+    """
+    from email_provider import send_verification_email, is_email_configured
+    from token_models import create_verification_token, hash_token
+
+    check_rate_limit(request, "auth_signup")  # Reuse signup limit
+
+    if user.is_verified:
+        return {"message": "Email already verified", "already_verified": True}
+
+    if not is_email_configured():
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Email delivery is not configured",
+        )
+
+    # Create new verification token
+    token_record, raw_token = create_verification_token(user.id)
+    db.add(token_record)
+    db.commit()
+
+    # Send email
+    base_url = os.getenv("FRONTEND_BASE_URL", "http://localhost:3000")
+    sent = send_verification_email(user.email, raw_token, base_url)
+
+    if not sent:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Failed to send verification email",
+        )
+
+    return {"message": "Verification email sent", "expires_hours": 24}
+
+
+@app.post("/api/auth/verify-email", response_model=dict)
+def verify_email(
+    request: Request,
+    token: str = Body(..., embed=True),
+    db: Session = Depends(get_db),
+):
+    """Verify email address using token from email link (unauthenticated).
+
+    Atomically consumes the token and marks user verified.
+    """
+    from token_models import hash_token, VerificationToken
+    from datetime import datetime, timezone
+
+    check_rate_limit(request, "auth_login")  # Reuse login limit (IP-based)
+
+    token_hash = hash_token(token)
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+
+    # Find valid, unconsumed token; lock the row for atomic consumption so
+    # concurrent requests cannot both consume the same single-use token.
+    token_record = (
+        db.query(VerificationToken)
+        .filter(
+            VerificationToken.token_hash == token_hash,
+            VerificationToken.consumed == False,
+            VerificationToken.expires_at > now,
+        )
+        .with_for_update()
+        .first()
+    )
+
+    if not token_record:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired verification token",
+        )
+
+    # Atomic consumption
+    token_record.consumed = True
+    token_record.consumed_at = now
+
+    user = db.query(User).filter(User.id == token_record.user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid verification token",
+        )
+
+    user.is_verified = True
+    db.commit()
+
+    return {"message": "Email verified successfully"}
+
+
+@app.post("/api/auth/request-password-reset", response_model=dict)
+def request_password_reset(
+    request: Request,
+    data: PasswordResetRequest,
+    db: Session = Depends(get_db),
+):
+    """Request password reset link (unauthenticated).
+
+    Always returns success to avoid account enumeration.
+    """
+    from email_provider import send_password_reset_email, is_email_configured
+    from token_models import create_password_reset_token
+
+    email = data.email.lower()
+
+    # Rate limit by source IP AND by normalized account identifier. The
+    # account bucket is keyed on the (lowercased) submitted email regardless
+    # of whether an account exists, so the limit itself never reveals
+    # existence. Spoofed X-Forwarded-For cannot bypass the IP limit because
+    # get_client_ip only trusts forwarded headers behind a trusted proxy.
+    check_rate_limit(request, "auth_pwreset_request")
+    check_rate_limit_by_identifier("auth_pwreset_account", email)
+
+    # Always return the same response (timing-safe)
+    def success_response():
+        return {
+            "message": "If that email is registered, a password reset link has been sent",
+            "expires_hours": 2,
+        }
+
+    user = db.query(User).filter(User.email == email).first()
+
+    # Don't reveal whether account exists
+    if not user:
+        return success_response()
+
+    if not is_email_configured():
+        # Silent failure - don't reveal email is not configured to unauthenticated users
+        return success_response()
+
+    # Create reset token
+    token_record, raw_token = create_password_reset_token(user.id)
+    db.add(token_record)
+    db.commit()
+
+    # Send email
+    base_url = os.getenv("FRONTEND_BASE_URL", "http://localhost:3000")
+    sent = send_password_reset_email(user.email, raw_token, base_url)
+
+    # Return success regardless of delivery outcome (timing-safe, no enumeration)
+    return success_response()
+
+
+@app.post("/api/auth/reset-password", response_model=dict)
+def reset_password(
+    request: Request,
+    data: PasswordResetComplete,
+    db: Session = Depends(get_db),
+):
+    """Complete password reset using token (unauthenticated).
+
+    Atomically consumes token, updates password, revokes all sessions.
+    """
+    from token_models import hash_token, PasswordResetToken
+    from password_policy import validate_password, PasswordValidationError
+    from datetime import datetime, timezone
+
+    check_rate_limit(request, "auth_pwreset_complete")
+
+    # Validate new password
+    try:
+        validate_password(data.new_password)
+    except PasswordValidationError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+
+    token_hash = hash_token(data.token)
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+
+    # Find valid, unconsumed token
+    token_record = (
+        db.query(PasswordResetToken)
+        .filter(
+            PasswordResetToken.token_hash == token_hash,
+            PasswordResetToken.consumed == False,
+            PasswordResetToken.expires_at > now,
+        )
+        .with_for_update()  # Lock row for atomic consumption
+        .first()
+    )
+
+    if not token_record:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired reset token",
+        )
+
+    user = db.query(User).filter(User.id == token_record.user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid reset token",
+        )
+
+    # Atomic transaction: consume token + update password + revoke sessions
+    token_record.consumed = True
+    token_record.consumed_at = now
+    user.password_hash = hash_password(data.new_password)
+
+    # Revoke all active sessions (Phase 2B requirement)
+    db.query(UserSession).filter(
+        UserSession.user_id == user.id,
+        UserSession.revoked_at.is_(None),
+    ).update(
+        {
+            UserSession.revoked_at: now,
+            UserSession.revoke_reason: "password_reset",
+        },
+        synchronize_session=False,
+    )
+
+    db.commit()
+
+    return {"message": "Password reset successfully"}
+
+
+@app.post("/api/auth/change-password", response_model=dict)
+def change_password(
+    data: PasswordChange,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+    payload: dict = Depends(get_access_payload),
+):
+    """Change password while authenticated.
+
+    Requires current password. Revokes all OTHER sessions (keeps current one).
+    """
+    from password_policy import validate_password, PasswordValidationError
+    from datetime import datetime, timezone
+
+    # Verify current password
+    if not verify_password(data.current_password, user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is incorrect",
+        )
+
+    # Validate new password
+    try:
+        validate_password(data.new_password)
+    except PasswordValidationError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+
+    # Update password
+    user.password_hash = hash_password(data.new_password)
+
+    # Revoke all OTHER sessions (keep current one active - Phase 2B decision)
+    current_sid = payload.get("sid")
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+
+    if current_sid:
+        db.query(UserSession).filter(
+            UserSession.user_id == user.id,
+            UserSession.id != current_sid,
+            UserSession.revoked_at.is_(None),
+        ).update(
+            {
+                UserSession.revoked_at: now,
+                UserSession.revoke_reason: "password_change",
+            },
+            synchronize_session=False,
+        )
+
+    db.commit()
+
+    return {
+        "message": "Password changed successfully",
+        "sessions_revoked": "other",  # Current session remains active
+    }
 
 
 @app.post("/api/auth/switch-business", response_model=CurrentUserResponse)
@@ -410,7 +887,7 @@ def update_business(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    business = _owned_business(db, user, business_id)
+    business = _owned_business(db, user, business_id, Permission.UPDATE_BUSINESS_SETTINGS)
 
     # base_currency is intentionally absent from BusinessUpdate (and the
     # schema forbids extra fields) — it is locked forever at creation time.
@@ -422,6 +899,18 @@ def update_business(
 
     db.commit()
     db.refresh(business)
+    # Audit log business update
+    _audit_log(
+        db=db,
+        user=user,
+        business=business,
+        action="business_update",
+        resource_type="business",
+        resource_id=business.id,
+        previous_value=None,  # Could capture previous name if needed
+        new_value=json.dumps({"name": business.name}),
+        metadata={"ip": user.id, "action": "business_modification"},
+    )
     return _business_response(business, user.business_id)
 
 
@@ -429,7 +918,7 @@ def update_business(
 def get_business_context(
     business_id: str, db: Session = Depends(get_db), user: User = Depends(get_current_user)
 ):
-    business = _owned_business(db, user, business_id)
+    business = _owned_business(db, user, business_id, Permission.READ_OVERVIEW)
     return {"context": business.context_text}
 
 
@@ -440,7 +929,7 @@ def update_business_context(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    business = _owned_business(db, user, business_id)
+    business = _owned_business(db, user, business_id, Permission.UPDATE_BUSINESS_CONTEXT)
     # This is background for the AI assistant only — it never creates or
     # validates a transaction by itself, so a generous length is fine and
     # there's nothing here for the accounting engine to be defended against.
@@ -451,13 +940,16 @@ def update_business_context(
 
 @app.delete("/api/businesses/{business_id}", status_code=204)
 def delete_business(business_id: str, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    business = _owned_business(db, user, business_id)
+    business = _owned_business(db, user, business_id, Permission.DELETE_BUSINESS)
+
+    # Capture business details before deletion for audit
+    business_name = business.name
+    was_current = business.id == user.business_id
 
     remaining = db.query(Business).filter(Business.owner_id == user.id).count()
     if remaining <= 1:
         raise HTTPException(status_code=400, detail="You must keep at least one business.")
 
-    was_current = business.id == user.business_id
     db.delete(business)
     db.flush()
 
@@ -471,6 +963,19 @@ def delete_business(business_id: str, db: Session = Depends(get_db), user: User 
         if fallback:
             user.business_id = fallback.id
 
+    # Audit log business deletion
+    _audit_log(
+        db=db,
+        user=user,
+        business=business,
+        action="business_delete",
+        resource_type="business",
+        resource_id=business_id,
+        previous_value=json.dumps({"name": business_name}),
+        new_value=None,
+        metadata={"ip": user.id, "action": "business_deletion"},
+    )
+
     db.commit()
     return None
 
@@ -479,7 +984,7 @@ def delete_business(business_id: str, db: Session = Depends(get_db), user: User 
 def get_business_accounts(
     business_id: str, db: Session = Depends(get_db), user: User = Depends(get_current_user)
 ):
-    business = _owned_business(db, user, business_id)
+    business = _owned_business(db, user, business_id, Permission.READ_ACCOUNTS)
     accounts = (
         db.query(Account)
         .filter(Account.business_id == business.id)
@@ -504,7 +1009,7 @@ def get_business_accounts(
 def get_business_transactions(
     business_id: str, db: Session = Depends(get_db), user: User = Depends(get_current_user)
 ):
-    business = _owned_business(db, user, business_id)
+    business = _owned_business(db, user, business_id, Permission.READ_TRANSACTIONS)
 
     entries = (
         db.query(JournalEntry)
@@ -539,7 +1044,7 @@ def get_business_transactions(
 def get_business_overview(
     business_id: str, db: Session = Depends(get_db), user: User = Depends(get_current_user)
 ):
-    business = _owned_business(db, user, business_id)
+    business = _owned_business(db, user, business_id, Permission.READ_OVERVIEW)
     overview = compute_overview(db, business.id)
 
     return {
@@ -560,7 +1065,7 @@ def get_business_overview(
 def list_conversations(
     business_id: str, db: Session = Depends(get_db), user: User = Depends(get_current_user)
 ):
-    business = _owned_business(db, user, business_id)
+    business = _owned_business(db, user, business_id, Permission.READ_CONVERSATIONS)
     return list_conversations_svc(db, business.id)
 
 
@@ -573,7 +1078,7 @@ def create_conversation(
     This is what "New Chat" calls. It always creates a fresh conversation
     with a unique ID — never reuses or mixes with an existing one.
     """
-    business = _owned_business(db, user, business_id)
+    business = _owned_business(db, user, business_id, Permission.CREATE_CONVERSATION)
     return create_conversation_svc(db, business.id)
 
 
@@ -581,7 +1086,7 @@ def create_conversation(
 def get_conversation_messages(
     conversation_id: str, db: Session = Depends(get_db), user: User = Depends(get_current_user)
 ):
-    _owned_conversation(db, user, conversation_id)
+    _owned_conversation(db, user, conversation_id, Permission.READ_CONVERSATIONS)
     return get_conversation_messages_svc(db, conversation_id)
 
 
@@ -589,7 +1094,7 @@ def get_conversation_messages(
 def delete_conversation(
     conversation_id: str, db: Session = Depends(get_db), user: User = Depends(get_current_user)
 ):
-    conversation = _owned_conversation(db, user, conversation_id)
+    conversation = _owned_conversation(db, user, conversation_id, Permission.DELETE_CONVERSATION)
     db.delete(conversation)
     db.commit()
     return None
@@ -603,14 +1108,37 @@ def delete_conversation(
 def create_journal_entry_endpoint(
     data: JournalEntryInput, db: Session = Depends(get_db), user: User = Depends(get_current_user)
 ):
-    business = _owned_business(db, user, data.business_id)
+    business = _owned_business(db, user, data.business_id, Permission.CREATE_JOURNAL_ENTRY)
     # No conversion, no independent per-transaction currency — every entry
     # is always recorded in the business's own locked base currency,
     # regardless of what the caller sent.
     data.currency = business.base_currency
 
+    # Log previous state for audit (before the change)
+    previous_lines = None
+    existing_entries = db.query(JournalEntry).filter(JournalEntry.business_id == business.id).all()
+    if existing_entries:
+        last_entry = existing_entries[-1]
+        previous_lines = json.dumps([{"account_id": l.account_id, "debit": str(l.debit), "credit": str(l.credit)} for l in last_entry.lines]) if last_entry.lines else None
+
     try:
         entry = create_journal_entry(db=db, data=data, business_base_currency=business.base_currency)
+        # Audit log the journal entry creation
+        _audit_log(
+            db=db,
+            user=user,
+            business=business,
+            action="journal_entry_create",
+            resource_type="journal_entry",
+            resource_id=entry.id,
+            previous_value=previous_lines,
+            new_value=json.dumps({
+                "description": entry.description,
+                "currency": entry.currency,
+                "lines_count": len(entry.lines),
+            }),
+            metadata={"ip": user.id, "action": "financial_mutation"},
+        )
         return {
             "id": entry.id,
             "description": entry.description,
@@ -639,7 +1167,7 @@ def chat(
     # would block the event loop and serialize all concurrent chat requests.
     check_ai_rate_limit(request, user.id)
 
-    business = _owned_business(db, user, data.business_id)
+    business = _owned_business(db, user, data.business_id, Permission.READ_CONVERSATIONS)
 
     # Resolve the target conversation with ownership enforcement:
     # - If conversation_id is provided, it MUST belong to this business.
@@ -811,7 +1339,7 @@ def _handle_transaction_route(
 
 @app.post("/api/chat/resolve")
 def resolve_chat_choice(data: dict, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    business = _owned_business(db, user, data.get("business_id"))
+    business = _owned_business(db, user, data.get("business_id"), Permission.CONFIRM_AI_TRANSACTION)
 
     # Enforce conversation ownership before writing any message.
     conversation_id = data.get("conversation_id")
@@ -895,7 +1423,7 @@ def resolve_chat_choice(data: dict, db: Session = Depends(get_db), user: User = 
 
 @app.post("/api/chat/confirm")
 def confirm_transaction(data: ConfirmRequest, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    business = _owned_business(db, user, data.business_id)
+    business = _owned_business(db, user, data.business_id, Permission.CONFIRM_AI_TRANSACTION)
     # Enforce conversation ownership before writing any message.
     _verify_action_conversation(db, user, business, data.conversation_id)
 
@@ -937,6 +1465,22 @@ def confirm_transaction(data: ConfirmRequest, db: Session = Depends(get_db), use
 
             entry = create_journal_entry(db=db, data=journal_input, business_base_currency=business.base_currency)
             created_ids.append(str(entry.id))
+
+        # Audit log the transaction confirmation
+        _audit_log(
+            db=db,
+            user=user,
+            business=business,
+            action="transaction_confirm",
+            resource_type="transaction",
+            resource_id=",".join(created_ids) if created_ids else None,
+            previous_value=None,
+            new_value=json.dumps({
+                "count": len(created_ids),
+                "descriptions": [a.description or "" for a in actions if a.description],
+            }),
+            metadata={"ip": user.id, "action": "financial_mutation"},
+        )
 
         # Persist a success message in the conversation, in the user's language
         # (detected from the action description wording).
@@ -986,7 +1530,7 @@ def export_business_report(
     Deterministic backend calculation only — the AI never computes these
     numbers. The authenticated user must own the business.
     """
-    business = _owned_business(db, user, business_id)
+    business = _owned_business(db, user, business_id, Permission.EXPORT_REPORTS)
 
     report_key = resolve_report_key(data.report)
     if not report_key:
@@ -1037,7 +1581,7 @@ def export_business_report_get(
 
     Query params: period (natural-language string), format (csv/xlsx/pdf).
     """
-    business = _owned_business(db, user, business_id)
+    business = _owned_business(db, user, business_id, Permission.EXPORT_REPORTS)
 
     resolved_key = resolve_report_key(report_key)
     if not resolved_key:
@@ -1072,4 +1616,21 @@ def export_business_report_get(
         content=data_bytes,
         media_type=content_type,
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+if __name__ == "__main__":
+    # Console entry point.
+    #
+    # Without this block `python main.py` imported the app, printed nothing and
+    # exited 0 without binding a port, which looked like "the backend is not
+    # starting". Always launch through the project venv interpreter; the default
+    # interpreter on this machine (Anaconda) has none of the dependencies.
+    import uvicorn
+
+    uvicorn.run(
+        "main:app",
+        host=os.getenv("HOST", "0.0.0.0"),
+        port=int(os.getenv("PORT", "8000")),
+        reload=os.getenv("RELOAD", "false").lower() == "true",
     )

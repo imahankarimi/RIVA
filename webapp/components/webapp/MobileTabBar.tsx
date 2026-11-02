@@ -90,7 +90,7 @@ export function MobileTabBar() {
                   aria-label={t(item.label)}
                   title={t(item.label)}
                   className={cn(
-                    "group relative flex min-w-[60px] w-full flex-col items-center justify-center gap-0.5 rounded-2xl px-2.5 py-2 transition-all duration-200",
+                    "glass-lens group relative flex min-w-[60px] w-full flex-col items-center justify-center gap-0.5 rounded-2xl px-2.5 py-2 transition-all duration-200",
                     active
                       ? "bg-white/80 text-deep-ink shadow-sm dark:bg-white/15 dark:text-warm-white"
                       : "text-deep-ink/60 hover:bg-white/50 hover:text-deep-ink dark:text-warm-white/60 dark:hover:bg-white/15 dark:hover:text-warm-white"
@@ -114,7 +114,7 @@ export function MobileTabBar() {
                 aria-current={active ? "page" : undefined}
                 title={t(item.label)}
                 className={cn(
-                  "group relative flex min-w-[60px] w-full flex-col items-center justify-center gap-0.5 rounded-2xl px-2.5 py-2 transition-all duration-200",
+                  "glass-lens group relative flex min-w-[60px] w-full flex-col items-center justify-center gap-0.5 rounded-2xl px-2.5 py-2 transition-all duration-200",
                   isAssistant
                     ? cn(
                         "scale-[1.07] bg-deep-navy text-warm-white shadow-[0_16px_36px_-16px_rgba(16,28,44,0.8)]",

@@ -33,7 +33,7 @@ export function QuickChoices({
             disabled={disabled || resolved}
             onClick={() => onSelect(choice)}
             className={cn(
-              "flex min-h-[38px] items-center gap-1.5 rounded-full border px-4 text-[13px] font-medium transition-colors duration-150",
+              "glass-lens flex min-h-[38px] items-center gap-1.5 rounded-full border px-4 text-[13px] font-medium transition-colors duration-150",
               isSelected
                 ? "border-signal-500 bg-signal-500 text-onSignal"
                 : resolved

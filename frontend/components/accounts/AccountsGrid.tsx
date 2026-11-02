@@ -128,7 +128,7 @@ export function AccountsGrid({
             key={tab.value}
             onClick={() => setFilter(tab.value)}
             className={cn(
-              "rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
+              "glass-lens rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
               filter === tab.value
                 ? "bg-primary text-primary-foreground"
                 : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
