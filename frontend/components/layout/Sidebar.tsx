@@ -160,11 +160,11 @@ export function Sidebar() {
             }}
             title={displayedCollapsed ? business.name : undefined}
             className={cn(
-              "glass-lens relative mb-1 flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-start transition-colors duration-150 hover:bg-sidebar-accent",
+              "glass-lens relative mb-1 flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-start transition-colors duration-150",
               displayedCollapsed && "justify-center px-0"
             )}
           >
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-sidebar-accent text-xs font-semibold text-sidebar-accent-foreground">
+            <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-sidebar-accent text-xs font-semibold text-sidebar-accent-foreground">
               {business.name.charAt(0)}
             </div>
 
@@ -178,7 +178,7 @@ export function Sidebar() {
                   opacity: displayedCollapsed ? 0 : 1,
                 }}
                 transition={{ duration: DURATION.base, ease: EASE_OUT }}
-                className="min-w-0 flex-1 whitespace-pre !p-0 !m-0"
+                className="relative z-10 min-w-0 flex-1 whitespace-pre !p-0 !m-0"
               >
                 <p className="truncate text-[13px] font-medium text-sidebar-foreground">
                   {business.name}
@@ -201,7 +201,7 @@ export function Sidebar() {
                 opacity: displayedCollapsed || businesses.length <= 1 ? 0 : 1,
               }}
               transition={{ duration: DURATION.base, ease: EASE_OUT }}
-              className="whitespace-pre !p-0 !m-0"
+              className="relative z-10 whitespace-pre !p-0 !m-0"
             >
               <ChevronsUpDown size={14} className="text-ink-faint" />
             </motion.div>
@@ -217,11 +217,11 @@ export function Sidebar() {
                   setTimeout(() => setAccountOpen(false), 120)
                 }
                 className={cn(
-                  "glass-lens relative flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-start transition-colors duration-150 hover:bg-sidebar-accent",
+                  "glass-lens relative flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-start transition-colors duration-150",
                   displayedCollapsed && "justify-center px-0"
                 )}
               >
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sidebar-accent text-xs font-semibold text-sidebar-accent-foreground">
+                <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sidebar-accent text-xs font-semibold text-sidebar-accent-foreground">
                   {initial}
                 </div>
 
@@ -235,7 +235,7 @@ export function Sidebar() {
                       opacity: displayedCollapsed ? 0 : 1,
                     }}
                     transition={{ duration: DURATION.base, ease: EASE_OUT }}
-                    className="min-w-0 flex-1 whitespace-pre !p-0 !m-0"
+                    className="relative z-10 min-w-0 flex-1 whitespace-pre !p-0 !m-0"
                   >
                     <p className="truncate text-[13px] font-medium text-sidebar-foreground">
                       {displayName || user.email}

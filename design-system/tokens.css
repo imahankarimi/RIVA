@@ -146,6 +146,16 @@
   --c-accent: 238 241 244;
   --c-accent-fg: 16 28 44;
 
+  /* --- Sidebar navigation -----------------------------------------------
+     Sidebar active/selected state uses a solid surface treatment inspired by
+     the liquid-glass reference: elevated, crisp background with visible border.
+     This creates clear visual hierarchy without dots or heavy decoration. */
+  --c-sidebar: 255 255 255; /* sidebar surface itself           */
+  --c-sidebar-foreground: 16 19 26; /* default nav text                 */
+  --c-sidebar-accent: 255 255 255; /* active nav item background       */
+  --c-sidebar-accent-foreground: 16 28 44; /* active nav text (deep navy)      */
+  --c-sidebar-border: 217 223 228; /* subtle structural line           */
+
   /* --- Status ----------------------------------------------------------- */
   --c-success: 46 119 82; /* moss-700  — text/icon safe            */
   --c-success-fill: 62 154 109; /* moss-500  — fills, chart series    */
@@ -370,6 +380,13 @@
   --c-ink: 247 247 243;
   --c-ink-soft: 169 188 204;
   --c-ink-faint: 129 149 166;
+
+  /* Sidebar navigation in dark mode */
+  --c-sidebar: 16 28 44;
+  --c-sidebar-foreground: 247 247 243;
+  --c-sidebar-accent: 247 247 243;
+  --c-sidebar-accent-foreground: 16 19 26;
+  --c-sidebar-border: 41 54 70;
 
   /* Steel mixed into navy. Full steel is *lighter* than the card surface
      here, so every bordered card would read as a glowing outline. */

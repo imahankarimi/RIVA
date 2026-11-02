@@ -48,28 +48,20 @@ function NavLink({
       onClick={onNavigate}
       className={cn(
         "glass-lens group relative flex h-9 items-center gap-2.5 rounded-md px-3 text-[13px] font-medium",
-        "transition-colors duration-150",
+        "transition-all duration-180",
         collapsed && "justify-center px-0",
         active
-          ? "text-sidebar-accent-foreground"
-          : "text-ink-soft hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          ? "border border-sidebar-border bg-sidebar-accent text-sidebar-accent-foreground shadow-subtle"
+          : "border border-transparent text-ink-soft hover:border-line/50 hover:text-ink"
       )}
     >
-      {active && (
-        <motion.span
-          layoutId="sidebar-active-pill"
-          transition={SPRING_SNAPPY}
-          className="absolute inset-0 rounded-md bg-sidebar-accent"
-        />
-      )}
-
       <Icon
         size={16}
         strokeWidth={2}
         className={cn(
-          "relative shrink-0 transition-colors duration-150",
+          "relative z-10 shrink-0 transition-colors duration-180",
           active
-            ? "text-signal-600"
+            ? "text-sidebar-accent-foreground"
             : "text-ink-faint group-hover:text-ink"
         )}
       />
@@ -84,7 +76,7 @@ function NavLink({
           opacity: collapsed ? 0 : 1,
         }}
         transition={{ duration: DURATION.base, ease: EASE_OUT }}
-        className="relative whitespace-pre !p-0 !m-0 text-[13px] font-medium"
+        className="relative z-10 whitespace-pre !p-0 !m-0 text-[13px] font-medium"
       >
         {t(item.labelKey)}
       </motion.span>
@@ -146,7 +138,7 @@ export function SidebarNavLinks({
   const { t } = useI18n();
 
   return (
-    <nav className="flex min-h-0 flex-1 flex-col overflow-y-auto px-3 py-3">
+    <nav className="flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden px-3 py-3">
       <NavSection
         label={t("sidebar.workspace")}
         items={primaryNavItems}

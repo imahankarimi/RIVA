@@ -168,10 +168,10 @@ function ProfileTab() {
                 type="button"
                 tabIndex={-1}
                 onClick={() => setShowCurrentPassword((v) => !v)}
-                className="glass-lens absolute end-2 top-1/2 -translate-y-1/2 rounded p-1 text-ink-faint hover:text-ink transition-colors"
+                className="absolute end-2 top-1/2 -translate-y-1/2 rounded p-1.5 text-ink-faint hover:text-ink transition-colors"
                 aria-label={showCurrentPassword ? t("common.off") : t("common.on")}
               >
-                {showCurrentPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                {showCurrentPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
           </div>
@@ -189,10 +189,10 @@ function ProfileTab() {
                 type="button"
                 tabIndex={-1}
                 onClick={() => setShowNewPassword((v) => !v)}
-                className="glass-lens absolute end-2 top-1/2 -translate-y-1/2 rounded p-1 text-ink-faint hover:text-ink transition-colors"
+                className="absolute end-2 top-1/2 -translate-y-1/2 rounded p-1.5 text-ink-faint hover:text-ink transition-colors"
                 aria-label={showNewPassword ? t("common.off") : t("common.on")}
               >
-                {showNewPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
           </div>

@@ -235,17 +235,17 @@ export const rivaPreset = {
           5: "rgb(var(--c-chart-5) / <alpha-value>)",
         },
         sidebar: {
-          DEFAULT: "rgb(var(--c-surface) / <alpha-value>)",
-          foreground: "rgb(var(--c-text) / <alpha-value>)",
+          DEFAULT: "rgb(var(--c-sidebar) / <alpha-value>)",
+          foreground: "rgb(var(--c-sidebar-foreground) / <alpha-value>)",
           primary: {
             DEFAULT: "rgb(var(--c-signal-500) / <alpha-value>)",
             foreground: "rgb(var(--c-on-signal) / <alpha-value>)",
           },
           accent: {
-            DEFAULT: "rgb(var(--c-surface-muted) / <alpha-value>)",
-            foreground: "rgb(var(--c-text) / <alpha-value>)",
+            DEFAULT: "rgb(var(--c-sidebar-accent) / <alpha-value>)",
+            foreground: "rgb(var(--c-sidebar-accent-foreground) / <alpha-value>)",
           },
-          border: "rgb(var(--c-line) / <alpha-value>)",
+          border: "rgb(var(--c-sidebar-border) / <alpha-value>)",
           ring: "rgb(var(--c-ring) / <alpha-value>)",
         },
 
