@@ -102,12 +102,46 @@ body {
 /* ============================================================================
    Typography — locale-driven font switching
    ----------------------------------------------------------------------------
-   RIVA uses IBM Plex Sans for English UI, Manrope for display headings,
-   JetBrains Mono for money, and Vazirmatn for Persian.
+   `--font-ui` and `--font-ui-display` are the seam that keeps `font-sans` and
+   `font-display` correct in both languages. Tailwind's `fontFamily.sans` and
+   `.display` resolve through these, so a component never hardcodes Vazirmatn:
+   doing so would fight English typography and leave numeric contexts without a
+   Persian fallback.
 
-   The fonts are loaded via Next.js font loader in `app/layout.tsx` and the
-   CSS variables are applied to the body element.
+     fa → Vazirmatn (RTL-native Persian face) for both UI and display
+     en → Inter for UI, Manrope for display, JetBrains Mono for money
+
+   `html[data-locale]` is written client-side by `lib/i18n/index.tsx`; the
+   values are also declared on `:root` so the first paint before hydration is
+   already correct.
    ========================================================================== */
+
+:root,
+html[data-locale="en"] {
+  --font-ui: var(--font-inter), system-ui, sans-serif;
+  --font-ui-display: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
+}
+
+html[data-locale="fa"] {
+  --font-ui: var(--font-vazirmatn), system-ui, sans-serif;
+  --font-ui-display: var(--font-vazirmatn), system-ui, sans-serif;
+}
+
+html[data-locale="en"] body {
+  font-family: var(--font-ui);
+}
+
+html[data-locale="en"] .font-display {
+  font-family: var(--font-ui-display);
+}
+
+html[data-locale="fa"] body {
+  font-family: var(--font-ui);
+}
+
+html[data-locale="fa"] .font-display {
+  font-family: var(--font-ui-display);
+}
 
 /* ============================================================================
    Liquid Lens — pointer-tracked glass highlight
@@ -550,8 +584,8 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 999px;
   padding: 0 1.5rem;
-  background: linear-gradient(180deg, rgb(var(--c-signal-600)), rgb(var(--c-signal-500)));
-  color: #fff;
+  background: linear-gradient(180deg, rgb(var(--c-primary-hover)), rgb(var(--c-primary)));
+  color: rgb(var(--c-primary-fg));
   font-size: 0.9375rem;
   font-weight: 600;
   box-shadow:

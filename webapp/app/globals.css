@@ -583,8 +583,8 @@ html[data-locale="fa"] .font-display {
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 999px;
   padding: 0 1.5rem;
-  background: linear-gradient(180deg, rgb(var(--c-signal-600)), rgb(var(--c-signal-500)));
-  color: #fff;
+  background: linear-gradient(180deg, rgb(var(--c-primary-hover)), rgb(var(--c-primary)));
+  color: rgb(var(--c-primary-fg));
   font-size: 0.9375rem;
   font-weight: 600;
   box-shadow:

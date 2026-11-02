@@ -1,14 +1,16 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Eye, EyeOff, Loader2, Sparkle } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
+import Image from "next/image";
 import { useI18n } from "@/lib/i18n";
 import { ApiError } from "@/lib/api/client";
 import { requestPasswordReset } from "@/lib/api/auth";
 import { useAuth } from "@/app/providers";
 import { defaultCurrencyFor, type BackendCurrency } from "@/lib/currency";
 import { CurrencySelect, CurrencyLockWarning } from "@/components/settings/CurrencySelect";
+import { installLiquidLens } from "@/lib/liquidLens";
 
 type Mode = "login" | "signup" | "forgot";
 
@@ -27,6 +29,11 @@ export function AuthScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
+
+  useEffect(() => {
+    const cleanup = installLiquidLens();
+    return cleanup;
+  }, []);
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -86,6 +93,8 @@ export function AuthScreen() {
     setForgotSent(false);
   };
 
+  const brandMark = "R";
+
   return (
     <main className="liquid-glass-auth-page">
       {/* Animated gradient background */}
@@ -95,13 +104,32 @@ export function AuthScreen() {
         <div className="liquid-glass-gradient-3" />
       </div>
 
-      {/* Glass panel container */}
       <div className="liquid-glass-stage">
-        {/* Brand header */}
+        {/* Brand mark and heading */}
         <section className="liquid-glass-intro">
-          <div className="liquid-glass-mark">
-            <Sparkle size={20} strokeWidth={2.5} className="text-white" />
+          <div className="liquid-glass-mark" aria-hidden="true">
+            <span className="text-white text-[1.05rem] font-bold tracking-tight">{brandMark}</span>
           </div>
+
+          <div className="relative h-10 w-auto mb-3">
+            <Image
+              src="/brand/riva-logo.svg"
+              alt="RIVA"
+              width={96}
+              height={32}
+              className="dark:hidden"
+              priority
+            />
+            <Image
+              src="/brand/riva-logo-dark.svg"
+              alt="RIVA"
+              width={96}
+              height={32}
+              className="hidden dark:block"
+              priority
+            />
+          </div>
+
           <h1 className="liquid-glass-title">
             {mode === "login" ? t("auth.login") : mode === "signup" ? t("auth.signup") : t("auth.forgotTitle")}
           </h1>
@@ -110,16 +138,16 @@ export function AuthScreen() {
           </p>
         </section>
 
-        {/* Forgot password success state */}
+        {/* Form */}
         {mode === "forgot" && forgotSent ? (
-          <div className="space-y-6">
+          <div className="liquid-glass-form">
             <div className="liquid-glass-success-message">
               {t("auth.forgotSentGeneric")}
             </div>
             <button
               type="button"
               onClick={backToLogin}
-              className="liquid-glass-button glass-lens w-full"
+              className="glass-lens liquid-glass-button w-full"
             >
               {t("auth.backToLogin")}
             </button>
@@ -186,16 +214,16 @@ export function AuthScreen() {
                       autoComplete={mode === "login" ? "current-password" : "new-password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="liquid-glass-input pe-10"
+                      className="liquid-glass-input pe-11"
                       placeholder="••••••••"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute end-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/80 transition-colors"
+                      className="absolute end-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition-colors"
                       aria-label={showPassword ? t("common.off") : t("common.on")}
                     >
-                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
                 </label>
@@ -213,16 +241,16 @@ export function AuthScreen() {
                       autoComplete="new-password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="liquid-glass-input pe-10"
+                      className="liquid-glass-input pe-11"
                       placeholder="••••••••"
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirm(!showConfirm)}
-                      className="absolute end-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/80 transition-colors"
+                      className="absolute end-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition-colors"
                       aria-label={showConfirm ? t("common.off") : t("common.on")}
                     >
-                      {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
+                      {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
                 </label>
@@ -236,63 +264,58 @@ export function AuthScreen() {
               </div>
             )}
 
-            {/* Privacy note */}
-            <p className="liquid-glass-privacy-note">
-              {t("auth.privacyNote")}
-            </p>
-
             {/* Submit button */}
-            <div className="liquid-glass-actions">
-              <button
-                type="submit"
-                disabled={loading}
-                className="liquid-glass-button glass-lens"
-              >
-                {loading ? (
-                  <Loader2 size={18} className="animate-spin" />
-                ) : (
-                  <>
-                    {mode === "login" ? t("auth.loginAction") : mode === "signup" ? t("auth.signupAction") : t("auth.forgotAction")}
-                    {mode !== "forgot" && <ArrowRight size={18} className="flip-rtl ms-2" />}
-                  </>
-                )}
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="glass-lens liquid-glass-button w-full"
+            >
+              {loading ? (
+                <Loader2 size={18} className="animate-spin" />
+              ) : (
+                <>
+                  {mode === "login" ? t("auth.loginAction") : mode === "signup" ? t("auth.signupAction") : t("auth.forgotAction")}
+                  {mode !== "forgot" && <ArrowRight size={18} className="flip-rtl" />}
+                </>
+              )}
+            </button>
+
+            {/* Forgot password link (login only) */}
+            {mode === "login" && (
+              <div className="flex justify-center">
+                <button
+                  type="button"
+                  onClick={goToForgot}
+                  className="text-[13px] text-white/60 hover:text-white font-medium transition-colors"
+                >
+                  {t("auth.forgotPassword")}
+                </button>
+              </div>
+            )}
           </form>
         )}
 
         {/* Footer actions */}
         <div className="liquid-glass-footer">
-          {mode === "forgot" ? (
+          {mode === "forgot" && !forgotSent ? (
             <button
               type="button"
               onClick={backToLogin}
-              className="liquid-glass-link"
+              className="text-[13px] text-white/60 hover:text-white font-medium transition-colors"
             >
               {t("auth.backToLogin")}
             </button>
-          ) : (
-            <>
-              <p className="text-white/60 text-[13px]">
-                {mode === "login" ? t("auth.noAccount") : t("auth.hasAccount")}{" "}
-                <button
-                  type="button"
-                  onClick={switchMode}
-                  className="liquid-glass-link"
-                >
-                  {mode === "login" ? t("auth.signup") : t("auth.login")}
-                </button>
-              </p>
-              {mode === "login" && (
-                <button
-                  type="button"
-                  onClick={goToForgot}
-                  className="liquid-glass-link text-[13px]"
-                >
-                  {t("auth.forgotPassword")}
-                </button>
-              )}
-            </>
+          ) : mode !== "forgot" && (
+            <p className="text-[13px] text-white/60 text-center">
+              {mode === "login" ? t("auth.noAccount") : t("auth.hasAccount")}{" "}
+              <button
+                type="button"
+                onClick={switchMode}
+                className="text-white hover:text-white/90 font-semibold transition-colors"
+              >
+                {mode === "login" ? t("auth.signup") : t("auth.login")}
+              </button>
+            </p>
           )}
         </div>
       </div>
