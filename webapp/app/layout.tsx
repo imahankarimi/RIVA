@@ -48,13 +48,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="en"
       dir="ltr"
       suppressHydrationWarning
-      className={`${inter.variable} ${manrope.variable} ${mono.variable} ${vazirmatn.variable}`}
     >
       <head>
         {/* Sets .dark on <html> before paint so there's no light->dark flash. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} />
       </head>
-      <body className="font-sans">
+      <body className={`${inter.variable} ${manrope.variable} ${mono.variable} ${vazirmatn.variable} font-sans`}>
         <Providers>{children}</Providers>
         <ServiceWorkerRegistration />
         <LiquidLensInstaller />

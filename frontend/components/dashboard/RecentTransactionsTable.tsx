@@ -94,7 +94,7 @@ export function RecentTransactionsTable({ transactions }: { transactions: Transa
                     <span
                       className={cn(
                         "text-right text-sm font-semibold tabular-nums",
-                        positive ? "text-moss-700 dark:text-moss-500" : "text-foreground"
+                        positive ? "text-fin-positive" : "text-fin-negative"
                       )}
                     >
                       {formatCurrency(tx.amount, tx.currency, locale, { signed: true })}

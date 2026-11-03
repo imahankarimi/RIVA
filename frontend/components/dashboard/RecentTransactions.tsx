@@ -42,7 +42,7 @@ export function RecentTransactions({ transactions }: { transactions: Transaction
                   <span
                     className={cn(
                       "font-mono font-figures text-[13.5px] font-semibold",
-                      positive ? "text-moss-700" : "text-ink"
+                      positive ? "text-fin-positive" : "text-fin-negative"
                     )}
                   >
                     {formatCurrency(tx.amount, tx.currency, locale, { signed: true })}

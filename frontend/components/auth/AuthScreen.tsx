@@ -4,6 +4,7 @@ import { FormEvent, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 import { useI18n } from "@/lib/i18n";
 import { ApiError } from "@/lib/api/client";
 import { requestPasswordReset } from "@/lib/api/auth";
@@ -11,6 +12,7 @@ import { useAuth } from "@/app/providers";
 import { defaultCurrencyFor, type BackendCurrency } from "@/lib/currency";
 import { CurrencySelect, CurrencyLockWarning } from "@/components/settings/CurrencySelect";
 import { installLiquidLens } from "@/lib/liquidLens";
+import { DURATION, EASE_OUT } from "@/lib/motion/tokens";
 
 type Mode = "login" | "signup" | "forgot";
 
@@ -93,8 +95,6 @@ export function AuthScreen() {
     setForgotSent(false);
   };
 
-  const brandMark = "R";
-
   return (
     <main className="liquid-glass-auth-page">
       {/* Animated gradient background */}
@@ -104,14 +104,10 @@ export function AuthScreen() {
         <div className="liquid-glass-gradient-3" />
       </div>
 
-      <div className="liquid-glass-stage">
+      <motion.div className="liquid-glass-stage" layout transition={{ duration: DURATION.moderate, ease: EASE_OUT }}>
         {/* Brand mark and heading */}
         <section className="liquid-glass-intro">
-          <div className="liquid-glass-mark" aria-hidden="true">
-            <span className="text-white text-[1.05rem] font-bold tracking-tight">{brandMark}</span>
-          </div>
-
-          <div className="relative h-10 w-auto mb-3">
+          <div className="relative h-10 w-auto mb-6">
             <Image
               src="/brand/riva-logo.svg"
               alt="RIVA"
@@ -130,30 +126,56 @@ export function AuthScreen() {
             />
           </div>
 
-          <h1 className="liquid-glass-title">
-            {mode === "login" ? t("auth.login") : mode === "signup" ? t("auth.signup") : t("auth.forgotTitle")}
-          </h1>
-          <p className="liquid-glass-subtitle">
-            {mode === "login" ? t("auth.welcomeBody") : mode === "signup" ? t("auth.signupSubtitle") : t("auth.forgotBody")}
-          </p>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={mode}
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ duration: DURATION.base, ease: EASE_OUT }}
+            >
+              <h1 className="liquid-glass-title">
+                {mode === "login" ? t("auth.login") : mode === "signup" ? t("auth.signup") : t("auth.forgotTitle")}
+              </h1>
+              <p className="liquid-glass-subtitle">
+                {mode === "login" ? t("auth.welcomeBody") : mode === "signup" ? t("auth.signupSubtitle") : t("auth.forgotBody")}
+              </p>
+            </motion.div>
+          </AnimatePresence>
         </section>
 
         {/* Form */}
-        {mode === "forgot" && forgotSent ? (
-          <div className="liquid-glass-form">
-            <div className="liquid-glass-success-message">
-              {t("auth.forgotSentGeneric")}
-            </div>
-            <button
-              type="button"
-              onClick={backToLogin}
-              className="glass-lens liquid-glass-button w-full"
+        <AnimatePresence mode="wait">
+          {mode === "forgot" && forgotSent ? (
+            <motion.div
+              key="forgot-sent"
+              className="liquid-glass-form"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: DURATION.moderate, ease: EASE_OUT }}
             >
-              {t("auth.backToLogin")}
-            </button>
-          </div>
-        ) : (
-          <form className="liquid-glass-form" onSubmit={submit}>
+              <div className="liquid-glass-success-message">
+                {t("auth.forgotSentGeneric")}
+              </div>
+              <button
+                type="button"
+                onClick={backToLogin}
+                className="glass-lens liquid-glass-button w-full"
+              >
+                {t("auth.backToLogin")}
+              </button>
+            </motion.div>
+          ) : (
+            <motion.form
+              key={mode}
+              className="liquid-glass-form"
+              onSubmit={submit}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: DURATION.moderate, ease: EASE_OUT }}
+            >
             <div className="liquid-glass-fields">
               {/* Email */}
               <label className="liquid-glass-field">
@@ -292,33 +314,48 @@ export function AuthScreen() {
                 </button>
               </div>
             )}
-          </form>
-        )}
+          </motion.form>
+          )}
+        </AnimatePresence>
 
         {/* Footer actions */}
         <div className="liquid-glass-footer">
-          {mode === "forgot" && !forgotSent ? (
-            <button
-              type="button"
-              onClick={backToLogin}
-              className="text-[13px] text-white/60 hover:text-white font-medium transition-colors"
-            >
-              {t("auth.backToLogin")}
-            </button>
-          ) : mode !== "forgot" && (
-            <p className="text-[13px] text-white/60 text-center">
-              {mode === "login" ? t("auth.noAccount") : t("auth.hasAccount")}{" "}
-              <button
+          <AnimatePresence mode="wait">
+            {mode === "forgot" && !forgotSent ? (
+              <motion.button
+                key="back-to-login"
                 type="button"
-                onClick={switchMode}
-                className="text-white hover:text-white/90 font-semibold transition-colors"
+                onClick={backToLogin}
+                className="text-[13px] text-white/60 hover:text-white font-medium transition-colors"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: DURATION.base }}
               >
-                {mode === "login" ? t("auth.signup") : t("auth.login")}
-              </button>
-            </p>
-          )}
+                {t("auth.backToLogin")}
+              </motion.button>
+            ) : mode !== "forgot" && (
+              <motion.p
+                key={mode === "login" ? "to-signup" : "to-login"}
+                className="text-[13px] text-white/60 text-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: DURATION.base }}
+              >
+                {mode === "login" ? t("auth.noAccount") : t("auth.hasAccount")}{" "}
+                <button
+                  type="button"
+                  onClick={switchMode}
+                  className="text-white hover:text-white/90 font-semibold transition-colors"
+                >
+                  {mode === "login" ? t("auth.signup") : t("auth.login")}
+                </button>
+              </motion.p>
+            )}
+          </AnimatePresence>
         </div>
-      </div>
+      </motion.div>
     </main>
   );
 }

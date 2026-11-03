@@ -41,6 +41,7 @@ function NavLink({
     pathname === item.href || pathname?.startsWith(`${item.href}/`);
 
   const Icon = item.icon;
+  const showSoon = "soon" in item && item.soon;
 
   return (
     <Link
@@ -50,36 +51,50 @@ function NavLink({
         "glass-lens group relative flex h-9 items-center gap-2.5 rounded-md px-3 text-[13px] font-medium",
         "transition-all duration-180",
         collapsed && "justify-center px-0",
+        !collapsed && showSoon && "justify-between",
         active
           ? "border border-sidebar-border bg-sidebar-accent text-sidebar-accent-foreground shadow-subtle"
           : "border border-transparent text-ink-soft hover:border-line/50 hover:text-ink"
       )}
     >
-      <Icon
-        size={16}
-        strokeWidth={2}
-        className={cn(
-          "relative z-10 shrink-0 transition-colors duration-180",
-          active
-            ? "text-sidebar-accent-foreground"
-            : "text-ink-faint group-hover:text-ink"
-        )}
-      />
+      <span className="relative z-10 flex items-center gap-2.5">
+        <Icon
+          size={16}
+          strokeWidth={2}
+          className={cn(
+            "shrink-0 transition-colors duration-180",
+            active
+              ? "text-sidebar-accent-foreground"
+              : "text-ink-faint group-hover:text-ink"
+          )}
+        />
 
-      <motion.span
-        initial={{
-          display: collapsed ? "none" : "inline-block",
-          opacity: collapsed ? 0 : 1,
-        }}
-        animate={{
-          display: collapsed ? "none" : "inline-block",
-          opacity: collapsed ? 0 : 1,
-        }}
-        transition={{ duration: DURATION.base, ease: EASE_OUT }}
-        className="relative z-10 whitespace-pre !p-0 !m-0 text-[13px] font-medium"
-      >
-        {t(item.labelKey)}
-      </motion.span>
+        <motion.span
+          initial={{
+            display: collapsed ? "none" : "inline-block",
+            opacity: collapsed ? 0 : 1,
+          }}
+          animate={{
+            display: collapsed ? "none" : "inline-block",
+            opacity: collapsed ? 0 : 1,
+          }}
+          transition={{ duration: DURATION.base, ease: EASE_OUT }}
+          className="whitespace-pre !p-0 !m-0 text-[13px] font-medium"
+        >
+          {t(item.labelKey)}
+        </motion.span>
+      </span>
+
+      {!collapsed && showSoon && (
+        <motion.span
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: DURATION.base, ease: EASE_OUT }}
+          className="relative z-10 inline-flex items-center rounded-full border border-line/40 bg-surface px-2 py-0.5 text-[10px] font-medium leading-none text-ink-faint"
+        >
+          {t("common.soon")}
+        </motion.span>
+      )}
     </Link>
   );
 }

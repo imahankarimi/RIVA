@@ -261,19 +261,19 @@ export const rivaPreset = {
       },
 
       fontFamily: {
-        // Use the actual Next.js font loader variables directly.
-        // English uses IBM Plex Sans for UI, Manrope for display.
-        // Persian uses Vazirmatn for both.
-        sans: ["var(--font-ibm-plex-sans)", "system-ui", "sans-serif"],
-        display: ["var(--font-manrope)", "var(--font-ibm-plex-sans)", "system-ui", "sans-serif"],
+        // Locale-driven font switching via CSS variables set in globals.css.
+        // `--font-ui` and `--font-ui-display` are assigned per locale:
+        //   en → Inter (UI), Manrope (display), JetBrains Mono (mono)
+        //   fa → Vazirmatn (UI and display)
+        // Components use `font-sans` and `font-display` and stay correct in both.
+        sans: ["var(--font-ui)", "system-ui", "sans-serif"],
+        display: ["var(--font-ui-display)", "system-ui", "sans-serif"],
         mono: [
           "var(--font-mono)",
-          "var(--font-ibm-plex-sans)",
           "ui-monospace",
           "SFMono-Regular",
           "monospace",
         ],
-        fa: ["var(--font-vazirmatn)", "system-ui", "sans-serif"],
       },
 
       borderRadius: {

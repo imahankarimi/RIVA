@@ -29,7 +29,7 @@ export function TransactionRow({ tx }: { tx: Transaction }) {
         <span
           className={cn(
             "font-mono font-figures text-[14px] font-semibold tabular-nums",
-            positive ? "text-moss-700" : "text-ink"
+            positive ? "text-fin-positive" : "text-fin-negative"
           )}
         >
           {formatCurrency(tx.amount, tx.currency, locale, { signed: true })}
@@ -56,7 +56,7 @@ export function TransactionRow({ tx }: { tx: Transaction }) {
         <div className="text-right">
           <p className={cn(
             "font-mono font-figures text-[14px] font-semibold tabular-nums",
-            positive ? "text-moss-700" : "text-ink"
+            positive ? "text-fin-positive" : "text-fin-negative"
           )}>
             {formatCurrency(tx.amount, tx.currency, locale, { signed: true })}
           </p>

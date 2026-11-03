@@ -109,38 +109,38 @@ body {
    Persian fallback.
 
      fa → Vazirmatn (RTL-native Persian face) for both UI and display
-     en → Inter for UI, Manrope for display, JetBrains Mono for money
+     en → IBM Plex Sans for UI and display
 
    `html[data-locale]` is written client-side by `lib/i18n/index.tsx`; the
    values are also declared on `:root` so the first paint before hydration is
    already correct.
    ========================================================================== */
 
-:root,
-html[data-locale="en"] {
-  --font-ui: var(--font-inter), system-ui, sans-serif;
-  --font-ui-display: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
-}
-
 html[data-locale="fa"] {
   --font-ui: var(--font-vazirmatn), system-ui, sans-serif;
   --font-ui-display: var(--font-vazirmatn), system-ui, sans-serif;
 }
 
-html[data-locale="en"] body {
-  font-family: var(--font-ui);
-}
-
-html[data-locale="en"] .font-display {
-  font-family: var(--font-ui-display);
-}
-
 html[data-locale="fa"] body {
-  font-family: var(--font-ui);
+  font-family: var(--font-vazirmatn), system-ui, sans-serif;
 }
 
 html[data-locale="fa"] .font-display {
-  font-family: var(--font-ui-display);
+  font-family: var(--font-vazirmatn), system-ui, sans-serif;
+}
+
+:root,
+html[data-locale="en"] {
+  --font-ui: var(--font-ibm-plex-sans), system-ui, sans-serif;
+  --font-ui-display: var(--font-ibm-plex-sans), system-ui, sans-serif;
+}
+
+html[data-locale="en"] body {
+  font-family: var(--font-ibm-plex-sans), system-ui, sans-serif;
+}
+
+html[data-locale="en"] .font-display {
+  font-family: var(--font-ibm-plex-sans), system-ui, sans-serif;
 }
 
 /* ============================================================================

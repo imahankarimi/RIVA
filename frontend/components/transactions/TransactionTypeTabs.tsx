@@ -54,7 +54,7 @@ export function TransactionTypeTabs({
             tabIndex={active ? 0 : -1}
             onClick={() => onChange(opt.key)}
             className={cn(
-              "glass-lens relative z-10 flex h-9 items-center justify-center rounded-md text-[13.5px] font-medium",
+              "relative z-10 flex h-9 items-center justify-center rounded-md text-[13.5px] font-medium",
               "transition-colors duration-150 focus-visible:outline-none",
               "focus-visible:ring-2 focus-visible:ring-signal-500/40 focus-visible:ring-offset-1",
               active ? "text-onSignal" : "text-ink-soft hover:text-ink"
