@@ -20,3 +20,9 @@ export function getBusinessTransactions(
     { token }
   );
 }
+
+export function deleteTransaction(entryId: string) {
+  return apiRequest<void>(`/api/journal-entries/${entryId}`, {
+    method: "DELETE",
+  });
+}

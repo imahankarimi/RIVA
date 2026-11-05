@@ -17,6 +17,7 @@ const fa: Dictionary = {
     date: "تاریخ",
     amount: "مبلغ",
     status: "وضعیت",
+    actions: "عملیات",
     seeAll: "مشاهده همه",
     soon: "به‌زودی",
     comingSoon: "به‌زودی",
@@ -191,6 +192,10 @@ const fa: Dictionary = {
     clearFilters: "پاک‌کردن فیلترها",
     posted: "ثبت‌شده",
     pending: "در انتظار",
+    delete: "حذف تراکنش",
+    deleting: "در حال حذف…",
+    deleteConfirmTitle: "این تراکنش حذف شود؟",
+    deleteConfirmMessage: "این عملیات تراکنش و ثبت‌های حسابداری مرتبط را برای همیشه حذف می‌کند. این عمل قابل بازگشت نیست.",
   },
   accounts: {
     title: "حساب‌ها",

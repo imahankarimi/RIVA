@@ -27,6 +27,8 @@ function getSystemTheme(): ResolvedTheme {
 function applyTheme(resolved: ResolvedTheme) {
   const root = document.documentElement;
   root.classList.toggle("dark", resolved === "dark");
+  // Glisse uses data-theme attribute for its own theme system
+  root.setAttribute("data-theme", resolved);
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
@@ -88,7 +90,9 @@ export const THEME_BOOTSTRAP_SCRIPT = `
   try {
     var v = localStorage.getItem('${STORAGE_KEY}');
     var dark = v !== 'light';
+    var theme = dark ? 'dark' : 'light';
     if (dark) document.documentElement.classList.add('dark');
+    document.documentElement.setAttribute('data-theme', theme);
   } catch (e) {}
 })();
 `;

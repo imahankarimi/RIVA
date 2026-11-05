@@ -5,6 +5,7 @@ import { iconFor } from "@/lib/categoryIcons";
 import type { Transaction } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { translateCategory } from "@/lib/i18n/labels";
+import { DeleteTransactionButton } from "./DeleteTransactionButton";
 
 export function TransactionRow({ tx }: { tx: Transaction }) {
   const { t, locale } = useI18n();
@@ -14,7 +15,7 @@ export function TransactionRow({ tx }: { tx: Transaction }) {
   return (
     <>
       {/* Desktop / tablet row */}
-      <div className="hidden items-center gap-4 px-5 py-3.5 transition-colors duration-150 hover:bg-surfaceMuted/60 sm:grid sm:grid-cols-[2fr_1fr_1fr_1fr_auto]">
+      <div className="hidden items-center gap-4 px-5 py-3.5 transition-colors duration-150 hover:bg-surfaceMuted/60 sm:grid sm:grid-cols-[2fr_1fr_1fr_1fr_auto_auto]">
         <div className="flex min-w-0 items-center gap-3">
           <span className={cn(
             "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
@@ -37,6 +38,7 @@ export function TransactionRow({ tx }: { tx: Transaction }) {
         <Badge tone={tx.status === "posted" ? "success" : "warning"}>
           {tx.status === "posted" ? t("transactions.posted") : t("transactions.pending")}
         </Badge>
+        <DeleteTransactionButton transactionId={tx.id} description={tx.description} />
       </div>
 
       {/* Mobile card */}
@@ -53,16 +55,19 @@ export function TransactionRow({ tx }: { tx: Transaction }) {
             {translateCategory(tx.category, t)} · {formatDate(tx.date, locale)}
           </p>
         </div>
-        <div className="text-right">
-          <p className={cn(
-            "font-mono font-figures text-[14px] font-semibold tabular-nums",
-            positive ? "text-fin-positive" : "text-fin-negative"
-          )}>
-            {formatCurrency(tx.amount, tx.currency, locale, { signed: true })}
-          </p>
-          <Badge tone={tx.status === "posted" ? "success" : "warning"} className="mt-1">
-            {tx.status === "posted" ? t("transactions.posted") : t("transactions.pending")}
-          </Badge>
+        <div className="flex items-center gap-2">
+          <div className="text-right">
+            <p className={cn(
+              "font-mono font-figures text-[14px] font-semibold tabular-nums",
+              positive ? "text-fin-positive" : "text-fin-negative"
+            )}>
+              {formatCurrency(tx.amount, tx.currency, locale, { signed: true })}
+            </p>
+            <Badge tone={tx.status === "posted" ? "success" : "warning"} className="mt-1">
+              {tx.status === "posted" ? t("transactions.posted") : t("transactions.pending")}
+            </Badge>
+          </div>
+          <DeleteTransactionButton transactionId={tx.id} description={tx.description} />
         </div>
       </div>
     </>

@@ -14,6 +14,9 @@ importers:
       framer-motion:
         specifier: ^11.3.19
         version: 11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      glisse:
+        specifier: 0.5.0
+        version: 0.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       jspdf:
         specifier: ^4.2.1
         version: 4.2.1
@@ -1091,6 +1094,12 @@ packages:
 
   get-tsconfig@4.14.3:
     resolution: {integrity: sha512-++QEw4DIY7WGoukz+/+A/8dGYPT9l9yIadnmSgZ8Rjr3YVSVDipQSO9CdnJo9ePqFqUUqh+wk9uIaoiAwsiPkA==}
+
+  glisse@0.5.0:
+    resolution: {integrity: sha512-FVL7wBj6JS9hx7FrikqLGiJojy4RX1sIRlBSUDZW/3f9+LwILqX9hsILHPgi54PsKSfHFL+C4k6YB411f0mJhA==}
+    peerDependencies:
+      react: '>=18'
+      react-dom: '>=18'
 
   glob-parent@5.1.2:
     resolution: {integrity: sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==}
@@ -3239,6 +3248,11 @@ snapshots:
   get-tsconfig@4.14.3:
     dependencies:
       resolve-pkg-maps: 1.0.0
+
+  glisse@0.5.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
   glob-parent@5.1.2:
     dependencies:

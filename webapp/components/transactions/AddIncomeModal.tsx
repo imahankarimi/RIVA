@@ -17,6 +17,7 @@ import { confirmChatAction } from "@/lib/api/chat";
 import { CURRENCY_META } from "@/lib/currency";
 import { DURATION, EASE_OUT, SPRING_SNAPPY } from "@/lib/motion/tokens";
 import type { ChatAction } from "@/lib/types";
+import { TRANSACTIONS_CHANGED_EVENT } from "./AddIncomeContext";
 
 const QUICK_AMOUNTS = [1_000_000, 5_000_000, 10_000_000] as const;
 
@@ -121,6 +122,7 @@ export function AddIncomeModal({ open, onClose, onSaved }: { open: boolean; onCl
     if (!business || !canSave) return;
     setSaving(true);
     setError("");
+
     try {
       const description =
         [receivedFrom.trim(), note.trim()].filter(Boolean).join(" — ") || title;
@@ -142,28 +144,40 @@ export function AddIncomeModal({ open, onClose, onSaved }: { open: boolean; onCl
               debit_account_id: expenseAccountId,
               credit_account_id: paidFromAccountId,
             };
+
       // This goes through the same accounting confirmation endpoint the AI
       // assistant uses — a manual "Add Income/Spent" is still just a normal,
       // validated double-entry transaction, never a frontend-only balance bump.
       const result = await confirmChatAction(business.id, action);
-      if (!result.success) {
+
+      // Check the result
+      if (!result || !result.success) {
         setSaving(false);
-        setError(t("common.retry"));
+        setError(result?.message || t("common.retry"));
         return;
       }
+
+      // Transaction confirmed — update UI state
       setSaving(false);
       setSuccess(true);
+
+      // Notify other views to refetch
+      window.dispatchEvent(new CustomEvent(TRANSACTIONS_CHANGED_EVENT));
       onSaved?.();
+
+      // Auto-close after success animation
       saveTimer.current = setTimeout(() => {
         handleClose();
       }, 900);
-    } catch {
+    } catch (err) {
+      // Network/API errors
+      console.error("Transaction submission error:", err);
       setSaving(false);
       setError(t("common.retry"));
     }
   };
 
-  // Manual failure path (smth blockable is empty) — reveal inline errors and
+  // Manual failure path (a required field is empty) — reveal inline errors and
   // nudge the amount hero when the amount itself is the missing field.
   const submitBlocked = () => {
     setAttempted(true);
@@ -202,7 +216,7 @@ export function AddIncomeModal({ open, onClose, onSaved }: { open: boolean; onCl
               <h2 className="font-display text-[16px] font-bold text-ink">{title}</h2>
               <button
                 onClick={handleClose}
-                className="flex h-8 w-8 items-center justify-center rounded-md text-ink-faint hover:bg-surfaceMuted hover:text-ink"
+                className="glass-lens flex h-8 w-8 items-center justify-center rounded-md text-ink-faint hover:bg-surfaceMuted hover:text-ink"
                 aria-label={t("common.close")}
               >
                 <X size={16} />

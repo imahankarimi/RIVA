@@ -51,14 +51,16 @@ export function Sidebar() {
     <motion.aside
       animate={{ width: displayedCollapsed ? 76 : 248 }}
       transition={SPRING_SOFT}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       className="relative hidden h-full shrink-0 flex-col overflow-hidden lg:flex"
     >
       {/* Inset card shell — ports the Shadcn inset sidebar's visual
           language (floating rounded surface over the paper page) around
           RIVA's existing spring width animation. */}
-      <div className="m-2 flex h-[calc(100vh-1rem)] w-auto flex-col overflow-hidden rounded-xl bg-sidebar text-sidebar-foreground shadow-subtle ring-1 ring-line/70">
+      <div
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        className="m-2 flex h-[calc(100vh-1rem)] w-auto flex-col overflow-hidden rounded-xl bg-sidebar text-sidebar-foreground shadow-subtle ring-1 ring-line/70"
+      >
         {/* RIVA brand */}
         <div
           className={cn(

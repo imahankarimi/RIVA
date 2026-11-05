@@ -43,21 +43,24 @@ export function StatCard({
   const t = toneStyles[tone];
 
   return (
-    <AnimatedCard delay={delay} className="group relative overflow-hidden p-3.5 transition-all duration-240 hover:shadow-card hover:-translate-y-0.5 sm:p-4">
-      {/* Subtle tonal accent at the top edge — ties the KPI to its semantic tone. */}
+    <AnimatedCard
+      delay={delay}
+      className="group relative overflow-hidden rounded-[18px] bg-surface p-4 shadow-[0_1px_3px_rgba(16,28,44,0.04)] ring-1 ring-line/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_4px_12px_rgba(16,28,44,0.08)] sm:p-5"
+    >
+      {/* Subtle tonal accent at the top edge — ties the KPI to its semantic tone */}
       <span
         aria-hidden
         className={cn(
-          "absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r to-transparent transition-all duration-300 group-hover:opacity-100 group-hover:h-[2.5px]",
+          "absolute inset-x-0 top-0 h-[2.5px] bg-gradient-to-r to-transparent transition-all duration-300 group-hover:h-[3px] group-hover:opacity-100",
           t.bar,
-          "opacity-75"
+          "opacity-80"
         )}
       />
 
       {/* Inner glass reflection on hover */}
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-6 rounded-t-[inherit] bg-gradient-to-b from-white/30 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-white/8"
+        className="pointer-events-none absolute inset-x-0 top-0 h-8 rounded-t-[inherit] bg-gradient-to-b from-white/25 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-white/6"
       />
 
       {/* Hover glow effect */}
@@ -65,60 +68,79 @@ export function StatCard({
         aria-hidden
         className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 transition-opacity duration-400 group-hover:opacity-100"
         style={{
-          background: `radial-gradient(400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${
-            tone === 'positive' ? 'rgba(62,154,109,0.08)' :
-            tone === 'negative' ? 'rgba(181,67,58,0.08)' :
-            'rgba(113,135,155,0.06)'
-          }, transparent 40%)`
+          background: `radial-gradient(400px circle at 50% 50%, ${
+            tone === "positive"
+              ? "rgba(62,154,109,0.06)"
+              : tone === "negative"
+              ? "rgba(181,67,58,0.06)"
+              : "rgba(113,135,155,0.04)"
+          }, transparent 40%)`,
         }}
       />
 
-      <div className="relative flex items-center justify-between gap-2">
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-ink-faint">{label}</span>
+      <div className="relative space-y-4">
+        {/* Header row — label and icon */}
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[11.5px] font-semibold uppercase tracking-[0.08em] text-ink-faint">
+            {label}
+          </span>
 
-        <motion.span
-          whileHover={{ scale: 1.08, rotate: 5 }}
-          whileTap={{ scale: 0.95 }}
-          transition={{ type: "spring", stiffness: 500, damping: 25 }}
+          <motion.span
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            whileTap={{ scale: 0.92 }}
+            transition={{ type: "spring", stiffness: 500, damping: 25 }}
+            className={cn(
+              "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl shadow-sm ring-1 ring-inset transition-all duration-300 group-hover:shadow-md sm:h-9 sm:w-9",
+              t.tile,
+              tone === "positive" && "ring-moss-200/40",
+              tone === "negative" && "ring-rose-200/40",
+              tone === "default" && "ring-signal-200/40"
+            )}
+          >
+            <Icon size={15} strokeWidth={2.3} className="sm:h-4 sm:w-4" />
+          </motion.span>
+        </div>
+
+        {/* Value with enhanced typography */}
+        <AnimatedNumber
+          value={value}
+          format={format}
           className={cn(
-            "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg shadow-sm transition-all duration-300 group-hover:shadow-md",
-            t.tile
+            "relative block font-mono font-figures text-[20px] font-bold tabular-nums tracking-tight transition-colors duration-300 sm:text-[22px]",
+            tone === "positive" && "text-moss-700 dark:text-moss-500",
+            tone === "negative" && "text-rose-700 dark:text-rose-500",
+            tone === "default" && "text-ink"
           )}
-        >
-          <Icon size={13} strokeWidth={2.3} />
-        </motion.span>
-      </div>
+        />
 
-      <AnimatedNumber
-        value={value}
-        format={format}
-        className={cn(
-          "relative mt-3 block font-mono font-figures text-[16px] font-semibold tracking-tight transition-colors duration-300 sm:text-[18px]",
-          tone === "positive" && "text-moss-700 dark:text-moss-500",
-          tone === "negative" && "text-rose-700 dark:text-rose-500",
-          tone === "default" && "text-ink"
-        )}
-      />
-
-      {/* Always reserve space for trend to maintain consistent card heights across all metrics */}
-      <div className="mt-2 flex min-h-[24px] items-center gap-1 text-[10.5px]">
-        {hasTrend && (
-          <>
-            <motion.span
-              initial={{ opacity: 0, x: -4 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: delay + 0.15 }}
-              className={cn(
-                "flex items-center gap-0.5 rounded-full px-1.5 py-0.5 font-semibold",
-                trendFavorable ? "bg-moss-100/70 text-moss-700" : "bg-rose-100/70 text-rose-700"
+        {/* Trend indicator — always reserve space for consistent heights */}
+        <div className="flex min-h-[26px] items-center gap-1.5 text-[11px]">
+          {hasTrend && (
+            <>
+              <motion.span
+                initial={{ opacity: 0, x: -6 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: delay + 0.18, duration: 0.24 }}
+                className={cn(
+                  "inline-flex items-center gap-1 rounded-lg px-2 py-1 font-semibold ring-1 ring-inset",
+                  trendFavorable
+                    ? "bg-moss-100/80 text-moss-700 ring-moss-200/50"
+                    : "bg-rose-100/80 text-rose-700 ring-rose-200/50"
+                )}
+              >
+                {trendUp ? (
+                  <ArrowUpRight size={12} strokeWidth={2.5} />
+                ) : (
+                  <ArrowDownRight size={12} strokeWidth={2.5} />
+                )}
+                {Math.abs(trendPct as number).toFixed(1)}%
+              </motion.span>
+              {trendLabel && (
+                <span className="text-[10.5px] text-ink-faint">{trendLabel}</span>
               )}
-            >
-              {trendUp ? <ArrowUpRight size={11} strokeWidth={2.5} /> : <ArrowDownRight size={11} strokeWidth={2.5} />}
-              {Math.abs(trendPct as number).toFixed(1)}%
-            </motion.span>
-            {trendLabel && <span className="text-ink-faint">{trendLabel}</span>}
-          </>
-        )}
+            </>
+          )}
+        </div>
       </div>
     </AnimatedCard>
   );

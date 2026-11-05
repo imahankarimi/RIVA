@@ -1,203 +1,181 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, LogOut, UserCircle2, Sun, Moon } from "lucide-react";
+import { Sun, Moon, User, Building2 } from "lucide-react";
 import Link from "next/link";
+import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/app/providers";
 import { useBusiness } from "@/app/providers";
 import { useTheme } from "@/lib/theme/ThemeProvider";
-import { Avatar } from "@/components/ui/Avatar";
-import { cn } from "@/lib/utils";
+import { Glass, Menu } from "@/components/glisse";
 import { CURRENCY_META } from "@/lib/currency";
-
-const dropdownMotion = {
-  initial: { opacity: 0, y: -8, scale: 0.95 },
-  animate: { opacity: 1, y: 0, scale: 1 },
-  exit: { opacity: 0, y: -8, scale: 0.95 },
-  transition: { type: "spring", stiffness: 300, damping: 30 },
-};
+import { cn } from "@/lib/utils";
+import type { MenuItem } from "@/components/glisse";
 
 export function TopbarActions() {
   const { user, logout } = useAuth();
   const { business, businesses, setBusinessId } = useBusiness();
   const { resolved, toggle } = useTheme();
-  const [businessOpen, setBusinessOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-
-  // Close both menus when clicking anywhere outside the cluster (including on
-  // another topbar control — no focus trap, a plain document listener).
-  useEffect(() => {
-    if (!businessOpen && !profileOpen) return;
-    function onPointerDown(e: PointerEvent) {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
-        setBusinessOpen(false);
-        setProfileOpen(false);
-      }
-    }
-    document.addEventListener("pointerdown", onPointerDown);
-    return () => document.removeEventListener("pointerdown", onPointerDown);
-  }, [businessOpen, profileOpen]);
-
-  // Close menus with Escape for keyboard users.
-  useEffect(() => {
-    if (!businessOpen && !profileOpen) return;
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        setBusinessOpen(false);
-        setProfileOpen(false);
-      }
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [businessOpen, profileOpen]);
+  const [businessMenuOpen, setBusinessMenuOpen] = useState(false);
+  const businessButtonRef = useRef<HTMLButtonElement>(null);
+  const businessMenuRef = useRef<HTMLDivElement>(null);
 
   const displayName = user ? [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email : "";
 
+  // Close business menu when clicking outside
+  useEffect(() => {
+    if (!businessMenuOpen) return;
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        businessButtonRef.current &&
+        businessMenuRef.current &&
+        !businessButtonRef.current.contains(e.target as Node) &&
+        !businessMenuRef.current.contains(e.target as Node)
+      ) {
+        setBusinessMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [businessMenuOpen]);
+
+  // Build profile menu items
+  const profileMenuItems: MenuItem[] = [
+    {
+      label: (
+        <Link href="/settings" className="flex w-full whitespace-nowrap">
+          Edit Profile
+        </Link>
+      ),
+      onSelect: () => {}, // Link handles navigation
+    },
+    "separator",
+    {
+      label: <span className="whitespace-nowrap">Log Out</span>,
+      onSelect: logout,
+      destructive: true,
+    },
+  ];
+
   return (
-    <div ref={rootRef} className="flex items-center gap-1 sm:gap-2">
-      {/* Theme toggle — top-left button in the mobile floating topbar (the
-          desktop slot lives in WebappDesktopBar next to this cluster). */}
-      <button
-        onClick={toggle}
-        className="flex h-9 w-9 items-center justify-center rounded-md text-deep-ink/60 transition-colors duration-150 hover:bg-white/40 hover:text-deep-ink dark:text-warm-white/60 dark:hover:bg-white/10 dark:hover:text-warm-white"
-        aria-label={resolved === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-      >
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.span
-            key={resolved}
-            initial={{ opacity: 0, rotate: -90, scale: 0.6 }}
-            animate={{ opacity: 1, rotate: 0, scale: 1 }}
-            exit={{ opacity: 0, rotate: 90, scale: 0.6 }}
-            transition={{ duration: 0.12, ease: "easeOut" }}
-            className="flex"
-          >
-            {resolved === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-          </motion.span>
-        </AnimatePresence>
-      </button>
-
-      {/* Business Switcher — shown whenever there is more than one business.
-          Switches via the real business context (no fake data). */}
-      {businesses.length > 1 && (
-        <div className="relative">
-          <button
-            onClick={() => setBusinessOpen(!businessOpen)}
-            aria-expanded={businessOpen}
-            aria-haspopup="listbox"
-            className={cn(
-              "flex items-center gap-1 sm:gap-2 rounded-lg border px-1.5 sm:px-2.5 py-1.5 text-[11px] sm:text-[12px] font-medium transition-all",
-              businessOpen
-                ? "border-signal-300 bg-signal-50/60"
-                : "border-line bg-surface hover:border-signal-200"
-            )}
-          >
-            <span className="flex h-5 w-5 items-center justify-center rounded-md bg-signal-100 text-[9px] font-bold text-signal-700">
-              {business.name.charAt(0)}
-            </span>
-            <span className="hidden max-w-[100px] truncate text-ink sm:inline">{business.name}</span>
-            <ChevronDown
-              size={12}
-              className={cn("transition-transform", businessOpen && "rotate-180")}
-            />
-          </button>
-
-          <AnimatePresence>
-            {businessOpen && (
-              <motion.div
-                {...dropdownMotion}
-                className="absolute right-0 top-full mt-2 z-50 min-w-[200px] rounded-lg border border-line bg-surface shadow-raised"
-              >
-                <div className="p-1">
-                  {businesses.map((b) => (
-                    <button
-                      key={b.id}
-                      onClick={() => {
-                        setBusinessId(b.id);
-                        setBusinessOpen(false);
-                      }}
-                      className={cn(
-                        "flex w-full items-center gap-2 rounded-md px-3 py-2 text-[12px] transition-colors",
-                        b.id === business.id
-                          ? "bg-signal-50 text-signal-700"
-                          : "text-ink-soft hover:bg-surfaceMuted hover:text-ink"
-                      )}
-                    >
-                      <span className="flex h-6 w-6 items-center justify-center rounded-md bg-surfaceMuted text-[11px] font-bold text-ink-soft">
-                        {b.name.charAt(0)}
-                      </span>
-                      <span className="min-w-0 text-left">
-                        <span className="block truncate font-medium text-[12px]">{b.name}</span>
-                        <span className="block text-[10px] text-ink-faint">
-                          {CURRENCY_META[b.currency].flag} {b.currency}
-                        </span>
-                      </span>
-                      {b.id === business.id && (
-                        <span className="ml-auto text-signal-700">✓</span>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      )}
-
-      {/* Profile Menu */}
-      <div className="relative">
+    <div className="flex items-center gap-2">
+      {/* ONE shared oval Glisse surface containing Theme + Business */}
+      <Glass className="flex h-12 items-center gap-0.5 rounded-full px-0.5">
+        {/* Theme Switcher */}
         <button
-          onClick={() => setProfileOpen(!profileOpen)}
-          aria-expanded={profileOpen}
-          aria-haspopup="menu"
-          className="flex items-center gap-1 rounded-lg border border-line bg-surface px-1.5 py-1.5 transition-all hover:border-signal-200 sm:px-2"
-          title={displayName}
+          onClick={toggle}
+          aria-label={resolved === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          className={cn(
+            "flex h-10 w-10 shrink-0 items-center justify-center rounded-full",
+            "text-deep-ink dark:text-warm-white",
+            "hover:bg-white/40 active:bg-white/60",
+            "dark:hover:bg-white/10 dark:active:bg-white/20",
+            "transition-colors duration-150"
+          )}
         >
-          <Avatar
-            name={displayName}
-            size="sm"
-            className="h-6 w-6 text-[10px]"
-          />
-          <ChevronDown
-            size={12}
-            className={cn("text-ink-faint transition-transform hidden sm:block", profileOpen && "rotate-180")}
-          />
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.span
+              key={resolved}
+              initial={{ opacity: 0, rotate: -90, scale: 0.6 }}
+              animate={{ opacity: 1, rotate: 0, scale: 1 }}
+              exit={{ opacity: 0, rotate: 90, scale: 0.6 }}
+              transition={{ duration: 0.12, ease: "easeOut" }}
+              className="flex"
+            >
+              {resolved === "dark" ? <Sun size={20} strokeWidth={2} /> : <Moon size={20} strokeWidth={2} />}
+            </motion.span>
+          </AnimatePresence>
         </button>
 
-        <AnimatePresence>
-          {profileOpen && (
-            <motion.div
-              {...dropdownMotion}
-              className="absolute right-0 top-full mt-2 z-50 min-w-[180px] rounded-lg border border-line bg-surface shadow-raised"
+        {/* Business Switcher - only show if multiple businesses */}
+        {businesses.length > 1 && (
+          <div className="relative">
+            <button
+              ref={businessButtonRef}
+              onClick={() => setBusinessMenuOpen(!businessMenuOpen)}
+              aria-label="Switch business"
+              className={cn(
+                "flex h-10 w-10 shrink-0 items-center justify-center rounded-full",
+                "text-deep-ink dark:text-warm-white",
+                "hover:bg-white/40 active:bg-white/60",
+                "dark:hover:bg-white/10 dark:active:bg-white/20",
+                "transition-colors duration-150"
+              )}
             >
-              <div className="border-b border-line px-3 py-2.5">
-                <p className="text-[12px] font-semibold text-ink truncate">{displayName}</p>
-                <p className="text-[10px] text-ink-faint truncate">{user?.email}</p>
-              </div>
-              <div className="p-1">
-                <Link
-                  href="/settings"
-                  onClick={() => setProfileOpen(false)}
-                  className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-[12px] text-ink-soft transition-colors hover:bg-surfaceMuted hover:text-ink"
+              <Building2 size={20} strokeWidth={2} />
+            </button>
+
+            {/* Business Menu Popup */}
+            <AnimatePresence>
+              {businessMenuOpen && (
+                <motion.div
+                  ref={businessMenuRef}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  className={cn(
+                    "absolute end-0 top-[calc(100%+8px)] z-50 min-w-[200px] origin-top-end",
+                    "overflow-hidden rounded-2xl",
+                    "border border-white/[0.15] bg-white/[0.85] backdrop-blur-xl",
+                    "dark:border-white/[0.08] dark:bg-[rgb(var(--c-surface))]/[0.85]",
+                    "shadow-[0_8px_24px_-4px_rgba(16,28,44,0.12),0_2px_8px_-2px_rgba(16,28,44,0.08)]",
+                    "dark:shadow-[0_8px_24px_-4px_rgba(0,0,0,0.4),0_2px_8px_-2px_rgba(0,0,0,0.2)]"
+                  )}
                 >
-                  <UserCircle2 size={14} />
-                  Edit Profile
-                </Link>
-                <button
-                  onClick={() => {
-                    setProfileOpen(false);
-                    logout();
-                  }}
-                  className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-[12px] text-rose-700 transition-colors hover:bg-rose-100/30 dark:hover:bg-rose-900/20"
-                >
-                  <LogOut size={14} />
-                  Log Out
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                  <div className="p-1.5">
+                    {businesses.map((b) => (
+                      <button
+                        key={b.id}
+                        onClick={() => {
+                          setBusinessId(b.id);
+                          setBusinessMenuOpen(false);
+                        }}
+                        className={cn(
+                          "flex w-full items-center justify-between gap-2.5 rounded-xl px-3 py-2.5 text-start",
+                          "transition-colors duration-100",
+                          b.id === business.id
+                            ? "bg-black/[0.06] dark:bg-white/[0.08]"
+                            : "hover:bg-black/[0.04] active:bg-black/[0.08] dark:hover:bg-white/[0.04] dark:active:bg-white/[0.08]"
+                        )}
+                      >
+                        <div className="flex min-w-0 flex-1 items-center gap-2.5">
+                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-signal-100 text-[11px] font-bold text-signal-700 dark:bg-signal-800/80 dark:text-signal-300">
+                            {b.name.charAt(0)}
+                          </span>
+                          <span className="flex min-w-0 flex-1 flex-col">
+                            <span className="truncate text-[13px] font-medium text-[rgb(var(--c-ink))] dark:text-[rgb(var(--c-warm-white))]">
+                              {b.name}
+                            </span>
+                            <span className="text-[11px] text-[rgb(var(--c-ink-faint))]">
+                              {CURRENCY_META[b.currency].flag} {b.currency}
+                            </span>
+                          </span>
+                        </div>
+                        {b.id === business.id && (
+                          <span className="shrink-0 text-[14px] text-signal-600 dark:text-signal-400">✓</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
+      </Glass>
+
+      {/* Profile Menu - ONE separate circular Glisse button */}
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center [&_button]:!h-12 [&_button]:!w-12 [&_button]:!min-h-[48px] [&_button]:!min-w-[48px] [&_button]:!rounded-full">
+        <Menu
+          items={profileMenuItems}
+          aria-label="Profile menu"
+          icon={<User size={20} strokeWidth={2} />}
+          align="end"
+          className="p-0"
+        />
       </div>
     </div>
   );

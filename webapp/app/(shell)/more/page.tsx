@@ -8,7 +8,7 @@ import { WebappSettingsModal } from "@/components/webapp/WebappSettingsModal";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/app/providers";
 import { Avatar } from "@/components/ui/Avatar";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/glisse";
 import { cn } from "@/lib/utils";
 import {
   primaryNavItems,

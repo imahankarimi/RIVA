@@ -11,7 +11,8 @@ import { requestPasswordReset } from "@/lib/api/auth";
 import { useAuth } from "@/app/providers";
 import { defaultCurrencyFor, type BackendCurrency } from "@/lib/currency";
 import { CurrencySelect, CurrencyLockWarning } from "@/components/settings/CurrencySelect";
-import { installLiquidLens } from "@/lib/liquidLens";
+import { Button } from "@/components/glisse";
+import { installLiquidLens } from "@/lib/motion/liquidLens";
 import { DURATION, EASE_OUT } from "@/lib/motion/tokens";
 
 type Mode = "login" | "signup" | "forgot";
@@ -158,13 +159,14 @@ export function AuthScreen() {
               <div className="liquid-glass-success-message">
                 {t("auth.forgotSentGeneric")}
               </div>
-              <button
+              <Button
                 type="button"
                 onClick={backToLogin}
-                className="glass-lens liquid-glass-button w-full"
+                variant="filled"
+                className="w-full"
               >
                 {t("auth.backToLogin")}
-              </button>
+              </Button>
             </motion.div>
           ) : (
             <motion.form
@@ -287,10 +289,11 @@ export function AuthScreen() {
             )}
 
             {/* Submit button */}
-            <button
+            <Button
               type="submit"
               disabled={loading}
-              className="glass-lens liquid-glass-button w-full"
+              variant="filled"
+              className="w-full"
             >
               {loading ? (
                 <Loader2 size={18} className="animate-spin" />
@@ -300,7 +303,7 @@ export function AuthScreen() {
                   {mode !== "forgot" && <ArrowRight size={18} className="flip-rtl" />}
                 </>
               )}
-            </button>
+            </Button>
 
             {/* Forgot password link (login only) */}
             {mode === "login" && (

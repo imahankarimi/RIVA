@@ -3,8 +3,9 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Search, Wallet, TrendingUp, ArrowDownToLine, ArrowUpFromLine, FileUp, SlidersHorizontal,
+  Wallet, TrendingUp, ArrowDownToLine, ArrowUpFromLine, FileUp, SlidersHorizontal,
 } from "lucide-react";
+import { SearchField, SegmentedControl, Button } from "@/components/glisse";
 import { WebappHeader } from "@/components/webapp/WebappHeader";
 import { WebappNotice } from "@/components/webapp/WebappNotice";
 import { useI18n } from "@/lib/i18n";
@@ -55,89 +56,169 @@ export default function CashPage() {
 
   return (
     <div className="mx-auto w-full max-w-content px-4 pb-8 pt-1 sm:px-6">
-      <WebappHeader eyebrow={t("webapp.nav.cash")} title={t("webapp.cash.title")} description={t("webapp.cash.subtitle")} />
+      <WebappHeader
+        eyebrow={t("webapp.nav.cash")}
+        title={t("webapp.cash.title")}
+        description={t("webapp.cash.subtitle")}
+      />
 
       <WebappNotice variant={usingDemoData ? "demo" : undefined} />
 
       {status === "error" ? (
-        <ErrorState title={t("transactions.loadErrorTitle")} body={error ?? t("transactions.loadErrorBody")} onRetry={refetch} retryLabel={t("common.retry")} />
+        <ErrorState
+          title={t("transactions.loadErrorTitle")}
+          body={error ?? t("transactions.loadErrorBody")}
+          onRetry={refetch}
+          retryLabel={t("common.retry")}
+        />
       ) : (
-        <div className="space-y-5">
-          {/* Summary strip — cash balance + net movement (crisp content layer). */}
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
-            <div className="rounded-2xl bg-surface p-3 ring-1 ring-line sm:p-4">
-              <p className="flex items-center gap-1 text-[9.5px] font-semibold uppercase tracking-wider text-ink-faint">
-                <Wallet size={10} /> {t("overview.balance")}
-              </p>
-              <p className="mt-2 font-mono font-figures text-[16px] font-semibold tabular-nums text-ink sm:mt-2.5 sm:text-[18px]">
-                {formatMoney(cashBalance)}
-              </p>
-            </div>
-            <div className="rounded-2xl bg-surface p-3 ring-1 ring-line sm:p-4">
-              <p className="flex items-center gap-1 text-[9.5px] font-semibold uppercase tracking-wider text-ink-faint">
-                <ArrowDownToLine size={10} /> {t("webapp.cash.income")}
-              </p>
-              <p className="mt-2 font-mono font-figures text-[16px] font-semibold tabular-nums text-moss-700 sm:mt-2.5 sm:text-[18px]">
-                {formatMoney(totals.inSum)}
-              </p>
-            </div>
-            <div className="rounded-2xl bg-surface p-3 ring-1 ring-line sm:p-4">
-              <p className="flex items-center gap-1 text-[9.5px] font-semibold uppercase tracking-wider text-ink-faint">
-                <ArrowUpFromLine size={10} /> {t("webapp.cash.expense")}
-              </p>
-              <p className="mt-2 font-mono font-figures text-[16px] font-semibold tabular-nums text-rose-700 sm:mt-2.5 sm:text-[18px]">
-                {formatMoney(totals.outSum)}
-              </p>
-            </div>
-          </div>
-
-          {/* Toolbar */}
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-line bg-surface px-3 py-2.5 focus-within:border-signal-300 focus-within:ring-1 focus-within:ring-signal-100">
-              <Search size={14} className="shrink-0 text-ink-faint" />
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder={t("webapp.cash.searchPlaceholder")}
-                className="min-w-0 flex-1 bg-transparent text-[13px] text-ink placeholder:text-ink-faint focus:outline-none"
+        <div className="space-y-6 sm:space-y-7">
+          {/* Summary strip — enhanced visual hierarchy and spacing */}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+            {/* Balance card */}
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.28, ease: EASE_OUT }}
+              className="group relative overflow-hidden rounded-[20px] bg-gradient-to-br from-surface to-surface/80 p-5 shadow-[0_1px_3px_rgba(16,28,44,0.04)] ring-1 ring-line/60 transition-all hover:shadow-[0_4px_12px_rgba(16,28,44,0.08)] sm:p-6"
+            >
+              {/* Subtle gradient overlay */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 bg-gradient-to-br from-signal-500/[0.02] to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
               />
-            </div>
-            <div className="flex items-center gap-1 rounded-lg border border-line bg-surface p-1">
-              {(["all", "in", "out"] as const).map((k) => (
-                <button
-                  key={k}
-                  onClick={() => setHeading(k)}
-                  className={cn(
-                    "rounded-md px-2.5 py-1.5 text-[12px] font-semibold transition-colors duration-150",
-                    heading === k ? "bg-signal-500 text-onSignal shadow-subtle" : "text-ink-soft hover:text-ink"
-                  )}
-                >
-                  {k === "all" ? "All" : k === "in" ? <TrendingUp size={13} /> : "Out"}
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => setImportExportOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface px-3 py-2.5 text-[12px] font-medium text-ink-soft transition-colors hover:bg-surfaceMuted/60 hover:text-ink"
+
+              <div className="relative z-10 space-y-3.5">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-signal-100/40">
+                    <Wallet size={16} strokeWidth={2.2} className="text-signal-600" />
+                  </div>
+                  <p className="text-[11.5px] font-semibold uppercase tracking-[0.08em] text-ink-faint">
+                    {t("overview.balance")}
+                  </p>
+                </div>
+                <p className="font-mono font-figures text-[20px] font-semibold tabular-nums text-ink sm:text-[22px]">
+                  {formatMoney(cashBalance)}
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Income card */}
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.28, delay: 0.04, ease: EASE_OUT }}
+              className="group relative overflow-hidden rounded-[20px] bg-gradient-to-br from-surface to-surface/80 p-5 shadow-[0_1px_3px_rgba(16,28,44,0.04)] ring-1 ring-line/60 transition-all hover:shadow-[0_4px_12px_rgba(16,28,44,0.08)] sm:p-6"
             >
-              <FileUp size={13} /> {t("importExport.title")}
-            </button>
-            <button
-              aria-label={t("common.filter")}
-              className="inline-flex items-center justify-center rounded-lg border border-line bg-surface px-3 py-2.5 text-ink-soft transition-colors hover:bg-surfaceMuted/60 hover:text-ink"
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 bg-gradient-to-br from-moss-500/[0.02] to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              />
+
+              <div className="relative z-10 space-y-3.5">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-moss-100">
+                    <ArrowDownToLine size={16} strokeWidth={2.2} className="text-moss-700" />
+                  </div>
+                  <p className="text-[11.5px] font-semibold uppercase tracking-[0.08em] text-ink-faint">
+                    {t("webapp.cash.income")}
+                  </p>
+                </div>
+                <p className="font-mono font-figures text-[20px] font-semibold tabular-nums text-moss-700 sm:text-[22px]">
+                  {formatMoney(totals.inSum)}
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Expense card */}
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.28, delay: 0.08, ease: EASE_OUT }}
+              className="group relative overflow-hidden rounded-[20px] bg-gradient-to-br from-surface to-surface/80 p-5 shadow-[0_1px_3px_rgba(16,28,44,0.04)] ring-1 ring-line/60 transition-all hover:shadow-[0_4px_12px_rgba(16,28,44,0.08)] sm:p-6"
             >
-              <SlidersHorizontal size={14} />
-            </button>
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 bg-gradient-to-br from-rose-500/[0.02] to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              />
+
+              <div className="relative z-10 space-y-3.5">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-100">
+                    <ArrowUpFromLine size={16} strokeWidth={2.2} className="text-rose-700" />
+                  </div>
+                  <p className="text-[11.5px] font-semibold uppercase tracking-[0.08em] text-ink-faint">
+                    {t("webapp.cash.expense")}
+                  </p>
+                </div>
+                <p className="font-mono font-figures text-[20px] font-semibold tabular-nums text-rose-700 sm:text-[22px]">
+                  {formatMoney(totals.outSum)}
+                </p>
+              </div>
+            </motion.div>
           </div>
 
-          {/* Transaction list */}
-          <div className="overflow-hidden rounded-2xl bg-surface ring-1 ring-line">
+          {/* Toolbar — enhanced mobile UX with better touch targets */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.12, ease: EASE_OUT }}
+            className="space-y-3"
+          >
+            {/* Search field with improved sizing */}
+            <SearchField
+              value={search}
+              onValueChange={setSearch}
+              placeholder={t("webapp.cash.searchPlaceholder")}
+              className="w-full"
+            />
+
+            {/* Filter controls — stacked on mobile, horizontal on desktop */}
+            <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-3">
+              <div className="flex-1">
+                <SegmentedControl
+                  items={[
+                    { value: "all", label: t("common.all") },
+                    { value: "in", label: t("webapp.cash.income") },
+                    { value: "out", label: t("webapp.cash.expense") },
+                  ]}
+                  value={heading}
+                  onValueChange={(v) => setHeading(v as "all" | "in" | "out")}
+                />
+              </div>
+
+              {/* Action buttons — enhanced touch targets */}
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => setImportExportOpen(true)}
+                  variant="secondary"
+                  size="md"
+                  className="min-h-11 flex-1 gap-1.5 text-[13px] font-medium sm:flex-none"
+                >
+                  <FileUp size={16} strokeWidth={2} />
+                  <span className="hidden sm:inline">{t("importExport.title")}</span>
+                </Button>
+
+                <Button
+                  aria-label={t("common.filter")}
+                  variant="secondary"
+                  size="md"
+                  className="min-h-11 px-3.5 sm:px-4"
+                >
+                  <SlidersHorizontal size={16} strokeWidth={2} />
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Transaction list — enhanced visual design */}
+          <div className="overflow-hidden rounded-[20px] bg-surface shadow-[0_1px_3px_rgba(16,28,44,0.04)] ring-1 ring-line/60">
             {status === "loading" && (
-              <div className="divide-y divide-line-soft">
+              <div className="divide-y divide-line-soft/60">
                 {[0, 1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-center gap-3 px-4 py-3">
-                    <Skeleton className="h-9 w-9 rounded-lg" />
-                    <div className="flex-1 space-y-1.5">
+                  <div key={i} className="flex items-center gap-3.5 px-4 py-4.5 sm:px-5">
+                    <Skeleton className="h-11 w-11 rounded-xl" />
+                    <div className="flex-1 space-y-2">
                       <Skeleton className="h-3.5 w-44" />
                       <Skeleton className="h-3 w-28" />
                     </div>
@@ -148,12 +229,18 @@ export default function CashPage() {
             )}
 
             {isEmpty && (
-              <EmptyState title={t("transactions.emptyAllTitle")} body={t("transactions.emptyAllBody")} />
+              <div className="py-12">
+                <EmptyState
+                  title={t("transactions.emptyAllTitle")}
+                  body={t("transactions.emptyAllBody")}
+                />
+              </div>
             )}
 
             {hasLoaded && !isEmpty && (
               <div>
-                <div className="hidden grid-cols-[2fr_1fr_1fr_1fr_auto] gap-4 border-b border-line px-4 py-2 text-[10px] font-semibold uppercase tracking-wider text-ink-faint sm:grid">
+                {/* Desktop header — hidden on mobile */}
+                <div className="hidden grid-cols-[2fr_1fr_1fr_1fr_auto] gap-4 border-b border-line/60 bg-surfaceMuted/30 px-5 py-3 text-[10.5px] font-semibold uppercase tracking-wider text-ink-faint sm:grid">
                   <span>{t("common.description")}</span>
                   <span>{t("common.category")}</span>
                   <span>{t("common.date")}</span>
@@ -162,16 +249,23 @@ export default function CashPage() {
                 </div>
 
                 {filtered.length === 0 ? (
-                  <p className="px-4 py-10 text-center text-[13px] text-ink-faint">{t("transactions.empty")}</p>
+                  <p className="px-4 py-12 text-center text-[13px] text-ink-faint">
+                    {t("transactions.empty")}
+                  </p>
                 ) : (
                   <AnimatePresence initial={false}>
-                    <div className="divide-y divide-line-soft">
+                    <div className="divide-y divide-line-soft/60">
                       {filtered.map((tx, i) => (
                         <motion.div
                           key={tx.id}
                           initial={{ opacity: 0, y: 4 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: Math.min(i * 0.025, 0.3), duration: 0.18, ease: EASE_OUT }}
+                          transition={{
+                            delay: Math.min(i * 0.03, 0.2),
+                            duration: 0.22,
+                            ease: EASE_OUT,
+                          }}
+                          className="transition-colors active:bg-surfaceMuted/30 sm:hover:bg-surfaceMuted/20"
                         >
                           <TransactionRow tx={tx} />
                         </motion.div>

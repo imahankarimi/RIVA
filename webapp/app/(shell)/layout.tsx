@@ -16,17 +16,27 @@ import { AddIncomeProvider } from "@/components/transactions/AddIncomeContext";
  *
  * The desktop shell uses translucent floating surfaces with backdrop blur,
  * soft borders, subtle shadows, and refined spacing — unmistakably RIVA Web.
+ *
+ * Mobile UX enhancements:
+ * - Optimized padding and spacing system
+ * - Proper safe area handling for notched devices
+ * - Enhanced scroll behavior (momentum scrolling)
+ * - Touch-optimized layout with breathing room
+ * - Fixed scroll container hierarchy for proper mobile scroll tracking
  */
 export default function ShellLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthGate>
       <AddIncomeProvider>
-        <div className="flex min-h-dvh flex-col bg-paper font-sans text-ink antialiased md:h-screen">
+        <div className="flex h-dvh flex-col bg-paper font-sans text-ink antialiased md:h-screen">
           <div className="flex min-h-0 flex-1 md:overflow-hidden">
             <WebappSidebar />
             <div className="flex min-h-0 min-w-0 flex-1 flex-col">
               <WebappDesktopBar />
-              <main className="relative min-h-0 min-w-0 flex-1 pt-[4.5rem] pb-[calc(env(safe-area-inset-bottom)+80px)] md:overflow-y-auto md:overscroll-contain md:pb-10">
+              <main
+                id="webapp-main-scroll"
+                className="relative min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain pt-[5rem] pb-[calc(env(safe-area-inset-bottom)+76px)] md:overflow-y-auto md:overscroll-contain md:pb-8 md:pt-0"
+              >
                 {children}
               </main>
             </div>

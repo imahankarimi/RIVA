@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Sparkle } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/glisse";
 import { Card } from "@/components/ui/Card";
 import { Textarea } from "@/components/ui/Textarea";
 import { useI18n } from "@/lib/i18n";

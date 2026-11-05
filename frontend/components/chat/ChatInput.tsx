@@ -23,7 +23,9 @@ export function ChatInput({
     if (!trimmed || disabled) return;
     onSend(trimmed);
     setValue("");
-    if (textareaRef.current) textareaRef.current.style.height = "auto";
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+    }
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
@@ -37,77 +39,97 @@ export function ChatInput({
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = "auto";
-    el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
+    el.style.height = `${Math.min(el.scrollHeight, 200)}px`;
   }
 
   const canSend = Boolean(value.trim()) && !disabled;
 
   return (
-    <div
-      className="sticky bottom-0 z-20 border-t border-line-soft bg-paper/95 px-3 pt-3 backdrop-blur sm:px-6"
-      style={{
-        paddingBottom: "calc(env(safe-area-inset-bottom) + 12px)",
-        boxShadow: "0 -12px 24px -20px rgba(16, 28, 44, 0.18)",
-      }}
-    >
-      <div
-        className={cn(
-          "mx-auto flex max-w-content items-end gap-1.5 rounded-xl border bg-surface p-1.5 transition-all duration-150",
-          focused ? "border-signal-400 shadow-card ring-4 ring-signal-100/70" : "border-line shadow-subtle",
-          disabled && "opacity-70"
-        )}
-      >
-        <button
-          type="button"
-          disabled
-          title={t("common.comingSoon")}
-          className="glass-lens mb-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-ink-faint opacity-40 cursor-not-allowed"
-          aria-label={`${t("assistant.attach")} (${t("common.comingSoon")})`}
-        >
-          <Paperclip size={18} />
-        </button>
-
-        <textarea
-          ref={textareaRef}
-          rows={1}
-          value={value}
-          disabled={disabled}
-          placeholder={t("assistant.inputPlaceholder")}
-          onChange={(e) => {
-            setValue(e.target.value);
-            autoGrow();
-          }}
-          onKeyDown={handleKeyDown}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          className="max-h-[120px] flex-1 resize-none bg-transparent py-2.5 text-[14.5px] leading-normal text-ink placeholder:text-ink-faint focus:outline-none"
-        />
-
-        <button
-          type="button"
-          disabled
-          title={t("common.comingSoon")}
-          className="glass-lens mb-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-ink-faint opacity-40 cursor-not-allowed"
-          aria-label={`${t("assistant.voice")} (${t("common.comingSoon")})`}
-        >
-          <Mic size={18} />
-        </button>
-
-        <motion.button
-          type="button"
-          onClick={submit}
-          disabled={disabled || !value.trim()}
-          aria-label={t("assistant.send")}
-          whileHover={canSend ? { scale: 1.05 } : undefined}
-          whileTap={canSend ? { scale: 0.95 } : undefined}
-          transition={{ type: "spring", stiffness: 400, damping: 24 }}
+    <div className="sticky bottom-0 z-20 border-t border-line-soft bg-paper/80 backdrop-blur-xl">
+      <div className="mx-auto w-full max-w-3xl px-4 py-4 sm:px-6">
+        <div
           className={cn(
-            "glass-lens mb-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors duration-150",
-            canSend ? "bg-signal-500 text-onSignal hover:bg-signal-600" : "bg-surfaceMuted text-ink-faint"
+            "group relative flex items-end gap-2 rounded-2xl border bg-surface px-4 py-3 shadow-sm transition-all duration-200",
+            focused
+              ? "border-signal-400 shadow-[0_0_0_3px_rgba(113,135,155,0.1)] ring-1 ring-signal-400/20"
+              : "border-line hover:border-line-strong",
+            disabled && "opacity-60"
           )}
         >
-          <ArrowUp size={17} strokeWidth={2.5} />
-        </motion.button>
+          {/* Attach button (disabled) */}
+          <button
+            type="button"
+            disabled
+            title={t("common.comingSoon")}
+            className="mb-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-ink-faint opacity-40 transition-colors hover:bg-surfaceMuted disabled:cursor-not-allowed"
+            aria-label={`${t("assistant.attach")} (${t("common.comingSoon")})`}
+          >
+            <Paperclip size={18} strokeWidth={2} />
+          </button>
+
+          {/* Message input */}
+          <div className="flex min-w-0 flex-1 flex-col">
+            <textarea
+              ref={textareaRef}
+              rows={1}
+              value={value}
+              disabled={disabled}
+              placeholder={t("assistant.inputPlaceholder")}
+              onChange={(e) => {
+                setValue(e.target.value);
+                autoGrow();
+              }}
+              onKeyDown={handleKeyDown}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              className="max-h-[200px] w-full resize-none bg-transparent py-1.5 text-[15px] leading-relaxed text-ink placeholder:text-ink-faint focus:outline-none disabled:cursor-not-allowed"
+              style={{ scrollbarWidth: "thin" }}
+            />
+
+            {/* Input hint */}
+            {focused && !value && (
+              <motion.div
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                className="mt-1 text-[12px] text-ink-faint"
+              >
+                Press <kbd className="rounded bg-surfaceMuted px-1.5 py-0.5 font-mono text-[11px]">Enter</kbd> to send,{" "}
+                <kbd className="rounded bg-surfaceMuted px-1.5 py-0.5 font-mono text-[11px]">Shift + Enter</kbd> for new line
+              </motion.div>
+            )}
+          </div>
+
+          {/* Voice button (disabled) */}
+          <button
+            type="button"
+            disabled
+            title={t("common.comingSoon")}
+            className="mb-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-ink-faint opacity-40 transition-colors hover:bg-surfaceMuted disabled:cursor-not-allowed"
+            aria-label={`${t("assistant.voice")} (${t("common.comingSoon")})`}
+          >
+            <Mic size={18} strokeWidth={2} />
+          </button>
+
+          {/* Send button */}
+          <motion.button
+            type="button"
+            onClick={submit}
+            disabled={!canSend}
+            aria-label={t("assistant.send")}
+            whileHover={canSend ? { scale: 1.05 } : undefined}
+            whileTap={canSend ? { scale: 0.95 } : undefined}
+            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+            className={cn(
+              "mb-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg shadow-sm transition-all duration-200",
+              canSend
+                ? "bg-signal-500 text-onSignal hover:bg-signal-600 hover:shadow-md active:shadow-sm"
+                : "cursor-not-allowed bg-surfaceMuted text-ink-faint"
+            )}
+          >
+            <ArrowUp size={18} strokeWidth={2.5} />
+          </motion.button>
+        </div>
       </div>
     </div>
   );

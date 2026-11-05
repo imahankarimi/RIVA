@@ -1,29 +1,11 @@
-import * as React from "react";
-import { cn } from "@/lib/utils";
+/**
+ * RIVA Input - Re-export of official Glisse Input
+ *
+ * This file previously contained a legacy custom Input implementation.
+ * It now re-exports the official Glisse Input wrapper to maintain
+ * backward compatibility while using the official Glisse design system.
+ *
+ * All input usage across the webapp now uses the official Glisse components.
+ */
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
-
-const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, disabled, ...props }, ref) => {
-    return (
-      <input
-        type={type}
-        disabled={disabled}
-        ref={ref}
-        data-slot="input"
-        className={cn(
-          "flex h-10 w-full rounded-md border border-input bg-surface px-3 py-2 text-sm text-ink",
-          "transition-colors duration-150",
-          "placeholder:text-ink-faint",
-          "focus-visible:outline-none focus-visible:border-signal-400 focus-visible:ring-2 focus-visible:ring-signal-100",
-          "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-surfaceMuted",
-          className
-        )}
-        {...props}
-      />
-    );
-  }
-);
-Input.displayName = "Input";
-
-export { Input, type InputProps };
+export { Input, type InputProps } from "@/components/glisse";

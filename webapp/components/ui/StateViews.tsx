@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Inbox, AlertTriangle, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/glisse";
 import { fadeUp } from "@/lib/motion/tokens";
 
 export function LoadingState({ label }: { label: string }) {

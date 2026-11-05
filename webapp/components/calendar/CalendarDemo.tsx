@@ -12,7 +12,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardAction } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/glisse";
 import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";

@@ -11,7 +11,7 @@ import { requestPasswordReset } from "@/lib/api/auth";
 import { useAuth } from "@/app/providers";
 import { defaultCurrencyFor, type BackendCurrency } from "@/lib/currency";
 import { CurrencySelect, CurrencyLockWarning } from "@/components/settings/CurrencySelect";
-import { installLiquidLens } from "@/lib/liquidLens";
+import { installLiquidLens } from "@/lib/motion/liquidLens";
 import { DURATION, EASE_OUT } from "@/lib/motion/tokens";
 
 type Mode = "login" | "signup" | "forgot";

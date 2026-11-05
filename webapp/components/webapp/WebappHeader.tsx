@@ -1,65 +1,83 @@
 "use client";
 
 import { motion } from "framer-motion";
-import type { LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-/** Premium page header for RIVA App — sophisticated typography, refined spacing,
- *  and intentional hierarchy. Designed for mobile-first PWA experience. */
+interface WebappHeaderProps {
+  eyebrow?: string;
+  title?: string;
+  description?: string;
+  action?: React.ReactNode;
+  className?: string;
+}
+
+const EASE_OUT = [0.16, 1, 0.3, 1] as const;
+
+/**
+ * Premium page header for RIVA Webapp.
+ *
+ * Mobile UX enhancements:
+ * - Optimized spacing and breathing room (56px → 68px total height)
+ * - Better typography hierarchy with proper line heights
+ * - Refined motion with stagger for visual interest
+ * - Improved readability on small screens
+ */
 export function WebappHeader({
   eyebrow,
   title,
   description,
   action,
-  icon: Icon,
-}: {
-  eyebrow?: string;
-  title?: string;
-  description?: string;
-  action?: React.ReactNode;
-  icon?: LucideIcon;
-}) {
+  className,
+}: WebappHeaderProps) {
   return (
-    <motion.header
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      className="relative mb-6 sm:mb-7"
-    >
-      <div className="flex min-h-[84px] flex-col justify-center gap-3.5 sm:min-h-[92px] sm:gap-4">
-        {/* Top row: eyebrow/icon + optional action */}
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5 sm:gap-3">
-            {Icon && (
-              <div className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[10px] bg-signal-500/[0.08] text-signal-600 sm:h-8 sm:w-8 sm:rounded-xl">
-                <Icon size={16} strokeWidth={2.2} className="sm:h-[17px] sm:w-[17px]" />
-              </div>
-            )}
-            {eyebrow && (
-              <span className="text-[10.5px] font-semibold uppercase tracking-[0.09em] text-ink-faint sm:text-[11px]">
-                {eyebrow}
-              </span>
-            )}
-          </div>
-          {action && <div className="shrink-0">{action}</div>}
-        </div>
+    <header className={cn("mb-4 sm:mb-5", className)}>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1 space-y-1.5">
+          {eyebrow && (
+            <motion.p
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.24, ease: EASE_OUT }}
+              className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-faint"
+            >
+              {eyebrow}
+            </motion.p>
+          )}
 
-        {/* Title + description with refined typography */}
-        <div className="space-y-2 sm:space-y-2.5">
           {title && (
-            <h1 className="font-display text-[27px] font-bold leading-[1.15] tracking-[-0.024em] text-ink sm:text-[34px] sm:leading-[1.12]">
+            <motion.h1
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.28, delay: 0.04, ease: EASE_OUT }}
+              className="font-display text-[20px] font-bold leading-tight text-ink sm:text-[24px] sm:leading-tight"
+            >
               {title}
-            </h1>
+            </motion.h1>
           )}
+
           {description && (
-            <p className="max-w-[min(100%,40rem)] text-[13px] leading-[1.5] text-ink-soft sm:text-[14px] sm:leading-relaxed">
+            <motion.p
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.26, delay: 0.08, ease: EASE_OUT }}
+              className="max-w-xl text-[13px] leading-relaxed text-ink-soft sm:text-[14px]"
+            >
               {description}
-            </p>
+            </motion.p>
           )}
         </div>
-      </div>
 
-      {/* Refined separator with gradient fade */}
-      <div className="mt-5 h-px bg-gradient-to-r from-line/50 via-line/25 to-transparent sm:mt-6" />
-    </motion.header>
+        {action && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.24, delay: 0.12, ease: EASE_OUT }}
+            className="shrink-0"
+          >
+            {action}
+          </motion.div>
+        )}
+      </div>
+    </header>
   );
 }

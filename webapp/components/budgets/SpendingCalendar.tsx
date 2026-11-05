@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardAction } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/glisse";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/currency";

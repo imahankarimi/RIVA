@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/glisse";
 
 export function QuickChoices({
   choices,
@@ -28,22 +29,23 @@ export function QuickChoices({
       {choices.map((choice) => {
         const isSelected = choice === selected;
         return (
-          <button
+          <Button
             key={choice}
+            variant="glass"
             disabled={disabled || resolved}
             onClick={() => onSelect(choice)}
             className={cn(
-              "glass-lens flex min-h-[38px] items-center gap-1.5 rounded-full border px-4 text-[13px] font-medium transition-colors duration-150",
+              "min-h-[38px] rounded-full border px-4 text-[13px]",
               isSelected
                 ? "border-signal-500 bg-signal-500 text-onSignal"
                 : resolved
                   ? "border-line bg-surfaceMuted text-ink-faint opacity-60"
-                  : "border-signal-300 bg-signal-50 text-signal-700 hover:bg-signal-100 disabled:opacity-40"
+                  : "border-signal-300 bg-signal-50 text-signal-700 hover:bg-signal-100"
             )}
+            icon={isSelected ? <Check size={13} strokeWidth={2.6} /> : undefined}
           >
-            {isSelected && <Check size={13} strokeWidth={2.6} />}
             {choice}
-          </button>
+          </Button>
         );
       })}
     </motion.div>

@@ -51,10 +51,12 @@ export function useChat(
   useEffect(() => {
     const key = selectionKey ?? "";
     const isFirst = prevSelectionKey.current === undefined;
+    const keyChanged = prevSelectionKey.current !== key;
 
-    if (!isFirst && prevSelectionKey.current !== key) {
-      // User switched conversations. Load messages for the newly selected
-      // conversation (if any) — authoritative fetch avoids stale props.
+    // Load messages when:
+    // 1. First render with an existing conversation (page refresh case)
+    // 2. User switched conversations (selectionKey changed)
+    if ((isFirst && conversationId) || (!isFirst && keyChanged)) {
       const targetId = conversationId;
       if (targetId) {
         setMessages([]);
@@ -71,6 +73,7 @@ export function useChat(
           cancelled = true;
         };
       }
+      // New conversation (no ID yet) - clear messages
       setMessages([]);
       setAiState("idle");
     }

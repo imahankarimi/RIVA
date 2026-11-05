@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Topbar } from "@/components/layout/Topbar";
 import { Card, Chip } from "@/components/ui/Card";
 import { TransactionFilters } from "@/components/transactions/TransactionFilters";
@@ -14,6 +14,7 @@ import { DATE_RANGES, DATE_RANGE_LABEL_KEY, withinDateRange, type DateRange } fr
 import { ImportExportModal } from "@/components/settings/ImportExportModal";
 import { Alert } from "@/components/ui/Alert";
 import { FileUp } from "lucide-react";
+import { TRANSACTIONS_CHANGED_EVENT } from "@/components/transactions/AddIncomeContext";
 
 export default function TransactionsPage() {
   const { t } = useI18n();
@@ -23,6 +24,15 @@ export default function TransactionsPage() {
   const [category, setCategory] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState<DateRange>("all");
   const [importExportOpen, setImportExportOpen] = useState(false);
+
+  // Listen for transaction changes (from AddIncomeModal or deletions)
+  useEffect(() => {
+    const handleChange = () => {
+      refetch();
+    };
+    window.addEventListener(TRANSACTIONS_CHANGED_EVENT, handleChange);
+    return () => window.removeEventListener(TRANSACTIONS_CHANGED_EVENT, handleChange);
+  }, [refetch]);
 
   const categories = useMemo(
     () => Array.from(new Set(transactions.map((tx) => tx.category))),
@@ -111,12 +121,13 @@ export default function TransactionsPage() {
 
           {status !== "loading" && status !== "error" && transactions.length > 0 && (
             <>
-              <div className="hidden grid-cols-[2fr_1fr_1fr_1fr_auto] gap-4 border-b border-line px-5 py-2.5 text-[11.5px] font-medium uppercase tracking-wide text-ink-faint sm:grid">
+              <div className="hidden grid-cols-[2fr_1fr_1fr_1fr_auto_auto] gap-4 border-b border-line px-5 py-2.5 text-[11.5px] font-medium uppercase tracking-wide text-ink-faint sm:grid">
                 <span>{t("common.description")}</span>
                 <span>{t("common.category")}</span>
                 <span>{t("common.date")}</span>
                 <span>{t("common.amount")}</span>
                 <span>{t("common.status")}</span>
+                <span>{t("common.actions")}</span>
               </div>
               {filtered.length === 0 ? (
                 <p className="px-5 py-10 text-center text-[13.5px] text-ink-faint">{t("transactions.empty")}</p>

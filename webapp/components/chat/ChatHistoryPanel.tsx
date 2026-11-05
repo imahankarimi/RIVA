@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { MessageSquare, Plus, Trash2, X } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/glisse";
 
 interface HistoryEntry {
   id: string;
@@ -73,28 +74,27 @@ export function ChatHistoryPanel({
           >
             <div className="flex h-16 shrink-0 items-center justify-between border-b border-line px-4">
               <h2 className="font-display text-[15px] font-bold text-ink">{t("assistant.history")}</h2>
-              <button
+              <Button
+                variant="glass"
+                icon={<X size={16} />}
                 onClick={onClose}
-                className="glass-lens flex h-8 w-8 items-center justify-center rounded-md text-ink-faint hover:bg-surfaceMuted hover:text-ink"
+                className="h-8 w-8 text-ink-faint hover:bg-surfaceMuted hover:text-ink"
                 aria-label={t("common.close")}
-              >
-                <X size={16} />
-              </button>
+              />
             </div>
 
             <div className="p-3">
-              <motion.button
-                whileHover={{ scale: 1.015 }}
-                whileTap={{ scale: 0.985 }}
+              <Button
+                variant="primary"
+                icon={<Plus size={15} strokeWidth={2.4} />}
                 onClick={() => {
                   onNew();
                   onClose();
                 }}
-                className="glass-lens flex w-full items-center justify-center gap-1.5 rounded-md bg-signal-500 px-3 py-2.5 text-[13px] font-medium text-onSignal hover:bg-signal-600"
+                className="w-full justify-center text-[13px]"
               >
-                <Plus size={15} strokeWidth={2.4} />
                 {t("assistant.newChat")}
-              </motion.button>
+              </Button>
             </div>
 
             <div className="flex-1 overflow-y-auto px-2 pb-4">
@@ -124,31 +124,32 @@ export function ChatHistoryPanel({
                               transition={{ duration: 0.16 }}
                               className="group relative"
                             >
-                              <button
+                              <Button
+                                variant="glass"
+                                icon={<MessageSquare size={14} className="shrink-0 text-ink-faint" />}
                                 onClick={() => {
                                   onSelect(conv.id);
                                   onClose();
                                 }}
                                 className={cn(
-                                  "glass-lens flex w-full items-center gap-2 rounded-md px-2.5 py-2.5 pe-9 text-start text-[13px] transition-colors duration-150",
+                                  "w-full justify-start pe-9 text-start text-[13px]",
                                   conv.id === activeId
                                     ? "bg-signal-50 text-signal-700"
                                     : "text-ink-soft hover:bg-surfaceMuted hover:text-ink"
                                 )}
                               >
-                                <MessageSquare size={14} className="shrink-0 text-ink-faint" />
                                 <span className="truncate">{conv.title}</span>
-                              </button>
-                              <button
+                              </Button>
+                              <Button
+                                variant="glass"
+                                icon={<Trash2 size={13} />}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   onRemove(conv.id);
                                 }}
                                 aria-label={t("assistant.historyDelete")}
-                                className="glass-lens absolute end-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-ink-faint opacity-0 transition-opacity duration-150 hover:bg-rose-100 hover:text-rose-700 focus-visible:opacity-100 group-hover:opacity-100"
-                              >
-                                <Trash2 size={13} />
-                              </button>
+                                className="absolute end-1.5 top-1/2 h-7 w-7 -translate-y-1/2 text-ink-faint opacity-0 transition-opacity duration-150 hover:bg-rose-100 hover:text-rose-700 focus-visible:opacity-100 group-hover:opacity-100"
+                              />
                             </motion.li>
                           ))}
                         </AnimatePresence>

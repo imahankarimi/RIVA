@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Manrope, JetBrains_Mono, Vazirmatn } from "next/font/google";
+import { IBM_Plex_Sans, JetBrains_Mono, Vazirmatn } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { THEME_BOOTSTRAP_SCRIPT } from "@/lib/theme/ThemeProvider";
@@ -14,8 +14,12 @@ import { LiquidLensInstaller } from "./LiquidLensInstaller";
  * Persian and English without any component hardcoding a family. Keep this list
  * identical to `frontend/app/layout.tsx`. See docs/DESIGN_SYSTEM.md → Typography.
  */
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope", display: "swap" });
+const ibmPlexSans = IBM_Plex_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-ibm-plex-sans",
+  display: "swap"
+});
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 const vazirmatn = Vazirmatn({ subsets: ["arabic"], variable: "--font-vazirmatn", display: "swap" });
 
@@ -53,7 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Sets .dark on <html> before paint so there's no light->dark flash. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} />
       </head>
-      <body className={`${inter.variable} ${manrope.variable} ${mono.variable} ${vazirmatn.variable} font-sans`}>
+      <body className={`${ibmPlexSans.variable} ${mono.variable} ${vazirmatn.variable} font-sans`}>
         <Providers>{children}</Providers>
         <ServiceWorkerRegistration />
         <LiquidLensInstaller />

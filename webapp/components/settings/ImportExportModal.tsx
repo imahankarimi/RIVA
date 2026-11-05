@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Download, Upload, FileText, FileJson, FileSpreadsheet, FileX, CheckCircle2, AlertTriangle } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 import { Chip } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/glisse";
 import { useI18n } from "@/lib/i18n";
 import { DATE_RANGES, DATE_RANGE_LABEL_KEY, withinDateRange, type DateRange } from "@/lib/dateRange";
 import { toCsv, parseCsvPreview, downloadTextFile } from "@/lib/importExport/csv";
@@ -52,15 +52,16 @@ export function ImportExportModal({
     <Modal open={open} onClose={onClose} title={t("importExport.title")} maxWidthClassName="max-w-xl">
       <div className="mb-4 flex gap-1.5 rounded-lg bg-surfaceMuted p-1">
         {(["export", "import"] as const).map((id) => (
-          <button
+          <Button
             key={id}
+            variant="glass"
             onClick={() => setTab(id)}
-            className={`glass-lens flex-1 rounded-md py-2 text-[13px] font-medium transition-colors duration-150 ${
-              tab === id ? "bg-surface text-ink shadow-subtle" : "text-ink-faint hover:text-ink-soft"
+            className={`flex-1 py-2 text-[13px] ${
+              tab === id ? "bg-surface text-ink shadow-subtle" : "text-ink-faint"
             }`}
           >
             {t(id === "export" ? "importExport.export" : "importExport.import")}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -315,9 +316,9 @@ function ImportPanel() {
               <p className="text-[11.5px] text-ink-faint">{fileMeta.sizeKb} KB</p>
             </div>
           </div>
-          <button onClick={reset} className="text-[12px] font-medium text-signal-600 hover:text-signal-700">
+          <Button variant="glass" onClick={reset} className="h-auto px-0 text-[12px] font-medium text-signal-600 hover:text-signal-700">
             {t("common.close")}
-          </button>
+          </Button>
         </div>
       )}
 

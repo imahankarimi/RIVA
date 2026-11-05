@@ -16,8 +16,8 @@ import {
   Loader2,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/glisse";
+import { Input } from "@/components/glisse";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/currency";

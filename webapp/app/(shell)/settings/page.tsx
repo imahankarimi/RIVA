@@ -6,10 +6,10 @@ import {
   User, Shield, Palette, Globe, HardDrive, ChevronRight, Lock, Plus,
   Trash2, Pencil, LogOut, Sun, Moon, Monitor, Check, Loader2, Sparkle, Eye, EyeOff,
 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/glisse";
+import { Input } from "@/components/glisse";
 import { Label } from "@/components/ui/Label";
-import { Switch } from "@/components/ui/Switch";
+import { Switch } from "@/components/glisse";
 import { Modal } from "@/components/ui/Modal";
 import { Alert } from "@/components/ui/Alert";
 import { Separator } from "@/components/ui/Separator";

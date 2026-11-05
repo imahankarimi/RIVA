@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { Alert } from "@/components/ui/Alert";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/glisse";
 import { useI18n } from "@/lib/i18n";
 import { verifyEmail } from "@/lib/api/auth";
 

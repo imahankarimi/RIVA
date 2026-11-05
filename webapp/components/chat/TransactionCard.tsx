@@ -7,7 +7,7 @@ import { useI18n } from "@/lib/i18n";
 import { usePreferences } from "@/lib/preferences/PreferencesProvider";
 import { formatCurrency } from "@/lib/currency";
 import { iconFor } from "@/lib/categoryIcons";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/glisse";
 import { cn } from "@/lib/utils";
 import type { ChatAction } from "@/lib/types";
 

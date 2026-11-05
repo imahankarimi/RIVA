@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Topbar } from "@/components/layout/Topbar";
 import { Card } from "@/components/ui/Card";
 import { TransactionRow } from "@/components/transactions/TransactionRow";
@@ -9,12 +9,22 @@ import { StaggerContainer, StaggerItem } from "@/components/motion/Stagger";
 import { useI18n } from "@/lib/i18n";
 import { useBusiness } from "@/app/providers";
 import { useTransactions } from "@/lib/hooks/useTransactions";
+import { TRANSACTIONS_CHANGED_EVENT } from "@/components/transactions/AddIncomeContext";
 
 export default function ExpensesPage() {
   const { t } = useI18n();
   const { business } = useBusiness();
   const { transactions, status, error, refetch } = useTransactions(business?.id ?? null);
   const expenses = useMemo(() => transactions.filter((tx) => tx.amount < 0), [transactions]);
+
+  // Listen for transaction changes (from AddIncomeModal or deletions)
+  useEffect(() => {
+    const handleChange = () => {
+      refetch();
+    };
+    window.addEventListener(TRANSACTIONS_CHANGED_EVENT, handleChange);
+    return () => window.removeEventListener(TRANSACTIONS_CHANGED_EVENT, handleChange);
+  }, [refetch]);
 
   return (
     <div className="flex min-h-screen flex-col">

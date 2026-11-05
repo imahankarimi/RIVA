@@ -7,10 +7,12 @@ import { SidebarProvider } from "@/components/layout/SidebarContext";
 import { AuthGate } from "@/components/auth/AuthGate";
 import { ProfileSetupModal } from "@/components/settings/ProfileSetupModal";
 import { AddIncomeProvider } from "@/components/transactions/AddIncomeContext";
+import { LiquidLensInstaller } from "@/app/LiquidLensInstaller";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthGate>
+      <LiquidLensInstaller />
       <SidebarProvider>
         <AddIncomeProvider>
           <div className="flex h-screen overflow-hidden bg-paper">

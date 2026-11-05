@@ -19,16 +19,66 @@
    ========================================================================== */
 @import "../../design-system/tokens.css";
 
+/* Glisse — Apple Liquid Glass implementation */
+@import "glisse/styles.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ----------------------------------------------------------------------------
+   FONT SWITCHING
+   ----------------------------------------------------------------------------
+   Locale-driven font assignment. The I18nProvider sets `data-locale` on
+   <html>, and these rules wire the correct family into `--font-ui` and
+   `--font-ui-display`, which the Tailwind preset consumes as `font-sans` and
+   `font-display`. English → IBM Plex Sans (UI and display); Persian →
+   Vazirmatn for both. See AGENT.md Typography. */
+
+html[data-locale="fa"] {
+  --font-ui: var(--font-vazirmatn), system-ui, sans-serif;
+  --font-ui-display: var(--font-vazirmatn), system-ui, sans-serif;
+}
+
+html[data-locale="fa"] body {
+  font-family: var(--font-vazirmatn), system-ui, sans-serif;
+}
+
+html[data-locale="fa"] .font-display {
+  font-family: var(--font-vazirmatn), system-ui, sans-serif;
+}
+
+:root,
+html[data-locale="en"] {
+  --font-ui: var(--font-ibm-plex-sans), system-ui, sans-serif;
+  --font-ui-display: var(--font-ibm-plex-sans), system-ui, sans-serif;
+}
+
+html[data-locale="en"] body {
+  font-family: var(--font-ibm-plex-sans), system-ui, sans-serif;
+}
+
+html[data-locale="en"] .font-display {
+  font-family: var(--font-ibm-plex-sans), system-ui, sans-serif;
+}
 
 body {
   background-color: rgb(var(--c-paper));
   color: rgb(var(--c-ink));
   font-feature-settings: "cv11", "ss01";
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   transition: background-color var(--dur-base) ease, color var(--dur-base) ease;
+
+  /* Mobile optimizations */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* iOS momentum scrolling and overscroll behavior */
+* {
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Tabular figures for money — precision without shouting.
@@ -39,7 +89,7 @@ body {
   letter-spacing: -0.01em;
 }
 
-/* Hairline scrollbars, restrained */
+/* Refined scrollbars — thin and unobtrusive */
 * {
   scrollbar-width: thin;
   scrollbar-color: rgb(var(--c-scrollbar)) transparent;
@@ -55,6 +105,10 @@ body {
   border-radius: var(--r-pill);
 }
 
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 /* Visible, deliberate focus ring everywhere. `--c-ring` inverts with the theme,
    so the ring stays visible on both warm-white and near-black surfaces. */
 :focus-visible {
@@ -63,12 +117,23 @@ body {
   border-radius: var(--r-xs);
 }
 
+/* Enhanced focus for touch devices */
+@media (hover: none) and (pointer: coarse) {
+  button:focus-visible,
+  a:focus-visible,
+  [role="button"]:focus-visible {
+    outline-width: 3px;
+    outline-offset: 3px;
+  }
+}
+
 /* Directional icons (arrows, chevrons, trends) mirror under RTL.
    Add `flip-rtl` to any glyph whose meaning depends on direction. */
 [dir="rtl"] .flip-rtl {
   transform: scaleX(-1);
 }
 
+/* Reduce motion for accessibility */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -96,245 +161,136 @@ body {
   background-repeat: repeat-x;
   background-position: bottom;
   height: 12px;
-  transition: background-image var(--dur-base) ease;
+  width: 100%;
 }
 
-/* ============================================================================
-   Typography — locale-driven font switching
-   ----------------------------------------------------------------------------
-   `--font-ui` and `--font-ui-display` are the seam that keeps `font-sans` and
-   `font-display` correct in both languages. Tailwind's `fontFamily.sans` and
-   `.display` resolve through these, so a component never hardcodes Vazirmatn:
-   doing so would fight English typography and leave numeric contexts without a
-   Persian fallback.
-
-     fa → Vazirmatn (RTL-native Persian face) for both UI and display
-     en → Inter for UI, Manrope for display, JetBrains Mono for money
-
-   `html[data-locale]` is written client-side by `lib/i18n/index.tsx`; the
-   values are also declared on `:root` so the first paint before hydration is
-   already correct.
-   ========================================================================== */
-
-html[data-locale="fa"] {
-  --font-ui: var(--font-vazirmatn), system-ui, sans-serif;
-  --font-ui-display: var(--font-vazirmatn), system-ui, sans-serif;
-}
-
-html[data-locale="fa"] body {
-  font-family: var(--font-vazirmatn), system-ui, sans-serif;
-}
-
-html[data-locale="fa"] .font-display {
-  font-family: var(--font-vazirmatn), system-ui, sans-serif;
-}
-
-:root,
-html[data-locale="en"] {
-  --font-ui: var(--font-inter), system-ui, sans-serif;
-  --font-ui-display: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
-}
-
-html[data-locale="en"] body {
-  font-family: var(--font-inter), system-ui, sans-serif;
-}
-
-html[data-locale="en"] .font-display {
-  font-family: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
-}
-
-/* ============================================================================
-   Liquid Lens — pointer-tracked glass highlight
-   ----------------------------------------------------------------------------
-   A radial gradient that follows the pointer across interactive glass elements
-   (navigation items, glass buttons). Creates a premium lensing effect without
-   overwhelming the restrained RIVA aesthetic.
-
-   Adapted from the liquid-glass reference but tuned for RIVA:
-     - Softer gradients (no harsh white)
-     - Warmer in dark mode (Warm White #F7F7F3, not pure white)
-     - Uses RIVA's motion tokens
-     - Navigation-focused (not sprayed across content)
-
-   Usage: Add `glass-lens` class to interactive glass elements. The liquidLens
-   utility (lib/motion/liquidLens.ts) tracks pointer position and sets
-   --lens-x / --lens-y CSS custom properties.
-   ========================================================================== */
-
-.glass-lens {
-  --lens-x: 50%;
-  --lens-y: 50%;
-
-  /* Light mode gradients — enhanced for visibility on light surfaces */
-  --lens-gradient-light: radial-gradient(
-    140px circle at var(--lens-x) var(--lens-y),
-    rgba(16, 28, 44, 0.14),
-    rgba(16, 28, 44, 0.09) 24%,
-    rgba(113, 135, 155, 0.06) 44%,
-    transparent 68%
-  );
-  --lens-base-gradient-light: linear-gradient(
-    145deg,
-    rgba(16, 28, 44, 0.10) 0%,
-    rgba(113, 135, 155, 0.05) 46%,
-    transparent 100%
-  );
-  --lens-inner-light: inset 0 1px 0 rgba(255, 255, 255, 0.5),
-                      inset 0 -1px 0 rgba(16, 28, 44, 0.08),
-                      inset 0 0 0 1px rgba(113, 135, 155, 0.16),
-                      0 2px 8px rgba(16, 28, 44, 0.04);
-
-  /* Dark mode gradients */
-  --lens-gradient-dark: radial-gradient(
-    160px circle at var(--lens-x) var(--lens-y),
-    rgba(247, 247, 243, 0.28),
-    rgba(247, 247, 243, 0.12) 40%,
-    transparent 70%
-  );
-  --lens-base-gradient-dark: linear-gradient(
-    135deg,
-    rgba(247, 247, 243, 0.05) 0%,
-    transparent 60%
-  );
-  --lens-inner-dark: inset 0 1px 0 rgba(247, 247, 243, 0.22),
-                     inset 0 -0.5px 0 rgba(0, 0, 0, 0.08);
-
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  transition:
-    transform var(--dur-base) var(--ease-riva),
-    box-shadow var(--dur-base) var(--ease-riva),
-    background-color var(--dur-base) var(--ease-riva),
-    border-color var(--dur-base) var(--ease-riva),
-    color var(--dur-base) var(--ease-riva);
-}
-
-.glass-lens::before {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  pointer-events: none;
-  background:
-    var(--lens-gradient-light),
-    var(--lens-base-gradient-light);
-  opacity: 0;
-  transform: scale(1.02);
-  transition: opacity var(--dur-fast) var(--ease-riva);
-  z-index: 0;
-}
-
-.dark .glass-lens::before {
-  background:
-    var(--lens-gradient-dark),
-    var(--lens-base-gradient-dark);
-}
-
-.glass-lens::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  box-shadow: var(--lens-inner-light);
-  opacity: 0;
-  transition: opacity var(--dur-fast) var(--ease-riva);
-  z-index: 0;
-}
-
-.dark .glass-lens::after {
-  box-shadow: var(--lens-inner-dark);
-}
-
-.glass-lens > * {
-  position: relative;
-  z-index: 1;
-}
-
-.glass-lens.is-lens-active::before,
-.glass-lens:hover::before,
-.glass-lens:focus-visible::before {
-  opacity: 1;
-}
-
-.glass-lens.is-lens-active::after,
-.glass-lens:hover::after,
-.glass-lens:focus-visible::after {
-  opacity: 1;
-}
-
-.glass-lens.is-lens-active,
-.glass-lens:hover {
-  transform: translateY(-1px) scale(1.005);
-}
-
-.glass-lens:active {
-  transform: translateY(0) scale(0.995);
-}
-
-/* Touch devices: disable hover lift, keep only active press */
-@media (hover: none), (pointer: coarse) {
-  .glass-lens:hover {
-    transform: none;
+/* Mobile touch interaction optimizations */
+@layer utilities {
+  .touch-manipulation {
+    touch-action: manipulation;
   }
 
-  .glass-lens.is-lens-active {
-    transform: none;
+  .tap-highlight-none {
+    -webkit-tap-highlight-color: transparent;
   }
 
-  .glass-lens:active {
-    transform: scale(0.98);
+  /* Improved button press states for mobile */
+  .btn-active-scale {
+    transition: transform 0.1s ease;
+  }
+
+  .btn-active-scale:active {
+    transform: scale(0.96);
   }
 }
 
-/* ============================================================================
-   Liquid Glass Animations
-   ----------------------------------------------------------------------------
-   Entrance animations for glass surfaces. Kept restrained: RIVA is a business
-   tool, not a marketing site. These are shorter and subtler than the reference
-   liquid-glass animations.
-   ========================================================================== */
+/* Enhanced selection styles */
+::selection {
+  background-color: rgba(var(--c-signal-500), 0.2);
+  color: rgb(var(--c-ink));
+}
 
-@keyframes liquidRise {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 20px, 0) scale(0.99);
-    filter: blur(4px);
+::-moz-selection {
+  background-color: rgba(var(--c-signal-500), 0.2);
+  color: rgb(var(--c-ink));
+}
+
+/* Safe area padding utilities for notched devices */
+@supports (padding: max(0px)) {
+  .safe-top {
+    padding-top: max(env(safe-area-inset-top), 0px);
   }
-  to {
+
+  .safe-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom), 0px);
+  }
+
+  .safe-left {
+    padding-left: max(env(safe-area-inset-left), 0px);
+  }
+
+  .safe-right {
+    padding-right: max(env(safe-area-inset-right), 0px);
+  }
+}
+
+/* Improved form input styles for mobile */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="number"],
+input[type="search"],
+textarea {
+  /* Prevent iOS zoom on focus */
+  font-size: 16px;
+}
+
+@media (min-width: 640px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="search"],
+  textarea {
+    font-size: 14px;
+  }
+}
+
+/* Smooth scroll for in-page navigation */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Loading skeleton animation */
+@keyframes skeleton-pulse {
+  0%, 100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-    filter: blur(0);
+  }
+  50% {
+    opacity: 0.5;
   }
 }
 
-@keyframes liquidFlow {
-  from {
-    opacity: 0;
-    transform: translate3d(12px, 8px, 0) scale(0.99);
-    filter: blur(6px);
+.skeleton-pulse {
+  animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Improved dot pulse animation for thinking indicator */
+@keyframes pulse-dot {
+  0%, 60%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
   }
-  to {
+  30% {
     opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-    filter: blur(0);
+    transform: scale(1);
   }
 }
 
-.liquid-rise {
-  animation: liquidRise var(--dur-moderate) var(--ease-riva) both;
+.animate-pulse-dot {
+  animation: pulse-dot 1.5s ease-in-out infinite;
 }
 
-.liquid-flow {
-  animation: liquidFlow var(--dur-moderate) var(--ease-riva) both;
+.animate-pulse-dot:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.animate-pulse-dot:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.animate-pulse-dot:nth-child(3) {
+  animation-delay: 300ms;
 }
 
 /* ============================================================================
    Liquid Glass Authentication Page
    ----------------------------------------------------------------------------
-   Complete visual redesign of the auth screen matching the liquid-glass
-   reference project, adapted to RIVA's brand colors and typography.
+   Premium auth experience with animated gradient background and glass morphism.
    ========================================================================== */
 
 .liquid-glass-auth-page {
@@ -441,20 +397,6 @@ html[data-locale="en"] .font-display {
   border-color: rgba(255, 255, 255, 0.12);
 }
 
-/* Brand mark */
-.liquid-glass-mark {
-  width: 2.5rem;
-  height: 2.5rem;
-  display: grid;
-  place-items: center;
-  margin-bottom: 0.75rem;
-  border-radius: 999px;
-  background: linear-gradient(145deg, rgb(var(--c-signal-500)) 0%, rgb(var(--c-signal-600)) 48%, rgb(var(--c-signal-400)) 100%);
-  box-shadow:
-    0 10px 24px rgba(16, 28, 44, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
-}
-
 /* Typography */
 .liquid-glass-intro {
   margin-bottom: 0.5rem;
@@ -555,23 +497,6 @@ html[data-locale="en"] .font-display {
   line-height: 1.5;
 }
 
-/* Privacy note */
-.liquid-glass-privacy-note {
-  margin: 0;
-  font-size: 0.8125rem;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.45);
-}
-
-/* Actions area */
-.liquid-glass-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 0.5rem;
-}
-
 /* Glass button */
 .liquid-glass-button {
   min-width: 7rem;
@@ -623,17 +548,6 @@ html[data-locale="en"] .font-display {
   gap: 0.75rem;
   padding-top: 0.5rem;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.liquid-glass-link {
-  color: rgba(255, 255, 255, 0.75);
-  font-weight: 600;
-  transition: color var(--dur-fast) ease;
-  cursor: pointer;
-}
-
-.liquid-glass-link:hover {
-  color: #fff;
 }
 
 /* Responsive adjustments */

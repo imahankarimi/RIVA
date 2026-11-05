@@ -5,7 +5,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/glisse";
 import { useChartColors } from "@/components/reports/chartColors";
 import { useI18n } from "@/lib/i18n";
 import { formatCurrency, type BackendCurrency } from "@/lib/currency";

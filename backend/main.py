@@ -1104,6 +1104,49 @@ def delete_conversation(
 # Journal entries (manual)
 # ---------------------------------------------------------------------------
 
+@app.delete("/api/journal-entries/{entry_id}", status_code=204)
+def delete_journal_entry(
+    entry_id: str, db: Session = Depends(get_db), user: User = Depends(get_current_user)
+):
+    """Delete a journal entry (transaction).
+
+    CRITICAL: This maintains double-entry accounting integrity by deleting
+    the entire journal entry atomically with all its lines. The database
+    cascade delete handles the lines automatically.
+
+    Authorization: only the business owner can delete entries.
+    """
+    # Fetch the entry
+    entry = db.query(JournalEntry).filter(JournalEntry.id == entry_id).first()
+    if not entry:
+        raise HTTPException(status_code=404, detail="Journal entry not found")
+
+    # Verify business ownership
+    business = _owned_business(db, user, entry.business_id, Permission.DELETE_JOURNAL_ENTRY)
+
+    # Audit log before deletion
+    _audit_log(
+        db=db,
+        user=user,
+        business=business,
+        action="journal_entry_delete",
+        resource_type="journal_entry",
+        resource_id=entry.id,
+        previous_value=json.dumps({
+            "description": entry.description,
+            "currency": entry.currency,
+            "date": entry.transaction_date.isoformat() if entry.transaction_date else None,
+            "lines_count": len(entry.lines) if entry.lines else 0,
+        }),
+        new_value=None,
+        metadata={"ip": user.id, "action": "financial_mutation"},
+    )
+
+    # Delete the entry — cascade deletes all journal lines automatically
+    db.delete(entry)
+    db.commit()
+    return None
+
 @app.post("/api/journal-entries")
 def create_journal_entry_endpoint(
     data: JournalEntryInput, db: Session = Depends(get_db), user: User = Depends(get_current_user)

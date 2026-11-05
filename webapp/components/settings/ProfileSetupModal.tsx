@@ -3,8 +3,8 @@
 import { useState, type FormEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Sparkle } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/glisse";
+import { Input } from "@/components/glisse";
 import { Label } from "@/components/ui/Label";
 import { Alert } from "@/components/ui/Alert";
 import { useI18n } from "@/lib/i18n";

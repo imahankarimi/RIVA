@@ -15,6 +15,7 @@ const en = {
     date: "Date",
     amount: "Amount",
     status: "Status",
+    actions: "Actions",
     seeAll: "See all",
     soon: "Soon",
     comingSoon: "Coming soon",
@@ -189,6 +190,10 @@ const en = {
     clearFilters: "Clear filters",
     posted: "Posted",
     pending: "Pending",
+    delete: "Delete transaction",
+    deleting: "Deleting…",
+    deleteConfirmTitle: "Delete this transaction?",
+    deleteConfirmMessage: "This will permanently remove the transaction and its accounting entries. This cannot be undone.",
   },
   accounts: {
     title: "Accounts",

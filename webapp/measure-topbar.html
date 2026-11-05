@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Topbar Measurement Diagnostic</title>
+  <style>
+    body { font-family: monospace; padding: 20px; }
+    .result { margin: 10px 0; padding: 10px; background: #f0f0f0; }
+    .mismatch { background: #ffcccc; }
+  </style>
+</head>
+<body>
+  <h1>RIVA Topbar Measurement Diagnostic</h1>
+  <div id="instructions">
+    <p><strong>Instructions:</strong></p>
+    <ol>
+      <li>Open the RIVA webapp in your browser (localhost:3001)</li>
+      <li>Open DevTools Console (F12)</li>
+      <li>Copy and paste the script below into the console</li>
+      <li>Press Enter to run</li>
+    </ol>
+  </div>
+
+  <h2>Diagnostic Script:</h2>
+  <pre id="script">
+// RIVA Topbar Measurement Diagnostic
+// Copy this entire block and paste into browser console
+
+(function() {
+  console.log('=== RIVA Topbar Measurement ===\n');
+
+  // Find the oval Glass container (Theme + Business)
+  const ovalGlass = document.querySelector('header [class*="lg-glass"], header .lg-glass');
+
+  // Find the Profile Menu button
+  const profileMenu = document.querySelector('header button[aria-label*="Profile"]');
+
+  if (!ovalGlass) {
+    console.error('❌ Could not find oval Glass container');
+    return;
+  }
+
+  if (!profileMenu) {
+    console.error('❌ Could not find Profile Menu button');
+    return;
+  }
+
+  // Measure actual rendered dimensions
+  const ovalRect = ovalGlass.getBoundingClientRect();
+  const profileRect = profileMenu.getBoundingClientRect();
+
+  console.log('📏 Oval Glass (Theme + Business):');
+  console.log(`   Width: ${ovalRect.width}px`);
+  console.log(`   Height: ${ovalRect.height}px`);
+  console.log(`   Top: ${ovalRect.top}px`);
+  console.log(`   Bottom: ${ovalRect.bottom}px`);
+  console.log(`   Vertical Center: ${(ovalRect.top + ovalRect.bottom) / 2}px`);
+
+  console.log('\n🔵 Profile Button:');
+  console.log(`   Width: ${profileRect.width}px`);
+  console.log(`   Height: ${profileRect.height}px`);
+  console.log(`   Top: ${profileRect.top}px`);
+  console.log(`   Bottom: ${profileRect.bottom}px`);
+  console.log(`   Vertical Center: ${(profileRect.top + profileRect.bottom) / 2}px`);
+
+  console.log('\n📊 Comparison:');
+  const heightDiff = Math.abs(ovalRect.height - profileRect.height);
+  const centerDiff = Math.abs(
+    (ovalRect.top + ovalRect.bottom) / 2 -
+    (profileRect.top + profileRect.bottom) / 2
+  );
+
+  console.log(`   Height difference: ${heightDiff.toFixed(2)}px`);
+  console.log(`   Vertical center difference: ${centerDiff.toFixed(2)}px`);
+
+  if (heightDiff < 1 && centerDiff < 1) {
+    console.log('\n✅ PERFECT: Both surfaces match in height and alignment!');
+  } else {
+    console.log('\n❌ MISMATCH DETECTED:');
+    if (heightDiff >= 1) {
+      console.log(`   - Profile button needs to be ${heightDiff.toFixed(2)}px ${profileRect.height < ovalRect.height ? 'larger' : 'smaller'}`);
+    }
+    if (centerDiff >= 1) {
+      console.log(`   - Profile button is ${centerDiff.toFixed(2)}px ${profileRect.top < ovalRect.top ? 'higher' : 'lower'} than the oval`);
+    }
+  }
+
+  console.log('\n🔍 Computed Styles:');
+  const ovalStyles = window.getComputedStyle(ovalGlass);
+  const profileStyles = window.getComputedStyle(profileMenu);
+
+  console.log('Oval Glass:');
+  console.log(`   height: ${ovalStyles.height}`);
+  console.log(`   min-height: ${ovalStyles.minHeight}`);
+  console.log(`   padding: ${ovalStyles.padding}`);
+
+  console.log('Profile Button:');
+  console.log(`   height: ${profileStyles.height}`);
+  console.log(`   width: ${profileStyles.width}`);
+  console.log(`   min-height: ${profileStyles.minHeight}`);
+  console.log(`   min-width: ${profileStyles.minWidth}`);
+
+  console.log('\n=== End Measurement ===');
+})();
+  </pre>
+
+  <h2>What to look for:</h2>
+  <ul>
+    <li>Both surfaces should have exactly <strong>48px height</strong></li>
+    <li>Profile button should be <strong>48×48px</strong> (width = height = 48)</li>
+    <li>Height difference should be <strong>&lt; 1px</strong></li>
+    <li>Vertical center difference should be <strong>&lt; 1px</strong></li>
+  </ul>
+
+  <p><strong>After running the script, copy the console output and send it back so I can diagnose the exact issue.</strong></p>
+</body>
+</html>
