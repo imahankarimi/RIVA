@@ -1,6 +1,6 @@
 "use client";
 
-import { Paperclip, File, Image, Camera } from "lucide-react";
+import { Paperclip, File, Image as ImageIcon, Camera } from "lucide-react";
 import { Menu } from "@/components/glisse";
 import { useI18n } from "@/lib/i18n";
 
@@ -40,7 +40,7 @@ export function AttachmentMenu({
           },
           {
             label: t("assistant.attachPhotos") || "Photos",
-            icon: <Image size={16} strokeWidth={2} />,
+            icon: <ImageIcon size={16} strokeWidth={2} />,
             onSelect: onPhotosClick,
             disabled: disabled,
           },

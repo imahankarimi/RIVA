@@ -207,6 +207,7 @@ const fa: Dictionary = {
     historyYesterday: "دیروز",
     historyPrevious7Days: "۷ روز گذشته",
     historyOlder: "قدیمی‌تر",
+    mobileHint: "برای ارسال Enter، برای خط جدید Shift+Enter",
     suggestions: {
       expense: "ثبت یک هزینه",
       income: "ثبت یک دریافتی",

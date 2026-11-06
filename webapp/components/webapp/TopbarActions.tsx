@@ -10,7 +10,7 @@ import { useTheme } from "@/lib/theme/ThemeProvider";
 import { Glass, Menu } from "@/components/glisse";
 import { CURRENCY_META } from "@/lib/currency";
 import { cn } from "@/lib/utils";
-import type { MenuItem } from "@/components/glisse";
+import type { MenuEntry } from "@/components/glisse";
 
 export function TopbarActions() {
   const { user, logout } = useAuth();
@@ -42,7 +42,7 @@ export function TopbarActions() {
   }, [businessMenuOpen]);
 
   // Build profile menu items
-  const profileMenuItems: MenuItem[] = [
+  const profileMenuItems: MenuEntry[] = [
     {
       label: (
         <Link href="/settings" className="flex w-full whitespace-nowrap">

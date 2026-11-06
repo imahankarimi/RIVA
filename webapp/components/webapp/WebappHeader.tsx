@@ -2,11 +2,13 @@
 
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import type { LucideIcon } from "lucide-react";
 
 interface WebappHeaderProps {
   eyebrow?: string;
   title?: string;
   description?: string;
+  icon?: LucideIcon;
   action?: React.ReactNode;
   className?: string;
 }
@@ -26,6 +28,7 @@ export function WebappHeader({
   eyebrow,
   title,
   description,
+  icon: Icon,
   action,
   className,
 }: WebappHeaderProps) {
@@ -49,8 +52,9 @@ export function WebappHeader({
               initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.28, delay: 0.04, ease: EASE_OUT }}
-              className="font-display text-[20px] font-bold leading-tight text-ink sm:text-[24px] sm:leading-tight"
+              className="flex items-center gap-2 font-display text-[20px] font-bold leading-tight text-ink sm:text-[24px] sm:leading-tight"
             >
+              {Icon && <Icon className="h-5 w-5 shrink-0 text-ink-soft sm:h-6 sm:w-6" />}
               {title}
             </motion.h1>
           )}

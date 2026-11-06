@@ -28,14 +28,22 @@ export function usePullToRefresh(onRefresh: () => Promise<void>, enabled = true)
     const container = containerRef.current;
     if (!container || container.scrollTop > 5) return;
 
-    startY.current = e.touches[0].clientY;
+    // Safely check if touch exists
+    const touch = e.touches?.[0];
+    if (!touch) return;
+
+    startY.current = touch.clientY;
     isDragging.current = true;
   }, [enabled, isRefreshing]);
 
   const handleTouchMove = useCallback((e: TouchEvent) => {
     if (!isDragging.current || !enabled) return;
 
-    const currentY = e.touches[0].clientY;
+    // Safely check if touch exists
+    const touch = e.touches?.[0];
+    if (!touch) return;
+
+    const currentY = touch.clientY;
     const distance = currentY - startY.current;
 
     if (distance > 0 && containerRef.current && containerRef.current.scrollTop === 0) {
@@ -128,16 +136,24 @@ export function useSwipeGesture(
   const [isSwiping, setIsSwiping] = useState(false);
 
   const handleTouchStart = useCallback((e: TouchEvent) => {
-    startX.current = e.touches[0].clientX;
-    startY.current = e.touches[0].clientY;
+    // Safely check if touch exists
+    const touch = e.touches?.[0];
+    if (!touch) return;
+
+    startX.current = touch.clientX;
+    startY.current = touch.clientY;
     setIsSwiping(true);
   }, []);
 
   const handleTouchEnd = useCallback((e: TouchEvent) => {
     if (!isSwiping) return;
 
-    const endX = e.changedTouches[0].clientX;
-    const endY = e.changedTouches[0].clientY;
+    // Safely check if touch exists
+    const touch = e.changedTouches?.[0];
+    if (!touch) return;
+
+    const endX = touch.clientX;
+    const endY = touch.clientY;
     const deltaX = endX - startX.current;
     const deltaY = endY - startY.current;
 
@@ -273,8 +289,11 @@ export function useIntersectionObserver(
   useEffect(() => {
     if (!ref) return;
 
-    const observer = new IntersectionObserver(([entry]) => {
-      setIsIntersecting(entry.isIntersecting);
+    const observer = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+      if (entry) {
+        setIsIntersecting(entry.isIntersecting);
+      }
     }, {
       threshold: 0.1,
       ...options,
