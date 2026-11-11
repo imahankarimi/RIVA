@@ -45,7 +45,7 @@ export default function IncomePage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-content px-4 pb-8 pt-1 sm:px-6">
+    <div className="mx-auto w-full max-w-content px-4 pb-8 pt-4 sm:px-6 sm:pt-5">
       <WebappHeader eyebrow={t("webapp.nav.cash")} title="Income" description="Track all incoming funds to your business" />
 
       <CashSubnav active="income" />

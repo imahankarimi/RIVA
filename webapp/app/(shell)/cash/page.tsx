@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Wallet, TrendingUp, ArrowDownToLine, ArrowUpFromLine, FileUp, SlidersHorizontal,
+  Wallet, ArrowDownToLine, ArrowUpFromLine, Plus,
 } from "lucide-react";
 import { SearchField, SegmentedControl, Button } from "@/components/glisse";
 import { WebappHeader } from "@/components/webapp/WebappHeader";
@@ -16,18 +16,20 @@ import { TransactionRow } from "@/components/transactions/TransactionRow";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/StateViews";
 import { ImportExportModal } from "@/components/settings/ImportExportModal";
+import { useAddIncome } from "@/components/transactions/AddIncomeContext";
 import { formatCurrency } from "@/lib/currency";
-import { cn } from "@/lib/utils";
 
 const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 
 export default function CashPage() {
   const { t, locale } = useI18n();
   const { business } = useBusiness();
+  const { openAddIncome } = useAddIncome();
   const { transactions, status, error, usingDemoData, refetch } = useTransactions(business?.id ?? null);
   const { accounts } = useAccounts(business?.id ?? null);
   const [search, setSearch] = useState("");
   const [heading, setHeading] = useState<"all" | "in" | "out">("all");
+  const [importExportMode, setImportExportMode] = useState<"import" | "export">("import");
   const [importExportOpen, setImportExportOpen] = useState(false);
 
   const filtered = useMemo(() => {
@@ -55,11 +57,18 @@ export default function CashPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-content px-4 pb-8 pt-1 sm:px-6">
+    <div className="mx-auto w-full max-w-content px-4 pb-8 pt-4 sm:px-6 sm:pt-5">
       <WebappHeader
-        eyebrow={t("webapp.nav.cash")}
-        title={t("webapp.cash.title")}
-        description={t("webapp.cash.subtitle")}
+        title={t("webapp.nav.cash")}
+        action={
+          <button
+            onClick={openAddIncome}
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-signal-500 text-onSignal shadow-md transition-all hover:scale-105 hover:shadow-lg active:scale-95 sm:h-[52px] sm:w-[52px]"
+            aria-label={t("addIncome.title")}
+          >
+            <Plus size={24} strokeWidth={2.5} className="sm:h-7 sm:w-7" />
+          </button>
+        }
       />
 
       <WebappNotice variant={usingDemoData ? "demo" : undefined} />
@@ -97,7 +106,7 @@ export default function CashPage() {
                     {t("overview.balance")}
                   </p>
                 </div>
-                <p className="font-mono font-figures text-[20px] font-semibold tabular-nums text-ink sm:text-[22px]">
+                <p className="font-figures text-[20px] font-semibold tabular-nums text-ink sm:text-[22px]">
                   {formatMoney(cashBalance)}
                 </p>
               </div>
@@ -124,7 +133,7 @@ export default function CashPage() {
                     {t("webapp.cash.income")}
                   </p>
                 </div>
-                <p className="font-mono font-figures text-[20px] font-semibold tabular-nums text-moss-700 sm:text-[22px]">
+                <p className="font-figures text-[20px] font-semibold tabular-nums text-moss-700 sm:text-[22px]">
                   {formatMoney(totals.inSum)}
                 </p>
               </div>
@@ -151,7 +160,7 @@ export default function CashPage() {
                     {t("webapp.cash.expense")}
                   </p>
                 </div>
-                <p className="font-mono font-figures text-[20px] font-semibold tabular-nums text-rose-700 sm:text-[22px]">
+                <p className="font-figures text-[20px] font-semibold tabular-nums text-rose-700 sm:text-[22px]">
                   {formatMoney(totals.outSum)}
                 </p>
               </div>
@@ -165,47 +174,37 @@ export default function CashPage() {
             transition={{ duration: 0.3, delay: 0.12, ease: EASE_OUT }}
             className="space-y-3"
           >
-            {/* Search field with improved sizing */}
+            {/* Row 1: Search field — full width */}
             <SearchField
               value={search}
               onValueChange={setSearch}
               placeholder={t("webapp.cash.searchPlaceholder")}
-              className="w-full"
+              className="w-full max-w-none"
             />
 
-            {/* Filter controls — stacked on mobile, horizontal on desktop */}
-            <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-3">
-              <div className="flex-1">
-                <SegmentedControl
-                  items={[
-                    { value: "all", label: t("common.all") },
-                    { value: "in", label: t("webapp.cash.income") },
-                    { value: "out", label: t("webapp.cash.expense") },
-                  ]}
-                  value={heading}
-                  onValueChange={(v) => setHeading(v as "all" | "in" | "out")}
-                />
-              </div>
+            {/* Row 2: shared filter control on the start side, shared import/export control on the end side */}
+            <div className="grid grid-cols-[3fr_2fr] items-center gap-3">
+              {/* LEFT (LTR) / START (RTL): All / Income / Expenses control */}
+              <SegmentedControl
+                className="cash-filter-segmented"
+                items={[
+                  { value: "all", label: t("common.all") },
+                  { value: "in", label: t("webapp.cash.income") },
+                  { value: "out", label: t("webapp.cash.expense") },
+                ]}
+                value={heading}
+                onValueChange={(v) => setHeading(v as "all" | "in" | "out")}
+              />
 
-              {/* Action buttons — enhanced touch targets */}
-              <div className="flex gap-2">
+              {/* RIGHT (LTR) / END (RTL): single Glisse Button for Import / Export */}
+              <div className="cash-import-export-slot">
                 <Button
+                  variant="glass"
                   onClick={() => setImportExportOpen(true)}
-                  variant="secondary"
-                  size="md"
-                  className="min-h-11 flex-1 gap-1.5 text-[13px] font-medium sm:flex-none"
+                  className="w-full min-h-0"
+                  aria-label={t("importExport.title")}
                 >
-                  <FileUp size={16} strokeWidth={2} />
-                  <span className="hidden sm:inline">{t("importExport.title")}</span>
-                </Button>
-
-                <Button
-                  aria-label={t("common.filter")}
-                  variant="secondary"
-                  size="md"
-                  className="min-h-11 px-3.5 sm:px-4"
-                >
-                  <SlidersHorizontal size={16} strokeWidth={2} />
+                  {t("importExport.import")} / {t("importExport.export")}
                 </Button>
               </div>
             </div>
@@ -284,6 +283,7 @@ export default function CashPage() {
         onClose={() => setImportExportOpen(false)}
         transactions={filtered}
         currency={business.currency}
+        initialTab={importExportMode}
       />
     </div>
   );

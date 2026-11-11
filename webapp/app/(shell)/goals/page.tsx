@@ -19,7 +19,7 @@ export default function GoalsPage() {
   const { business } = useBusiness();
 
   return (
-    <div className="mx-auto w-full max-w-content px-4 pb-8 pt-1 sm:px-6">
+    <div className="mx-auto w-full max-w-content px-4 pb-8 pt-4 sm:px-6 sm:pt-5">
       <WebappHeader eyebrow={t("nav.goals")} title={t("nav.goals")} icon={Target} />
 
       <motion.div

@@ -33,8 +33,8 @@ export function WebappHeader({
   className,
 }: WebappHeaderProps) {
   return (
-    <header className={cn("mb-4 sm:mb-5", className)}>
-      <div className="flex items-start justify-between gap-3">
+    <header className={cn("mb-6 sm:mb-7", className)}>
+      <div className="flex items-center justify-between gap-4" dir="ltr">
         <div className="min-w-0 flex-1 space-y-1.5">
           {eyebrow && (
             <motion.p
@@ -52,9 +52,9 @@ export function WebappHeader({
               initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.28, delay: 0.04, ease: EASE_OUT }}
-              className="flex items-center gap-2 font-display text-[20px] font-bold leading-tight text-ink sm:text-[24px] sm:leading-tight"
+              className="flex items-center gap-2.5 font-display text-[32px] font-bold leading-tight text-ink sm:text-[36px] sm:leading-tight"
             >
-              {Icon && <Icon className="h-5 w-5 shrink-0 text-ink-soft sm:h-6 sm:w-6" />}
+              {Icon && <Icon className="h-7 w-7 shrink-0 text-ink-soft sm:h-8 sm:w-8" />}
               {title}
             </motion.h1>
           )}

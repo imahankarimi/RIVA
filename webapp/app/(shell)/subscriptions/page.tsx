@@ -24,7 +24,7 @@ export default function SubscriptionsPage() {
   const monthly = subscriptions.filter((s) => s.cadence === "monthly").reduce((s, x) => s + x.amount, 0);
 
   return (
-    <div className="mx-auto w-full max-w-content px-4 pb-8 pt-1 sm:px-6">
+    <div className="mx-auto w-full max-w-content px-4 pb-8 pt-4 sm:px-6 sm:pt-5">
       <WebappHeader eyebrow={t("nav.subscriptions")} title={t("nav.subscriptions")} icon={RefreshCw} />
 
       <motion.div

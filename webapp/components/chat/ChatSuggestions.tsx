@@ -22,7 +22,7 @@ export function ChatSuggestions({ onPick }: { onPick: (text: string) => void }) 
           onClick={() => onPick(t(`assistant.suggestions.${key}`))}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="group flex items-center gap-2.5 rounded-xl border border-line bg-surface p-3 text-left shadow-sm transition-all hover:border-signal-300 hover:bg-signal-50 hover:shadow-md dark:hover:bg-signal-950/20 sm:gap-3 sm:p-4"
+          className="group flex items-center gap-2.5 rounded-xl border border-line bg-surface p-3 text-start shadow-sm transition-all hover:border-signal-300 hover:bg-signal-50 hover:shadow-md dark:hover:bg-signal-950/20 sm:gap-3 sm:p-4"
         >
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-signal-100 text-signal-600 transition-colors group-hover:bg-signal-200 dark:bg-signal-900/40 dark:text-signal-400 sm:h-10 sm:w-10">
             <Icon size={16} strokeWidth={2} className="sm:hidden" />

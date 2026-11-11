@@ -59,23 +59,23 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
 const iconMap: Record<ToastVariant, React.ReactNode> = {
   default: <Info size={16} className="text-signal-500" />,
-  success: <CheckCircle2 size={16} className="text-moss-700" />,
-  error: <AlertCircle size={16} className="text-rose-700" />,
-  warning: <AlertCircle size={16} className="text-amber-700" />,
+  success: <CheckCircle2 size={16} className="text-onSignal" />,
+  error: <AlertCircle size={16} className="text-onSignal" />,
+  warning: <AlertCircle size={16} className="text-onSignal" />,
 };
 
 const bgMap: Record<ToastVariant, string> = {
   default: "bg-signal-50 border-signal-100",
-  success: "bg-moss-100 border-moss-100",
-  error: "bg-rose-100 border-rose-100",
-  warning: "bg-amber-100 border-amber-100",
+  success: "bg-moss-700 border-moss-700",
+  error: "bg-rose-700 border-rose-700",
+  warning: "bg-amber-700 border-amber-700",
 };
 
 const textMap: Record<ToastVariant, string> = {
   default: "text-signal-700",
-  success: "text-moss-700",
-  error: "text-rose-700",
-  warning: "text-amber-700",
+  success: "text-onSignal",
+  error: "text-onSignal",
+  warning: "text-onSignal",
 };
 
 function ToastContainer({
@@ -105,7 +105,10 @@ function ToastContainer({
             <span className={cn("flex-1 text-[13px] leading-snug", textMap[t.variant])}>{t.message}</span>
             <button
               onClick={() => onDismiss(t.id)}
-              className={cn("shrink-0 mt-0.5 rounded p-0.5 transition-colors hover:bg-black/5", textMap[t.variant])}
+              className={cn(
+                "shrink-0 mt-0.5 rounded p-0.5 transition-colors",
+                t.variant === 'default' ? `hover:bg-black/5 ${textMap[t.variant]}` : "text-white/90 hover:text-white hover:bg-white/15"
+              )}
               aria-label="Dismiss"
             >
               <X size={13} />

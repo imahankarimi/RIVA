@@ -84,13 +84,16 @@ export function MobileTabBar() {
     { label: t("sidebar.support"), items: supportNavItems },
   ];
 
-  // Transform TAB_ITEMS for Glisse TabBar
-  const glisseItems = TAB_ITEMS.map((item) => ({
-    value: item.value,
-    label: t(item.label),
-    icon: <item.icon size={20} strokeWidth={2} />,
-    href: item.href,
-  }));
+  // Transform TAB_ITEMS for Glisse TabBar with stable keys
+  const glisseItems = TAB_ITEMS.map((item) => {
+    const IconComponent = item.icon;
+    return {
+      value: item.value,
+      label: t(item.label),
+      icon: <IconComponent size={20} strokeWidth={2} />,
+      href: item.href,
+    };
+  });
 
   const currentValue = getCurrentValue();
 
@@ -98,7 +101,8 @@ export function MobileTabBar() {
     <>
       {/* Floating Liquid Glass bottom tab bar — permanently visible */}
       <nav
-        className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center px-2.5 pb-[max(env(safe-area-inset-bottom),10px)] sm:pb-3 md:hidden"
+        className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center px-2.5 pb-[max(env(safe-area-inset-bottom),12px)] sm:pb-3 md:hidden"
+        dir="ltr"
       >
         <div className="pointer-events-auto">
           <TabBar
@@ -164,7 +168,7 @@ export function MobileTabBar() {
                   }}
                   aria-label={t("common.close")}
                   variant="glass"
-                  className="rounded-xl p-2"
+                  className="flex h-9 w-9 min-h-[36px] min-w-[36px] items-center justify-center rounded-full p-0"
                 >
                   <X size={18} strokeWidth={2.5} />
                 </Button>
@@ -180,7 +184,6 @@ export function MobileTabBar() {
 
                     <div className="overflow-hidden rounded-[18px] border border-line/70 bg-surface/80 shadow-sm backdrop-blur-sm dark:border-line/40 dark:bg-surface/60">
                       {section.items.map((item) => {
-                        const active = isActive(item.href);
                         const Icon = item.icon;
 
                         return (
@@ -191,31 +194,13 @@ export function MobileTabBar() {
                               triggerHaptic("selection");
                               setMoreOpen(false);
                             }}
-                            className={cn(
-                              "flex min-h-[52px] items-center gap-3 border-b border-line/50 px-4 py-3 text-[14px] font-medium transition-all duration-150 last:border-b-0 active:scale-[0.98] dark:border-line/30",
-                              active
-                                ? "bg-signal-50 text-signal-700 dark:bg-signal-900/40 dark:text-signal-400"
-                                : "text-ink hover:bg-surface-muted/60 active:bg-surface-muted/90 dark:text-warm-white dark:hover:bg-surface-muted/40 dark:active:bg-surface-muted/60"
-                            )}
+                            className="flex min-h-[52px] items-center gap-3 border-b border-line/50 px-4 py-3 text-[14px] font-medium text-ink transition-all duration-150 last:border-b-0 hover:bg-surface-muted/60 active:scale-[0.98] active:bg-surface-muted/90 dark:border-line/30 dark:text-warm-white dark:hover:bg-surface-muted/40 dark:active:bg-surface-muted/60"
                           >
-                            <div
-                              className={cn(
-                                "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-all",
-                                active
-                                  ? "bg-signal-100 text-signal-600 dark:bg-signal-800/60 dark:text-signal-400"
-                                  : "bg-surface-muted/70 text-ink-faint dark:bg-surface-muted/50 dark:text-ink-faint"
-                              )}
-                            >
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-surface-muted/70 text-ink-faint transition-all dark:bg-surface-muted/50 dark:text-ink-faint">
                               <Icon size={17} strokeWidth={2.2} />
                             </div>
 
                             <span className="flex-1">{t(item.labelKey)}</span>
-
-                            {item.href === "/home" && (
-                              <span className="rounded-lg bg-signal-100 px-2.5 py-1 text-[10.5px] font-semibold text-signal-700 dark:bg-signal-900/50 dark:text-signal-400">
-                                {t("webapp.eyebrow")}
-                              </span>
-                            )}
                           </Link>
                         );
                       })}

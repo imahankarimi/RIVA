@@ -1,8 +1,9 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Sun, Moon, User, Building2 } from "lucide-react";
+import { Sun, Moon, User, Building2, Settings, LogOut } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/app/providers";
 import { useBusiness } from "@/app/providers";
@@ -13,6 +14,7 @@ import { cn } from "@/lib/utils";
 import type { MenuEntry } from "@/components/glisse";
 
 export function TopbarActions() {
+  const router = useRouter();
   const { user, logout } = useAuth();
   const { business, businesses, setBusinessId } = useBusiness();
   const { resolved, toggle } = useTheme();
@@ -41,20 +43,23 @@ export function TopbarActions() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [businessMenuOpen]);
 
-  // Build profile menu items
+  // Build profile menu items with proper handlers
   const profileMenuItems: MenuEntry[] = [
     {
-      label: (
-        <Link href="/settings" className="flex w-full whitespace-nowrap">
-          Edit Profile
-        </Link>
-      ),
-      onSelect: () => {}, // Link handles navigation
+      label: "Edit Profile",
+      icon: <Settings size={16} strokeWidth={2} />,
+      onSelect: () => {
+        router.push("/settings");
+      },
     },
     "separator",
     {
-      label: <span className="whitespace-nowrap">Log Out</span>,
-      onSelect: logout,
+      label: "Log Out",
+      icon: <LogOut size={16} strokeWidth={2} />,
+      onSelect: () => {
+        logout();
+        router.push("/login");
+      },
       destructive: true,
     },
   ];
@@ -89,8 +94,8 @@ export function TopbarActions() {
           </AnimatePresence>
         </button>
 
-        {/* Business Switcher - only show if multiple businesses */}
-        {businesses.length > 1 && (
+        {/* Business Switcher - show if user has businesses */}
+        {businesses && businesses.length > 0 && (
           <div className="relative">
             <button
               ref={businessButtonRef}
@@ -168,7 +173,7 @@ export function TopbarActions() {
       </Glass>
 
       {/* Profile Menu - ONE separate circular Glisse button */}
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center [&_button]:!h-12 [&_button]:!w-12 [&_button]:!min-h-[48px] [&_button]:!min-w-[48px] [&_button]:!rounded-full">
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center [&_button]:!h-12 [&_button]:!w-12 [&_button]:!min-h-[48px] [&_button]:!min-w-[48px] [&_button]:!rounded-full [&_[role='menuitem']]:whitespace-nowrap">
         <Menu
           items={profileMenuItems}
           aria-label="Profile menu"

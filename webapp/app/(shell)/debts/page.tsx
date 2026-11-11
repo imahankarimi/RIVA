@@ -23,7 +23,7 @@ export default function DebtsPage() {
   const currency = business.currency;
 
   return (
-    <div className="mx-auto w-full max-w-content px-4 pb-8 pt-1 sm:px-6">
+    <div className="mx-auto w-full max-w-content px-4 pb-8 pt-4 sm:px-6 sm:pt-5">
       <WebappHeader eyebrow={t("nav.debts")} title={t("nav.debts")} icon={CreditCard} />
 
       <motion.div

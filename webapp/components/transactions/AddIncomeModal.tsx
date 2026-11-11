@@ -13,6 +13,7 @@ import { StatefulButton } from "@/components/transactions/StatefulButton";
 import { useI18n } from "@/lib/i18n";
 import { useBusiness } from "@/app/providers";
 import { useAccounts } from "@/lib/hooks/useAccounts";
+import { useToast } from "@/components/ui/Toast";
 import { confirmChatAction } from "@/lib/api/chat";
 import { CURRENCY_META } from "@/lib/currency";
 import { DURATION, EASE_OUT, SPRING_SNAPPY } from "@/lib/motion/tokens";
@@ -25,6 +26,7 @@ export function AddIncomeModal({ open, onClose, onSaved }: { open: boolean; onCl
   const { t, locale, dir } = useI18n();
   const { business } = useBusiness();
   const { accounts } = useAccounts(business?.id ?? null);
+  const { toast } = useToast();
 
   const [kind, setKind] = useState<TransactionKind>("income");
   const [rawAmount, setRawAmount] = useState("");
@@ -100,6 +102,8 @@ export function AddIncomeModal({ open, onClose, onSaved }: { open: boolean; onCl
   };
 
   const title = kind === "spent" ? t("addIncome.spentTitle") : t("addIncome.title");
+  const saveLabel = kind === "spent" ? t("addIncome.saveSpent") : t("addIncome.saveIncome");
+  const successLabel = kind === "spent" ? t("addIncome.successSpent") : t("addIncome.success");
 
   // Same validation semantics as before, plus the mode-specific account pair.
   const canSave =
@@ -117,6 +121,8 @@ export function AddIncomeModal({ open, onClose, onSaved }: { open: boolean; onCl
   const incomeRevenueInvalid = kind === "income" && !revenueAccountId;
   const spentExpenseInvalid = kind === "spent" && !expenseAccountId;
   const spentPaidFromInvalid = kind === "spent" && !paidFromAccountId;
+
+  const keypadAccent = kind === "spent" ? "rose" : "moss";
 
   const handleSave = async () => {
     if (!business || !canSave) return;
@@ -161,6 +167,9 @@ export function AddIncomeModal({ open, onClose, onSaved }: { open: boolean; onCl
       setSaving(false);
       setSuccess(true);
 
+      // Show success notification
+      toast(successLabel, { variant: "success" });
+
       // Notify other views to refetch
       window.dispatchEvent(new CustomEvent(TRANSACTIONS_CHANGED_EVENT));
       onSaved?.();
@@ -183,11 +192,6 @@ export function AddIncomeModal({ open, onClose, onSaved }: { open: boolean; onCl
     setAttempted(true);
     if (amountInvalid) setFeedbackNonce((n) => n + 1);
   };
-
-  const saveLabel = kind === "spent" ? t("addIncome.saveSpent") : t("addIncome.saveIncome");
-  const successLabel = kind === "spent" ? t("addIncome.successSpent") : t("addIncome.success");
-
-  const keypadAccent = kind === "spent" ? "rose" : "moss";
 
   return (
     <AnimatePresence>

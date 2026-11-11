@@ -1,14 +1,23 @@
 "use client";
 
-import { SegmentedControl } from "@/components/glisse";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+
+const SPRING_INDICATOR = { type: "spring", stiffness: 420, damping: 40, mass: 0.5 } as const;
 
 export type TransactionKind = "spent" | "income";
 
 /**
  * TransactionTypeTabs
  *
- * Uses official Glisse SegmentedControl for the Spent/Income toggle.
- * Glisse provides the animated thumb, lens lift, and drag interaction behavior.
+ * Segmented Spent/Income control matching the frontend design exactly.
+ * Uses a hand-rolled implementation (not Glisse) to ensure proper dimensions,
+ * padding, colors, and motion for the modal context.
+ *
+ * The active indicator is a single `layoutId` shared motion element, so it
+ * travels continuously between the two labels with a spring instead of
+ * disappearing/reappearing. Colors follow RIVA's semantic tokens: spent uses
+ * rose (danger), income uses moss (success).
  */
 export function TransactionTypeTabs({
   value,
@@ -24,17 +33,48 @@ export function TransactionTypeTabs({
   /** Accessible name for the group, e.g. "Transaction type" / "نوع تراکنش". */
   ariaLabel?: string;
 }) {
-  const items = [
-    { value: "spent", label: spentLabel },
-    { value: "income", label: incomeLabel },
+  const options: Array<{ key: TransactionKind; label: string; fill: string }> = [
+    { key: "spent", label: spentLabel, fill: "bg-rose-500" },
+    { key: "income", label: incomeLabel, fill: "bg-moss-500" },
   ];
 
   return (
-    <SegmentedControl
-      items={items}
-      value={value}
-      onValueChange={(v) => onChange(v as TransactionKind)}
+    <div
+      role="radiogroup"
       aria-label={ariaLabel}
-    />
+      className="relative grid grid-cols-2 items-stretch rounded-lg bg-surfaceMuted p-1"
+    >
+      {options.map((opt) => {
+        const active = value === opt.key;
+        return (
+          <button
+            key={opt.key}
+            type="button"
+            role="radio"
+            aria-checked={active}
+            tabIndex={active ? 0 : -1}
+            onClick={() => onChange(opt.key)}
+            className={cn(
+              "relative z-10 flex h-9 items-center justify-center rounded-md text-[13.5px] font-medium",
+              "transition-colors duration-150 focus-visible:outline-none",
+              "focus-visible:ring-2 focus-visible:ring-signal-500/40 focus-visible:ring-offset-1",
+              active ? "text-onSignal" : "text-ink-soft hover:text-ink"
+            )}
+          >
+            {active && (
+              <motion.span
+                layoutId="transaction-type-indicator"
+                role="presentation"
+                className={cn("pointer-events-none absolute inset-0 rounded-md", opt.fill)}
+                transition={SPRING_INDICATOR}
+              />
+            )}
+            <span className={cn("relative z-10 transition-colors duration-150", active && "font-semibold")}>
+              {opt.label}
+            </span>
+          </button>
+        );
+      })}
+    </div>
   );
 }

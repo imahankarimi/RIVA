@@ -10,95 +10,183 @@ import { useEffect, useRef, useState, useCallback } from "react";
 
 /**
  * Pull-to-refresh hook for lists and scrollable content.
- * Returns refresh state and props to spread on the container.
+ *
+ * CRITICAL FIX: Properly detects the scroll container and only triggers
+ * when at absolute top (scrollTop === 0).
+ *
+ * @param onRefresh - Async function to call when refresh is triggered
+ * @param enabled - Whether pull-to-refresh is enabled
+ * @returns State and ref for the pull-to-refresh functionality
  */
 export function usePullToRefresh(onRefresh: () => Promise<void>, enabled = true) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
+  const [pullState, setPullState] = useState<'idle' | 'pulling' | 'ready' | 'refreshing'>('idle');
+
   const startY = useRef(0);
+  const currentY = useRef(0);
   const isDragging = useRef(false);
-  const containerRef = useRef<HTMLElement | null>(null);
+  const hasTriggeredRefresh = useRef(false);
+  const scrollContainerRef = useRef<HTMLElement | null>(null);
 
   const threshold = 80; // Pull distance to trigger refresh
-  const maxPull = 120; // Maximum pull distance
+  const maxPull = 140; // Maximum visual pull distance
+
+  /**
+   * Get the actual scroll container.
+   * In RIVA Web, the main scroll container is #webapp-main-scroll.
+   */
+  const getScrollContainer = useCallback(() => {
+    if (scrollContainerRef.current) return scrollContainerRef.current;
+
+    // Find the actual scrolling element
+    const main = document.getElementById('webapp-main-scroll');
+    if (main) {
+      scrollContainerRef.current = main;
+      return main;
+    }
+
+    return null;
+  }, []);
+
+  /**
+   * Check if we're at the absolute top of the scroll container.
+   */
+  const isAtTop = useCallback(() => {
+    const container = getScrollContainer();
+    if (!container) return false;
+
+    // Must be at absolute top (scrollTop === 0)
+    return container.scrollTop === 0;
+  }, [getScrollContainer]);
 
   const handleTouchStart = useCallback((e: TouchEvent) => {
     if (!enabled || isRefreshing) return;
 
-    const container = containerRef.current;
-    if (!container || container.scrollTop > 5) return;
+    // CRITICAL: Only start tracking if we're at the absolute top
+    if (!isAtTop()) {
+      isDragging.current = false;
+      return;
+    }
 
-    // Safely check if touch exists
     const touch = e.touches?.[0];
     if (!touch) return;
 
     startY.current = touch.clientY;
+    currentY.current = touch.clientY;
     isDragging.current = true;
-  }, [enabled, isRefreshing]);
+    hasTriggeredRefresh.current = false;
+    setPullState('idle');
+  }, [enabled, isRefreshing, isAtTop]);
 
   const handleTouchMove = useCallback((e: TouchEvent) => {
-    if (!isDragging.current || !enabled) return;
+    if (!isDragging.current || !enabled || isRefreshing) return;
 
-    // Safely check if touch exists
     const touch = e.touches?.[0];
     if (!touch) return;
 
-    const currentY = touch.clientY;
-    const distance = currentY - startY.current;
+    currentY.current = touch.clientY;
+    const deltaY = currentY.current - startY.current;
 
-    if (distance > 0 && containerRef.current && containerRef.current.scrollTop === 0) {
-      // Apply elastic resistance (logarithmic feel)
-      const elasticDistance = Math.min(
-        Math.log(distance + 1) * 20,
-        maxPull
-      );
-      setPullDistance(elasticDistance);
+    // If user scrolls up, immediately cancel the pull
+    if (deltaY < 0) {
+      isDragging.current = false;
+      setPullDistance(0);
+      setPullState('idle');
+      return;
+    }
 
-      // Prevent default scroll if we're pulling
-      if (distance > 10) {
+    // Only proceed if pulling down significantly AND still at top
+    if (deltaY > 0 && isAtTop()) {
+      // Apply elastic resistance for natural feel
+      const resistance = 0.5; // 50% resistance
+      const elasticDelta = deltaY * resistance;
+      const cappedDistance = Math.min(elasticDelta, maxPull);
+
+      setPullDistance(cappedDistance);
+
+      // Update pull state based on distance
+      if (cappedDistance >= threshold) {
+        setPullState('ready');
+      } else if (cappedDistance > 10) {
+        setPullState('pulling');
+      }
+
+      // Prevent default scrolling once we've committed to pulling
+      if (deltaY > 20) {
         e.preventDefault();
       }
+    } else if (deltaY > 0 && !isAtTop()) {
+      // Started at top but scrolled down — immediately cancel pull
+      isDragging.current = false;
+      setPullDistance(0);
+      setPullState('idle');
     }
-  }, [enabled, maxPull]);
+  }, [enabled, isRefreshing, isAtTop, threshold, maxPull]);
 
   const handleTouchEnd = useCallback(async () => {
     if (!isDragging.current) return;
 
     isDragging.current = false;
+    const shouldRefresh = pullDistance >= threshold && !hasTriggeredRefresh.current;
 
-    if (pullDistance >= threshold && !isRefreshing) {
+    if (shouldRefresh) {
+      hasTriggeredRefresh.current = true;
+      setPullState('refreshing');
       setIsRefreshing(true);
-      setPullDistance(0);
 
       try {
         await onRefresh();
+      } catch (error) {
+        console.error('Pull-to-refresh error:', error);
       } finally {
-        setIsRefreshing(false);
+        // Smooth transition out
+        setTimeout(() => {
+          setIsRefreshing(false);
+          setPullDistance(0);
+          setPullState('idle');
+        }, 300);
       }
     } else {
+      // Didn't reach threshold - animate back
       setPullDistance(0);
+      setPullState('idle');
     }
-  }, [pullDistance, threshold, isRefreshing, onRefresh]);
+  }, [pullDistance, threshold, onRefresh]);
+
+  const handleTouchCancel = useCallback(() => {
+    isDragging.current = false;
+    setPullDistance(0);
+    setPullState('idle');
+  }, []);
 
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container || !enabled) return;
+    if (!enabled) return;
 
+    const container = getScrollContainer();
+    if (!container) {
+      console.warn('Pull-to-refresh: Could not find scroll container');
+      return;
+    }
+
+    // Attach to the actual scroll container
     container.addEventListener('touchstart', handleTouchStart, { passive: true });
     container.addEventListener('touchmove', handleTouchMove, { passive: false });
     container.addEventListener('touchend', handleTouchEnd, { passive: true });
+    container.addEventListener('touchcancel', handleTouchCancel, { passive: true });
 
     return () => {
       container.removeEventListener('touchstart', handleTouchStart);
       container.removeEventListener('touchmove', handleTouchMove);
       container.removeEventListener('touchend', handleTouchEnd);
+      container.removeEventListener('touchcancel', handleTouchCancel);
     };
-  }, [enabled, handleTouchStart, handleTouchMove, handleTouchEnd]);
+  }, [enabled, handleTouchStart, handleTouchMove, handleTouchEnd, handleTouchCancel, getScrollContainer]);
 
   return {
-    containerRef,
     isRefreshing,
     pullDistance,
+    pullState,
     refreshProgress: Math.min(pullDistance / threshold, 1),
   };
 }

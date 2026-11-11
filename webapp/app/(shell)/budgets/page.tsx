@@ -26,7 +26,7 @@ export default function BudgetsPage() {
   }).format(new Date());
 
   return (
-    <div className="mx-auto w-full max-w-content px-4 pb-8 pt-1 sm:px-6">
+    <div className="mx-auto w-full max-w-content px-4 pb-8 pt-4 sm:px-6 sm:pt-5">
       <WebappHeader eyebrow={t("nav.budgets")} title={t("nav.budgets")} description={t("budgets.monthlyBudgets")} icon={PiggyBank} />
 
       <WebappNotice variant="info" />

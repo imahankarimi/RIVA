@@ -418,8 +418,8 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-content px-4 pb-8 pt-1 sm:px-6">
-      <WebappHeader eyebrow={t("settings.title")} title={t("settings.title")} description={t("settings.subtitle")} icon={User} />
+    <div className="mx-auto w-full max-w-content px-4 pb-8 pt-4 sm:px-6 sm:pt-5">
+      <WebappHeader title={t("settings.title")} icon={User} />
 
       <div className="mt-6 flex flex-col gap-5 md:flex-row md:gap-6">
         {/* Desktop/tablet: vertical tab nav */}

@@ -49,12 +49,9 @@ export default function ReportsPage() {
   );
 
   return (
-    <div className="mx-auto w-full max-w-content px-4 pb-8 pt-1 sm:px-6">
+    <div className="mx-auto w-full max-w-content px-4 pb-8 pt-4 sm:px-6 sm:pt-5">
       <WebappHeader
-        eyebrow={t("webapp.nav.more")}
-        title={t("analytics.title")}
-        description={t("analytics.subtitle")}
-        icon={BarChart3}
+        title={t("webapp.nav.insights")}
       />
 
       <WebappNotice variant={usingDemoData ? "demo" : undefined} />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Download, Upload, FileText, FileJson, FileSpreadsheet, FileX, CheckCircle2, AlertTriangle } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
@@ -39,14 +39,20 @@ export function ImportExportModal({
   onClose,
   transactions,
   currency,
+  initialTab = "export",
 }: {
   open: boolean;
   onClose: () => void;
   transactions: Transaction[];
   currency: BackendCurrency;
+  initialTab?: "import" | "export";
 }) {
   const { t } = useI18n();
-  const [tab, setTab] = useState<"export" | "import">("export");
+  const [tab, setTab] = useState<"export" | "import">(initialTab);
+
+  useEffect(() => {
+    if (open) setTab(initialTab);
+  }, [open, initialTab]);
 
   return (
     <Modal open={open} onClose={onClose} title={t("importExport.title")} maxWidthClassName="max-w-xl">

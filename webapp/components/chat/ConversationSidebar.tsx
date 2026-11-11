@@ -64,16 +64,20 @@ export function ConversationSidebar({
 
       {/* Sidebar - matches main RIVA sidebar inset card style */}
       <motion.aside
-        initial={false}
+        initial={{
+          x: -280,
+        }}
         animate={{
-          x: isOpen || window.innerWidth >= 768 ? 0 : dir === "rtl" ? 280 : -280,
+          x: isOpen || window.innerWidth >= 768 ? 0 : -280,
         }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
         className={cn(
-          "fixed top-[5rem] bottom-0 z-40 flex w-[280px] flex-col bg-paper",
+          "fixed top-[5rem] bottom-0 z-40 flex w-[280px] flex-col overflow-hidden bg-paper",
           dir === "rtl" ? "end-0" : "start-0",
-          "md:static md:inset-y-0 md:z-0"
+          "md:static md:inset-y-0 md:z-0 md:overflow-visible",
+          !isOpen && window.innerWidth < 768 && "pointer-events-none"
         )}
+        suppressHydrationWarning
       >
         {/* Inset card shell - same as main RIVA sidebar */}
         <div className="m-2 flex h-[calc(100vh-6rem)] w-auto flex-col overflow-hidden rounded-xl bg-sidebar text-sidebar-foreground shadow-subtle ring-1 ring-line/70 md:h-[calc(100vh-1rem)]">
