@@ -1,0 +1,49 @@
+/*
+ * RIVA — Vazirmatn @font-face declarations (Persian UI typeface).
+ *
+ * Loaded from the app's own /fonts directory (served by Next.js from
+ * public/fonts) so Persian rendering does not depend on a third-party CDN.
+ * The pinned jsDelivr copy of Vazirmatn v33.003 is kept as a fallback source
+ * in case the static assets are unavailable.
+ *
+ * Weights cover the RIVA type ramp: 400 (body), 500 (medium), 600 (semibold),
+ * 700 (bold). `font-display: swap` keeps text visible while the font loads.
+ *
+ * Reference: TYPOGRAPHY_FIXED_CDN.md
+ */
+
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/fonts/Vazirmatn-Regular.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/fonts/Vazirmatn-Medium.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/fonts/Vazirmatn-SemiBold.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/fonts/Vazirmatn-Bold.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}

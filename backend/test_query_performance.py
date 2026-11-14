@@ -4,7 +4,7 @@ Verifies the N+1 query fixes hold: the analytics and overview hot paths stay
 bounded in the number of SQL statements they issue regardless of how many
 journal entries / lines / accounts exist.
 
-Run via the shared app:  DATABASE_URL=sqlite:///<path> python -m unittest test_query_performance
+Run:  python -m pytest -q test_query_performance.py
 """
 
 import os
@@ -52,11 +52,12 @@ class QueryPerformanceTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        import models  # noqa: F401
-        from database import Base, engine, SessionLocal
+        # Dedicated PostgreSQL test database — the 200 seeded entries below
+        # must never land in the application's DATABASE_URL database.
+        from test_support import install_test_database
 
-        Base.metadata.create_all(engine)
-        cls.session = SessionLocal()
+        cls.engine, cls.session_factory = install_test_database()
+        cls.session = cls.session_factory()
 
         # Seed a business with a realistic number of entries/lines.
         from models import Business, Account, JournalEntry, JournalLine
@@ -106,8 +107,9 @@ class QueryPerformanceTests(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.session.close()
-        from database import engine
-        engine.dispose()
+        from test_support import teardown_test_database
+
+        teardown_test_database(cls.engine)
 
     def test_compute_overview_is_bounded(self):
         """compute_overview must not issue per-entry or per-line queries."""

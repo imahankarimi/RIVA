@@ -28,8 +28,13 @@ export function AnimatedNumber({
   });
 
   useEffect(() => {
+    // Respect prefers-reduced-motion: reduce
+    const prefersReducedMotion = typeof window !== "undefined"
+      ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      : false;
+
     const controls = animate(motionValue, value, {
-      duration,
+      duration: prefersReducedMotion ? 0.001 : duration,
       ease: [0.16, 1, 0.3, 1],
     });
     prev.current = value;

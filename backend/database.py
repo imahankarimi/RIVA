@@ -1,3 +1,4 @@
+import logging
 import os
 
 from dotenv import load_dotenv
@@ -75,6 +76,39 @@ SessionLocal = sessionmaker(
 
 class Base(DeclarativeBase):
     pass
+
+
+# Import token models so they're registered with Base.metadata
+logger = logging.getLogger(__name__)
+
+
+def _import_token_models():
+    """Import token models to register them with SQLAlchemy metadata.
+
+    Called at module load to ensure the verification_tokens and
+    password_reset_tokens tables are included in Base.metadata.create_all()
+    calls during testing and bootstrap, and are visible to Alembic's
+    target_metadata (env.py imports `models` but not `token_models`).
+
+    A missing token_models module is tolerated (older deployments may not ship
+    it yet) but is logged loudly, because create_all would then silently omit
+    the token tables. Any other import failure (e.g. a broken dependency
+    inside token_models.py) is a genuine error and is re-raised.
+    """
+    try:
+        from token_models import VerificationToken, PasswordResetToken  # noqa: F401
+    except ModuleNotFoundError as exc:
+        if exc.name != "token_models":
+            # Real import error inside token_models — do not hide it.
+            raise
+        logger.warning(
+            "token_models.py not found: verification/reset token tables are "
+            "NOT registered on Base.metadata (create_all and Alembic "
+            "autogenerate will skip them)."
+        )
+
+
+_import_token_models()
 
 
 def get_db():

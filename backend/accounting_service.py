@@ -18,6 +18,8 @@ def create_journal_entry(
     db: Session,
     data: JournalEntryInput,
     business_base_currency: str,
+    *,
+    commit: bool = True,
 ) -> JournalEntry:
     """Create a journal entry with full ACID guarantees.
 
@@ -27,6 +29,12 @@ def create_journal_entry(
     - Validates double-entry balance BEFORE commit
     - Atomic: all-or-nothing semantics (single COMMIT)
     - Safe for concurrent writes from multiple users
+
+    ``commit=False`` lets a caller that already owns a larger transaction
+    (e.g. the AI-confirm route, which must persist several entries together
+    with their audit rows) flush this entry into the caller's transaction and
+    commit it itself. Callers that leave the default ``commit=True`` keep the
+    original single-COMMIT behaviour. Validation is identical either way.
 
     Race condition protection:
     Two users posting to the same business concurrently could otherwise both
@@ -139,9 +147,14 @@ def create_journal_entry(
             )
             db.add(journal_line)
 
-        # 8. Commit everything atomically
-        db.commit()
-        db.refresh(entry)
+        # 8. Commit everything atomically — unless the caller owns the
+        #    transaction (commit=False), in which case flush so the entry and
+        #    its lines have IDs and remain pending in the caller's transaction.
+        if commit:
+            db.commit()
+            db.refresh(entry)
+        else:
+            db.flush()
 
         return entry
 

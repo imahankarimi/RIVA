@@ -330,11 +330,19 @@ def _audit_log(
     previous_value: str | None = None,
     new_value: str | None = None,
     metadata: dict | None = None,
+    *,
+    commit: bool = True,
 ) -> AuditLog:
     """Create an audit log entry.
 
     Append-only: logs are never deleted by ordinary users.
     Critical financial mutations are always logged.
+
+    ``commit=True`` (the default, and the behaviour every existing caller
+    relies on) persists the row immediately. ``commit=False`` is for flows
+    that must persist financial records and their audit trail in ONE
+    transaction: the row is added/flushed into the caller's transaction and
+    the caller commits (or rolls back) everything together.
     """
     import json as _json
 
@@ -352,8 +360,14 @@ def _audit_log(
     )
 
     db.add(log_entry)
-    db.commit()
-    db.refresh(log_entry)
+    if commit:
+        db.commit()
+        db.refresh(log_entry)
+    else:
+        # Stay inside the caller's transaction. flush() assigns the primary
+        # key and surfaces any constraint error (e.g. varchar overflow) right
+        # here, so a caller can roll the whole transaction back.
+        db.flush()
     return log_entry
 
 
@@ -1506,24 +1520,46 @@ def confirm_transaction(data: ConfirmRequest, db: Session = Depends(get_db), use
                 ],
             )
 
-            entry = create_journal_entry(db=db, data=journal_input, business_base_currency=business.base_currency)
+            entry = create_journal_entry(
+                db=db,
+                data=journal_input,
+                business_base_currency=business.base_currency,
+                # Do NOT commit yet: the entry must be committed together
+                # with its audit row (see below).
+                commit=False,
+            )
             created_ids.append(str(entry.id))
 
-        # Audit log the transaction confirmation
-        _audit_log(
-            db=db,
-            user=user,
-            business=business,
-            action="transaction_confirm",
-            resource_type="transaction",
-            resource_id=",".join(created_ids) if created_ids else None,
-            previous_value=None,
-            new_value=json.dumps({
-                "count": len(created_ids),
-                "descriptions": [a.description or "" for a in actions if a.description],
-            }),
-            metadata={"ip": user.id, "action": "financial_mutation"},
-        )
+        # Audit log the transaction confirmation — one row per created
+        # journal entry. audit_logs.resource_id is varchar(36), sized for a
+        # single resource ID, so a multi-transaction confirm must never
+        # comma-join the IDs into one row (that overflows the column and
+        # aborts the request with StringDataRightTruncation). Every created
+        # entry keeps its own full, untruncated ID, and the batch summary
+        # (count, descriptions and the complete ID list) is preserved in
+        # new_value, so no audit information is lost.
+        #
+        # commit=False keeps every audit row in the same transaction as the
+        # journal entries: the single db.commit() below persists journal
+        # entries + audit rows (+ the conversation success message) together.
+        audit_new_value = json.dumps({
+            "count": len(created_ids),
+            "ids": created_ids,
+            "descriptions": [a.description or "" for a in actions if a.description],
+        })
+        for entry_id in created_ids:
+            _audit_log(
+                db=db,
+                user=user,
+                business=business,
+                action="transaction_confirm",
+                resource_type="transaction",
+                resource_id=entry_id,
+                previous_value=None,
+                new_value=audit_new_value,
+                metadata={"ip": user.id, "action": "financial_mutation"},
+                commit=False,
+            )
 
         # Persist a success message in the conversation, in the user's language
         # (detected from the action description wording).
@@ -1540,7 +1576,13 @@ def confirm_transaction(data: ConfirmRequest, db: Session = Depends(get_db), use
             )
             if conversation:
                 _persist_message(db, conversation.id, "assistant", "success", success_message)
-                _touch_conversation(db, conversation)
+                conversation.updated_at = datetime.utcnow()
+
+        # Atomic commit: journal entries, their audit rows and the success
+        # message either all persist or (on any failure above, including an
+        # audit insert error) none of them do. This is the ONLY commit in
+        # this financial confirmation path.
+        db.commit()
 
         return {
             "success": True,
@@ -1550,11 +1592,21 @@ def confirm_transaction(data: ConfirmRequest, db: Session = Depends(get_db), use
         }
 
     except ValueError as error:
+        # Roll back any partially-created (uncommitted) journal entries from
+        # this batch BEFORE writing the error message. Without this, the
+        # db.commit() below would persist a partial confirmation whose audit
+        # rows were never written.
+        db.rollback()
         if data.conversation_id:
             _verify_action_conversation(db, user, business, data.conversation_id)
             _persist_message(db, data.conversation_id, "assistant", "error", str(error))
             db.commit()
         raise HTTPException(status_code=400, detail=str(error))
+    except Exception:
+        # Any non-validation failure (e.g. an audit row could not be written)
+        # must leave NO financial records behind.
+        db.rollback()
+        raise
 
 
 # ---------------------------------------------------------------------------

@@ -55,13 +55,19 @@ def _record_transactions_provider(messages, **kwargs):
 class AssistantFlowTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        import models  # noqa: F401
-        from database import Base, engine
-
-        Base.metadata.create_all(engine)
-        import main as main_mod
+        # Dedicated PostgreSQL test database — the schema is dropped and
+        # recreated, so the hardcoded signup e-mail below never collides with
+        # data from previous runs, and nothing is written to the app's
+        # DATABASE_URL (development/production) database.
+        from database import get_db
         from fastapi.testclient import TestClient
 
+        from test_support import install_test_database, make_get_db_override
+
+        cls.engine, cls.session_factory = install_test_database()
+        import main as main_mod
+
+        main_mod.app.dependency_overrides[get_db] = make_get_db_override(cls.session_factory)
         cls.app = main_mod.app
         cls.client = TestClient(cls.app)
         cls.signup = cls.client.post("/api/auth/signup", json={
@@ -76,8 +82,13 @@ class AssistantFlowTests(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        from database import engine
-        engine.dispose()
+        import main as main_mod
+        from database import get_db
+
+        from test_support import teardown_test_database
+
+        main_mod.app.dependency_overrides.pop(get_db, None)
+        teardown_test_database(cls.engine)
 
     def _chat(self, message, conversation_id=None):
         return self.client.post("/api/chat", headers=self.headers, json={

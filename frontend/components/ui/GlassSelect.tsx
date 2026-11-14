@@ -197,7 +197,7 @@ export function GlassSelect({
               ? 0
               : enabledIndexes.length - 1
             : (pos + delta + enabledIndexes.length) % enabledIndexes.length
-        return enabledIndexes[nextPos] ?? enabledIndexes[0]
+        return enabledIndexes[nextPos] ?? enabledIndexes[0] ?? current
       })
     },
     [enabledIndexes],
@@ -275,13 +275,13 @@ export function GlassSelect({
       case 'Home':
         if (open && enabledIndexes.length) {
           event.preventDefault()
-          setHighlight(enabledIndexes[0])
+          setHighlight(enabledIndexes[0] ?? -1)
         }
         break
       case 'End':
         if (open && enabledIndexes.length) {
           event.preventDefault()
-          setHighlight(enabledIndexes[enabledIndexes.length - 1])
+          setHighlight(enabledIndexes[enabledIndexes.length - 1] ?? -1)
         }
         break
       case 'Escape':

@@ -1,7 +1,9 @@
 """End-to-end API tests for the RIVA AI assistant flow.
 
-Runs the real FastAPI app (TestClient) against a temp-file SQLite database
-with the AI provider mocked, so no external service or PostgreSQL is needed.
+Runs the real FastAPI app (TestClient) against the dedicated PostgreSQL test
+database (TEST_DATABASE_URL via test_support) with the AI provider mocked, so
+no external AI service is needed and nothing touches the application's
+DATABASE_URL database.
 Verifies acceptance equivalents of:
 
 - New Chat creates an empty conversation
@@ -37,21 +39,30 @@ def _fake_ai(messages, **kwargs):
 class ApiFlowTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        import models  # noqa: F401  — populate metadata
-        from database import Base, engine
-
-        Base.metadata.create_all(engine)
-
-        import main as main_mod
+        # Dedicated PostgreSQL test database — schema dropped and recreated
+        # per run; isolated from the application's DATABASE_URL database.
+        from database import get_db
         from fastapi.testclient import TestClient
+
+        from test_support import install_test_database, make_get_db_override
+
+        cls.engine, cls.session_factory = install_test_database()
+        import main as main_mod
+
+        main_mod.app.dependency_overrides[get_db] = make_get_db_override(cls.session_factory)
 
         cls.app = main_mod.app
         cls.client = TestClient(cls.app)
 
     @classmethod
     def tearDownClass(cls):
-        from database import engine
-        engine.dispose()
+        import main as main_mod
+        from database import get_db
+
+        from test_support import teardown_test_database
+
+        main_mod.app.dependency_overrides.pop(get_db, None)
+        teardown_test_database(cls.engine)
 
     def setUp(self):
         self.signup_biz = "My Shop"

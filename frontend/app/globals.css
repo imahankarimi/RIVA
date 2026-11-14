@@ -18,12 +18,14 @@
    Full specification: docs/DESIGN_SYSTEM.md
    ========================================================================== */
 @import "../../design-system/tokens.css";
+@import "./vazirmatn.css";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
+  font-family: var(--font-ui, var(--font-ibm-plex-sans), system-ui, sans-serif);
   background-color: rgb(var(--c-paper));
   color: rgb(var(--c-ink));
   font-feature-settings: "cv11", "ss01";
@@ -117,16 +119,16 @@ body {
    ========================================================================== */
 
 html[data-locale="fa"] {
-  --font-ui: var(--font-vazirmatn), system-ui, sans-serif;
-  --font-ui-display: var(--font-vazirmatn), system-ui, sans-serif;
+  --font-ui: 'Vazirmatn', system-ui, sans-serif;
+  --font-ui-display: 'Vazirmatn', system-ui, sans-serif;
 }
 
 html[data-locale="fa"] body {
-  font-family: var(--font-vazirmatn), system-ui, sans-serif;
+  font-family: 'Vazirmatn', system-ui, sans-serif;
 }
 
 html[data-locale="fa"] .font-display {
-  font-family: var(--font-vazirmatn), system-ui, sans-serif;
+  font-family: 'Vazirmatn', system-ui, sans-serif;
 }
 
 :root,
