@@ -18,6 +18,7 @@
    Full specification: docs/DESIGN_SYSTEM.md
    ========================================================================== */
 @import "../../design-system/tokens.css";
+@import "../../design-system/landing.css";
 @import "./vazirmatn.css";
 
 @tailwind base;

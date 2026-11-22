@@ -5,6 +5,7 @@ The single source of truth for RIVA's visual language.
 | File | What it is |
 |---|---|
 | `tokens.css` | Every colour, radius, shadow, spacing, motion and layout value. Light + dark. |
+| `landing.css` | Shared atmosphere/utility surfaces for the two public landing pages. Token-backed, never a second palette. |
 | `tailwind-preset.ts` | The Tailwind theme that exposes those tokens as utilities. |
 | `glass.ts` | The Liquid Glass material used by the navigation layer. |
 | `validate.mjs` | Integrity check — run with `npm run design:check` from either app. |

@@ -1,0 +1,172 @@
+/* ============================================================================
+   RIVA DESIGN SYSTEM — design-system/landing.css
+   ----------------------------------------------------------------------------
+   Shared surfaces for the two public landing pages:
+
+     frontend/  RIVA Main   — desktop-first brand site
+     webapp/    RIVA Web    — mobile-first product site
+
+   These are *surfaces*, not a second token set. Every value resolves through
+   `tokens.css`, so the pages stay on the same paper/ink/signal system as the
+   applications they introduce.
+
+   The landing pages are intentionally the only place where atmosphere is
+   allowed to be expressive: a faint engineering grid, a single controlled
+   hero glow, and a slow float for product-preview cards. Content surfaces
+   inside the previews remain crisp and opaque — the same rule the app follows.
+
+   Imported by both apps immediately after `tokens.css`.
+   ========================================================================== */
+
+/* ----------------------------------------------------------------------------
+   1. Atmosphere
+   ------------------------------------------------------------------------- */
+
+/* Faint engineering grid. Masked so it never reaches the section edges. */
+.landing-grid {
+  background-image:
+    linear-gradient(to right, rgb(var(--c-line) / 0.42) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(var(--c-line) / 0.42) 1px, transparent 1px);
+  background-size: 72px 72px;
+  -webkit-mask-image: radial-gradient(
+    ellipse 78% 64% at 50% 0%,
+    rgb(0 0 0) 18%,
+    transparent 76%
+  );
+  mask-image: radial-gradient(
+    ellipse 78% 64% at 50% 0%,
+    rgb(0 0 0) 18%,
+    transparent 76%
+  );
+}
+
+/* The one hero glow. Steel and navy only — never an "AI" violet. */
+.landing-hero-glow {
+  background:
+    radial-gradient(
+      ellipse 46% 48% at 72% 26%,
+      rgb(var(--c-signal-400) / 0.2) 0%,
+      transparent 68%
+    ),
+    radial-gradient(
+      ellipse 34% 36% at 24% 62%,
+      rgb(var(--c-signal-500) / 0.1) 0%,
+      transparent 72%
+    );
+}
+
+/* Softer glow for inner sections. */
+.landing-soft-glow {
+  background: radial-gradient(
+    ellipse 52% 54% at 50% 0%,
+    rgb(var(--c-signal-400) / 0.12) 0%,
+    transparent 70%
+  );
+}
+
+/* Grid etched into a fixed Deep Navy product panel. */
+.landing-panel-grid {
+  background-image:
+    linear-gradient(to right, rgb(var(--c-signal-300) / 0.09) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(var(--c-signal-300) / 0.09) 1px, transparent 1px);
+  background-size: 34px 34px;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgb(0 0 0) 0%,
+    rgb(0 0 0) 55%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgb(0 0 0) 0%,
+    rgb(0 0 0) 55%,
+    transparent 100%
+  );
+}
+
+/* Hairline that fades at both ends instead of stopping abruptly. */
+.landing-hairline {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgb(var(--c-line)),
+    transparent
+  );
+}
+
+/* Horizontal scroll edge fade for the mobile screen gallery. */
+.landing-fade-x {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    rgb(0 0 0) 5%,
+    rgb(0 0 0) 95%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    rgb(0 0 0) 5%,
+    rgb(0 0 0) 95%,
+    transparent
+  );
+}
+
+/* ----------------------------------------------------------------------------
+   2. Motion
+   ----------------------------------------------------------------------------
+   A single, slow float. Product previews should feel alive, not animated.
+   Reduced motion removes it entirely; the pages read identically at rest.
+   ------------------------------------------------------------------------- */
+
+@keyframes landing-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -8px, 0);
+  }
+}
+
+.landing-float {
+  animation: landing-float 7s var(--ease-riva) infinite;
+}
+
+.landing-float-slow {
+  animation: landing-float 9s var(--ease-riva) infinite;
+  animation-delay: -3.5s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-float,
+  .landing-float-slow {
+    animation: none;
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   3. Utilities
+   ------------------------------------------------------------------------- */
+
+/* Horizontal galleries on touch devices: swipe, don't show a scrollbar. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* A device frame's elevation. Uses the shared float shadow, not a new one. */
+.landing-device {
+  box-shadow: var(--shadow-float);
+}
+
+/* Text selection inside a fixed navy panel should stay legible. */
+.landing-on-navy ::selection {
+  background: rgb(var(--c-signal-400) / 0.4);
+  color: #f7f7f3;
+}
