@@ -1,0 +1,34 @@
+{
+  "brand": "RIVA",
+  "version": "1.0",
+  "date": "2026-11",
+  "palette": {
+    "deepNavy":  { "hex": "#101C2C", "rgb": [16, 28, 44],    "role": "primary brand token (--c-signal-500)" },
+    "deepInk":   { "hex": "#10131A", "rgb": [16, 19, 26],    "role": "text" },
+    "warmWhite": { "hex": "#F7F7F3", "rgb": [247, 247, 243], "role": "light surface" },
+    "pureWhite": { "hex": "#FFFFFF", "rgb": [255, 255, 255], "role": "dark-mode logo" },
+    "steelBlue": { "hex": "#71879B", "rgb": [113, 135, 155], "role": "secondary / charts — not used in logo" },
+    "slateBlue": { "hex": "#607D94", "rgb": [96, 125, 148],  "role": "muted chrome — not used in logo" }
+  },
+  "logo": {
+    "light": { "fill": "#101C2C", "surface": "#F7F7F3", "contrast": 15.97 },
+    "dark":  { "fill": "#FFFFFF", "surface": "#101C2C", "contrast": 17.15 }
+  },
+  "geometry": {
+    "symbolHeight": 147.0,
+    "symbolWidth": 202.819,
+    "capHeight": 109.3,
+    "gap": 27.9,
+    "lockupWidth": 587.435,
+    "lockupHeight": 147.0,
+    "clearSpace": 73.5
+  },
+  "minimumSizes": {
+    "lockupDigitalPx": 108,
+    "lockupPrintMm": 30,
+    "symbolDigitalPx": 36,
+    "symbolPrintMm": 10,
+    "faviconPx": 16,
+    "iconMasterPx": 1024
+  }
+}

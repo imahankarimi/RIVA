@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="rivaTitle">
+  <title id="rivaTitle">RIVA — App Icon (Light)</title>
+  <rect width="1024" height="1024" fill="#F7F7F3"/>
+  <g id="riva-symbol" transform="translate(202 287.317) scale(3.056910)">
+    <path fill="#101C2C" fill-rule="evenodd" d="M76.176 0 L0 76.172 L70.84 146.999 L98.37 119.471 L53.505 74.608 L96.417 31.698 L143.822 79.102 L104.593 118.332 L133.272 147 L202.819 77.466 L125.35 0 Z M77.561 2.273 L86.915 2.273 L153.753 69.111 L146.103 76.761 L77.561 8.881 Z"/>
+  </g>
+
+</svg>

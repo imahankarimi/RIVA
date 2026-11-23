@@ -1,0 +1,322 @@
+<!doctype html><html><head><meta charset="utf-8"><title>RIVA Logo Usage Guide</title><style>
+@page{size:210mm 297mm;margin:0}
+*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+html,body{margin:0;padding:0}
+body{font-family:'Avenir Next','Helvetica Neue',Helvetica,Arial,sans-serif;color:#101C2C;font-size:9.4pt;line-height:1.5}
+.page{width:210mm;height:297mm;background:#F7F7F3;padding:16mm 17mm 13mm;position:relative;overflow:hidden;page-break-after:always}
+.page:last-child{page-break-after:auto}
+.page.dark{background:#101C2C;color:#fff}
+.top{display:flex;align-items:center;justify-content:space-between;border-bottom:.4pt solid #DCDCD6;padding-bottom:3.5mm;margin-bottom:7mm}
+.top .brand{font-size:7.2pt;letter-spacing:.24em;text-transform:uppercase;color:#71879B;font-weight:600}
+.top .num{font-size:7.2pt;letter-spacing:.18em;text-transform:uppercase;color:#9AA8B4}
+.dark .top{border-color:#2A3B4E}.dark .top .brand,.dark .top .num{color:#8FA3B8}
+.kicker{font-size:7.4pt;letter-spacing:.24em;text-transform:uppercase;color:#71879B;font-weight:600;margin-bottom:3mm}
+h1{font-size:26pt;line-height:1.08;letter-spacing:-.025em;font-weight:500;margin:0 0 3.5mm}
+h2{font-size:13.5pt;font-weight:600;letter-spacing:-.01em;margin:0 0 2mm}
+h3{font-size:9.6pt;font-weight:600;margin:0 0 1.2mm}
+p{margin:0 0 3mm;color:#3F4F5C}
+.lead{font-size:10.6pt;line-height:1.55;color:#2B3A47;max-width:165mm}
+.small{font-size:8pt;color:#71879B;line-height:1.5}
+.dark p{color:#C6D2DC}.dark .small{color:#8FA3B8}
+.rule{height:.4pt;background:#DCDCD6;margin:5mm 0}
+.dark .rule{background:#2A3B4E}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:6mm}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5mm}
+.card{background:#fff;border:.4pt solid #E4E4DE;border-radius:2.5mm;padding:5mm}
+.card.dark{background:#101C2C;border-color:#2A3B4E;color:#fff}
+.card .lab{font-size:6.8pt;letter-spacing:.16em;text-transform:uppercase;color:#71879B;font-weight:600;margin-bottom:3mm}
+.dark .card .lab{color:#8FA3B8}
+.asset{height:32mm;display:flex;align-items:center;justify-content:flex-start}
+.asset img{max-height:26mm;max-width:100%;width:auto;display:block}
+.asset.sym img{max-height:30mm}
+.asset.word img{max-height:20mm}
+.tag{display:inline-block;font-size:6.6pt;letter-spacing:.12em;text-transform:uppercase;border:.4pt solid #C9D2DA;border-radius:99px;padding:1mm 2.4mm;color:#5C7387}
+.footer{position:absolute;left:17mm;right:17mm;bottom:8mm;display:flex;justify-content:space-between;font-size:6.6pt;letter-spacing:.12em;text-transform:uppercase;color:#9AA8B4}
+.dark .footer{color:#7F93A6}
+.cover{padding:20mm 18mm 16mm;display:flex;flex-direction:column}
+.cover .logo{height:21mm;width:auto;margin-top:2mm}
+.cover .center{margin-top:34mm}
+.cover h1{font-size:42pt;letter-spacing:-.03em;line-height:1}
+.cover .sub{font-size:12pt;color:#5C6E7C;max-width:120mm;line-height:1.5;margin-top:5mm}
+.cover .band{position:absolute;left:18mm;right:18mm;bottom:20mm;background:#101C2C;color:#fff;border-radius:3mm;padding:8mm 9mm;display:flex;justify-content:space-between;align-items:center}
+.cover .band .t{font-size:8.2pt;letter-spacing:.22em;text-transform:uppercase;color:#8FA3B8}
+.cover .band .m{font-size:7.4pt;letter-spacing:.12em;text-transform:uppercase;color:#C6D2DC}
+.cover .v{font-size:7.2pt;letter-spacing:.16em;text-transform:uppercase;color:#71879B;margin-top:14mm}
+.swatches{display:grid;grid-template-columns:repeat(5,1fr);gap:3.5mm;margin:4mm 0 5mm}
+.sw{border-radius:2mm;overflow:hidden;border:.4pt solid #E4E4DE;background:#fff}
+.sw .chip{height:22mm}
+.sw .meta{padding:2.5mm 2.8mm}
+.sw .nm{font-size:7.2pt;font-weight:600;letter-spacing:.02em}
+.sw .hex{font-family:'SF Mono',Menlo,monospace;font-size:7.4pt;color:#5C6E7C}
+.sw .rl{font-size:6.6pt;color:#9AA8B4;line-height:1.35;margin-top:1mm}
+.clean{display:flex;gap:4mm;align-items:flex-start}
+.clean .item{flex:1;background:#fff;border:.4pt solid #E4E4DE;border-radius:2mm;padding:4mm;text-align:center}
+.clean .item.dark{background:#101C2C;border-color:#2A3B4E}
+.clean img{max-height:18mm;max-width:100%;width:auto;display:block;margin:0 auto 3mm}
+.clean .c{font-size:7.2pt;color:#71879B}
+.do{border-left:1.2mm solid #3E9A6D;padding-left:4mm;margin-bottom:3mm}
+.dont{border-left:1.2mm solid #B5433A;padding-left:4mm;margin-bottom:3mm}
+.do b,.dont b{font-size:8.6pt}
+.do p,.dont p{font-size:8pt;margin:0;color:#5C6E7C}
+.diagram{position:relative;background:#fff;border:.4pt solid #E4E4DE;border-radius:2mm;padding:7mm 8mm}
+.diagram .box{position:relative;border:.5pt dashed #8FA3B8;padding:14.5mm 21mm}
+.diagram .box img{width:100%;display:block}
+.diagram .inner{position:absolute;left:21mm;top:14.5mm;right:21mm;bottom:14.5mm;border:.3pt solid #E4E4DE}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:2mm 8mm;margin:3mm 0 0}
+.metric{display:flex;justify-content:space-between;border-bottom:.3pt solid #E8E8E2;padding:2mm 0;font-size:8.2pt}
+.metric b{font-family:'SF Mono',Menlo,monospace;font-weight:500}
+.table{width:100%;border-collapse:collapse;font-size:8pt}
+.table th{text-align:left;font-size:6.8pt;letter-spacing:.14em;text-transform:uppercase;color:#71879B;border-bottom:.4pt solid #DCDCD6;padding:2.2mm 2mm}
+.table td{border-bottom:.3pt solid #E8E8E2;padding:2.4mm 2mm;vertical-align:top;color:#3F4F5C}
+.table td:first-child{font-weight:600;color:#101C2C;white-space:nowrap}
+.badges{display:flex;gap:3mm;align-items:center;margin-top:2mm}
+.badges img{width:15mm;height:15mm;border-radius:3.2mm;display:block}
+.badges img.sq{border-radius:0}
+.wrongs{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm}
+.wrong{background:#fff;border:.4pt solid #E4E4DE;border-radius:2mm;padding:3.5mm;position:relative}
+.wrong .stage{height:24mm;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#F7F7F3;border-radius:1.5mm;margin-bottom:2.5mm}
+.wrong .stage img{max-height:14mm;max-width:100%}
+.wrong .stage.stretch img{max-height:11mm;transform:scaleX(1.5)}
+.wrong .stage.rotate img{transform:rotate(-14deg)}
+.wrong .stage.recolor img{filter:hue-rotate(120deg) saturate(1.5)}
+.wrong .stage.shadow img{filter:drop-shadow(1.5mm 1.5mm 1mm rgba(16,28,44,.55))}
+.wrong .stage.outline img{opacity:.28}
+.wrong .stage.busy{background:repeating-linear-gradient(45deg,#B9C4CE 0 3mm,#E6EAED 3mm 6mm)}
+.wrong .stage.busy img{opacity:.9}
+.wrong .stage.crop img{transform:scale(1.9);margin-left:-8mm}
+.wrong .badge{position:absolute;right:2.5mm;top:2.5mm;width:5mm;height:5mm;border-radius:50%;background:#B5433A;color:#fff;font-size:7pt;display:flex;align-items:center;justify-content:center;font-weight:700}
+.wrong .c{font-size:7pt;color:#71879B;line-height:1.35}
+.wrong .c b{display:block;color:#101C2C;font-size:7.8pt;margin-bottom:.5mm}
+
+.stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:2.5mm;margin-top:2mm}
+.stat{background:#fff;border:.4pt solid #E4E4DE;border-radius:1.5mm;padding:2.6mm 2.8mm}
+.stat .l{font-size:6.2pt;letter-spacing:.07em;text-transform:uppercase;color:#8A98A4;line-height:1.25}
+.stat .v{font-size:9.6pt;font-family:'SF Mono',Menlo,monospace;margin-top:1.4mm;color:#101C2C}
+.grid45{height:46mm;border:.4pt solid #E4E4DE;border-radius:2mm;background:#fff;position:relative;overflow:hidden}
+.grid45:before{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(16,28,44,.18) 0 .35mm,transparent .35mm 8mm),repeating-linear-gradient(-45deg,rgba(16,28,44,.18) 0 .35mm,transparent .35mm 8mm)}
+.grid45 img{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);height:30mm}
+.sizes{display:flex;align-items:flex-end;gap:7mm;margin-top:3mm;padding:4mm 5mm;background:#fff;border:.4pt solid #E4E4DE;border-radius:2mm}
+.sizes .s{text-align:center}
+.sizes .s img{display:block;margin:0 auto 1.5mm}
+.sizes .s span{font-size:6.2pt;color:#8A98A4;letter-spacing:.06em}
+.surface{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm;margin-top:2mm}
+.surface .sc{border-radius:2mm;padding:4mm 4mm 3.2mm;border:.4pt solid #E4E4DE;background:#fff}
+.surface .sc.dark{background:#101C2C;border-color:#2A3B4E}
+.surface .sc img{height:10mm;width:auto;display:block;margin-bottom:3mm}
+.surface .sc .sl{font-size:7pt;color:#71879B}
+.surface .sc.dark .sl{color:#8FA3B8}
+.surface .sc .cr{font-family:'SF Mono',Menlo,monospace;font-size:7pt;color:#101C2C;margin-top:.8mm}
+.surface .sc.dark .cr{color:#fff}
+</style></head><body>
+
+<!-- PAGE 1 · COVER -->
+<div class="page cover">
+  <div class="top" style="border:0;padding:0;margin:0"><div class="brand">RIVA · Brand Guidelines</div><div class="num">Version 1.0 · 2026</div></div>
+  <div class="center">
+    <img class="logo" src="../../01-Primary-Logo/Light/riva-logo-light.svg" alt="RIVA primary lockup">
+    <div class="v">Records · Intelligence · Visibility · Automation</div>
+    <div style="height:22mm"></div>
+    <div class="kicker">Logo usage guide</div>
+    <h1>One identity.<br>Every surface.</h1>
+    <div class="sub">The production standard for the RIVA mark — proportion, colour, clear space and export formats. The identity is unchanged; this guide makes it exact.</div>
+  </div>
+  <div class="band"><div><div class="t">Financial intelligence for business</div><div class="m" style="margin-top:2mm">riva.app</div></div><div class="m" style="text-align:right">Primary lockup<br>Light · #101C2C</div></div>
+</div>
+
+<!-- PAGE 2 · IDENTITY -->
+<div class="page">
+  <div class="top"><div class="brand">RIVA · Logo Usage Guide</div><div class="num">01 / The identity</div></div>
+  <div class="kicker">01 · The identity</div>
+  <h1>A folded ribbon,<br>resolved as a diamond.</h1>
+  <p class="lead">RIVA's symbol is a single continuous ribbon folded into a diamond aperture. The wordmark is a geometric monoline sans, drawn as outlines — not set in a font. Both are fixed. Production may change scale, never shape.</p>
+  <div class="card" style="margin-top:6mm">
+    <div class="lab">01 · Primary lockup</div>
+    <div class="asset" style="height:44mm"><img src="../../01-Primary-Logo/Light/riva-logo-light.svg" style="max-height:40mm"></div>
+    <div class="small">587.4 × 147 units · 4.076 : 1 · symbol + wordmark, fixed spacing</div>
+  </div>
+  <div class="grid3" style="margin-top:5mm">
+    <div class="card"><div class="lab">02 · Symbol</div><div class="asset sym" style="height:32mm"><img src="../../02-Symbol/Light/riva-symbol-light.svg"></div><div class="small">202.8 × 147 · 1.380 : 1</div></div>
+    <div class="card"><div class="lab">03 · Wordmark</div><div class="asset word" style="height:32mm"><img src="../../03-Wordmark/Light/riva-wordmark-light.svg"></div><div class="small">356.7 × 109.3 · 3.264 : 1</div></div>
+    <div class="card dark"><div class="lab">Dark mode lockup</div><div class="asset" style="height:32mm"><img src="../../01-Primary-Logo/Dark/riva-logo-dark.svg"></div><div class="small" style="color:#8FA3B8">Pure white · transparent</div></div>
+  </div>
+  <div class="grid2" style="margin-top:5mm">
+    <div class="card"><div class="lab">Construction</div>
+      <p style="font-size:8.2pt;margin:0 0 2mm">The symbol is drawn on a 45° grid. Every outer edge resolves to 0° or 45°; collinear points are removed. The ribbon fold is negative space, so the mark holds in one colour.</p>
+      <div class="metrics" style="margin:0">
+        <div class="metric"><span>Outer edges</span><b>0° / 45°</b></div>
+        <div class="metric"><span>Symbol nodes</span><b>11</b></div>
+        <div class="metric"><span>Wordmark</span><b>outlined</b></div>
+        <div class="metric"><span>Ribbon</span><b>knockout</b></div>
+      </div>
+    </div>
+    <div class="card"><div class="lab">Production note</div>
+      <p style="font-size:8.2pt;margin:0">The light reference used a secondary steel-blue on the ribbon. In single-colour production the ribbon is expressed as negative space — the same treatment already used by RIVA's dark lockup, favicon and app icon.</p>
+      <p class="small" style="margin:3mm 0 0">The wordmark is outlined. No font is required to open, render or print the logo.</p>
+    </div>
+  </div>
+  <div class="footer"><div>RIVA · Logo Usage Guide</div><div>02</div></div>
+</div>
+
+<!-- PAGE 3 · COLOUR -->
+<div class="page">
+  <div class="top"><div class="brand">RIVA · Logo Usage Guide</div><div class="num">02 / Colour</div></div>
+  <div class="kicker">02 · Colour</div>
+  <h1>Two logo colours.<br>One quiet palette.</h1>
+  <p class="lead">The logo is monochrome in both modes. Light mode uses the primary brand token — Deep Navy. Dark mode uses pure white. Backgrounds come from the RIVA surface palette, never from a new hue.</p>
+  <div class="swatches" style="margin-top:4mm">
+    <div class="sw"><div class="chip" style="background:#101C2C"></div><div class="meta"><div class="nm">Deep Navy</div><div class="hex">#101C2C</div><div class="rl">Primary · light logo<br>RGB 16 28 44</div></div></div>
+    <div class="sw"><div class="chip" style="background:#FFFFFF;border-bottom:.3pt solid #E4E4DE"></div><div class="meta"><div class="nm">Pure White</div><div class="hex">#FFFFFF</div><div class="rl">Dark-mode logo<br>RGB 255 255 255</div></div></div>
+    <div class="sw"><div class="chip" style="background:#F7F7F3"></div><div class="meta"><div class="nm">Warm White</div><div class="hex">#F7F7F3</div><div class="rl">Light surface<br>RGB 247 247 243</div></div></div>
+    <div class="sw"><div class="chip" style="background:#71879B"></div><div class="meta"><div class="nm">Steel Blue</div><div class="hex">#71879B</div><div class="rl">Secondary / charts<br>not used in logo</div></div></div>
+    <div class="sw"><div class="chip" style="background:#607D94"></div><div class="meta"><div class="nm">Slate Blue</div><div class="hex">#607D94</div><div class="rl">Muted chrome<br>not used in logo</div></div></div>
+  </div>
+  <div class="clean">
+    <div class="item"><img src="../../01-Primary-Logo/Light/riva-logo-light.svg"><div class="c">Light · #101C2C on #F7F7F3</div></div>
+    <div class="item dark"><img src="../../01-Primary-Logo/Dark/riva-logo-dark.svg"><div class="c" style="color:#8FA3B8">Dark · #FFFFFF on #101C2C</div></div>
+  </div>
+  <div class="kicker" style="margin-top:6mm">Surface contrast</div>
+  <div class="surface">
+    <div class="sc"><img src="../../01-Primary-Logo/Light/riva-logo-light.svg"><div class="sl">Deep Navy on Warm White</div><div class="cr">15.97 : 1</div></div>
+    <div class="sc"><img src="../../01-Primary-Logo/Light/riva-logo-light.svg"><div class="sl">Deep Navy on Pure White</div><div class="cr">17.15 : 1</div></div>
+    <div class="sc dark"><img src="../../01-Primary-Logo/Dark/riva-logo-dark.svg"><div class="sl">Pure White on Deep Navy</div><div class="cr">17.15 : 1</div></div>
+  </div>
+  <div class="grid2" style="margin-top:5mm">
+    <div><div class="do"><b>Do</b><p>Use #101C2C on Warm White or white. Use #FFFFFF on Deep Navy or near-black.</p></div>
+    <div class="do"><b>Do</b><p>Keep the background flat and quiet. A single solid surface is the preferred context.</p></div></div>
+    <div><div class="dont"><b>Do not</b><p>Recolour the mark, introduce a third logo colour, or use the steel-blue ribbon tint.</p></div>
+    <div class="dont"><b>Do not</b><p>Place the logo on gradients, photography, or surfaces below 4.5:1 contrast.</p></div></div>
+  </div>
+  <div class="rule"></div>
+  <p class="small" style="margin:0">Official values: Deep Navy #101C2C is the RIVA primary token (--c-signal-500). Legacy logo exports used #0C0D41 (with #8288A9 on the ribbon); this guide standardises on #101C2C for single-colour production.</p>
+  <div class="footer"><div>RIVA · Logo Usage Guide</div><div>03</div></div>
+</div>
+
+<!-- PAGE 4 · PROPORTION -->
+<div class="page">
+  <div class="top"><div class="brand">RIVA · Logo Usage Guide</div><div class="num">03 / Proportion &amp; space</div></div>
+  <div class="kicker">03 · Proportion &amp; space</div>
+  <h1>Built once.<br>Scaled exactly.</h1>
+  <p class="lead">The lockup is never re-spaced. Symbol height, cap height and the gap between them are fixed ratios; every asset is a uniform scale of the same master.</p>
+  <div class="diagram" style="margin-top:4mm">
+    <div class="box"><div class="inner"></div><img src="../../01-Primary-Logo/Light/riva-logo-light.svg"><div class="small" style="position:absolute;left:0;top:-5.5mm">Clear-space boundary</div><div class="small" style="position:absolute;left:0;bottom:-5.5mm">73.5 units = 0.5 × symbol height</div></div>
+  </div>
+  <div class="grid2" style="margin-top:4mm">
+    <div><h3>Master proportions</h3><div class="stats3">
+      <div class="stat"><div class="l">Symbol height</div><div class="v">147.0</div></div>
+      <div class="stat"><div class="l">Symbol width</div><div class="v">202.8</div></div>
+      <div class="stat"><div class="l">Cap height</div><div class="v">109.3</div></div>
+      <div class="stat"><div class="l">Symbol → word</div><div class="v">27.9</div></div>
+      <div class="stat"><div class="l">Lockup width</div><div class="v">587.4</div></div>
+      <div class="stat"><div class="l">Lockup ratio</div><div class="v">4.076:1</div></div>
+    </div></div>
+    <div><h3>Minimum sizes</h3><div class="stats3">
+      <div class="stat"><div class="l">Lockup · digital</div><div class="v">108 px</div></div>
+      <div class="stat"><div class="l">Lockup · print</div><div class="v">30 mm</div></div>
+      <div class="stat"><div class="l">Symbol · digital</div><div class="v">36 px</div></div>
+      <div class="stat"><div class="l">Symbol · print</div><div class="v">10 mm</div></div>
+      <div class="stat"><div class="l">Favicon</div><div class="v">16 px</div></div>
+      <div class="stat"><div class="l">Icon master</div><div class="v">1024 px</div></div>
+    </div></div>
+  </div>
+  <div class="grid2" style="margin-top:4mm;align-items:center">
+    <div class="grid45"><img src="../../02-Symbol/Light/riva-symbol-light.svg"></div>
+    <div>
+      <h3>Construction rules</h3>
+      <ul class="notes-list" style="margin:0;padding:0 0 0 4mm;color:#5C6E7C;font-size:8.2pt;line-height:1.5">
+        <li>Symbol edges resolve to 0° or 45°.</li>
+        <li>11 anchor points; no collinear nodes.</li>
+        <li>Wordmark shares one cap line and baseline.</li>
+        <li>Stem widths are uniform; R bowl keeps its tangencies.</li>
+        <li>Scale the whole lockup by one factor — never re-space.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="rule" style="margin:4mm 0"></div>
+  <div class="grid2">
+    <div class="do"><b>Do</b><p>Scale the whole lockup by one factor. Keep the clear space free of text, edges and other marks.</p></div>
+    <div class="dont"><b>Do not</b><p>Re-space the symbol and wordmark, change the cap height, or let any element enter the clear-space zone.</p></div>
+  </div>
+  <div class="footer"><div>RIVA · Logo Usage Guide</div><div>04</div></div>
+</div>
+
+<!-- PAGE 5 · APPLICATION -->
+<div class="page">
+  <div class="top"><div class="brand">RIVA · Logo Usage Guide</div><div class="num">04 / Application</div></div>
+  <div class="kicker">04 · Application</div>
+  <h1>The right variant,<br>on the right surface.</h1>
+  <div class="grid2" style="margin-top:5mm">
+    <div class="card"><div class="lab">Light surfaces</div><div class="asset"><img src="../../01-Primary-Logo/Light/riva-logo-light.svg"></div><p class="small" style="margin:3mm 0 0">Sidebar, top bar, documents, light landing pages. Use the blue lockup on Warm White or white.</p></div>
+    <div class="card dark"><div class="lab">Dark surfaces</div><div class="asset"><img src="../../01-Primary-Logo/Dark/riva-logo-dark.svg"></div><p class="small" style="margin:3mm 0 0;color:#8FA3B8">Dark UI, hero sections, app splash, print on dark stock. Use the white lockup on Deep Navy.</p></div>
+  </div>
+  <div class="rule" style="margin:5mm 0"></div>
+  <div class="kicker">App icon system</div>
+  <h2>One symbol, every platform.</h2>
+  <div class="badges">
+    <img src="../../04-App-Icons/Light/riva-app-icon-light.svg">
+    <img src="../../04-App-Icons/Dark/riva-app-icon-dark.svg">
+    <img src="../../04-App-Icons/iOS/AppIcon-1024-Light.png" style="border-radius:5mm">
+    <img src="../../04-App-Icons/PWA/icon-512-maskable.png" style="border-radius:50%">
+  </div>
+  <div class="sizes">
+    <div class="s"><img src="../../05-Favicons/favicon-dark-16.png" width="16" height="16"><span>16</span></div>
+    <div class="s"><img src="../../05-Favicons/favicon-dark-32.png" width="32" height="32"><span>32</span></div>
+    <div class="s"><img src="../../05-Favicons/favicon-dark-48.png" width="48" height="48"><span>48</span></div>
+    <div class="s"><img src="../../04-App-Icons/Dark/riva-app-icon-dark-64.png" width="64" height="64"><span>64</span></div>
+    <div class="s"><img src="../../04-App-Icons/Dark/riva-app-icon-dark-96.png" width="96" height="96"><span>96</span></div>
+    <div class="small" style="margin:0 0 1mm 4mm;max-width:60mm">Actual pixel sizes. 128 / 256 / 512 / 1024 px are also supplied.</div>
+  </div>
+  <div class="grid2" style="margin-top:5mm">
+    <div>
+      <h3>iOS</h3>
+      <p class="small" style="margin-bottom:2mm">1024 × 1024 square PNG, opaque, no rounded corners. iOS applies the mask. A 180 px Apple Touch icon is included.</p>
+      <h3>Android adaptive</h3>
+      <p class="small" style="margin:0">Foreground and background are separate. The symbol sits inside the 66 dp safe zone on a 108 dp canvas.</p>
+    </div>
+    <div>
+      <h3>PWA</h3>
+      <p class="small" style="margin-bottom:2mm">192 and 512 px any-purpose icons, plus a 512 px maskable icon whose content stays inside the 40% safe radius.</p>
+      <h3>Favicon</h3>
+      <p class="small" style="margin:0">Dedicated 16 / 32 / 48 px artwork with a tighter mark. ICO and SVG are both supplied.</p>
+    </div>
+  </div>
+  <div class="rule" style="margin:5mm 0"></div>
+  <div class="do"><b>Do</b><p>Use the supplied square master and let the platform mask it. Keep the symbol optically centred.</p></div>
+  <div class="dont"><b>Do not</b><p>Bake rounded corners into iOS artwork, stretch an icon to fill a slot, or place the full lockup inside an app icon.</p></div>
+  <div class="footer"><div>RIVA · Logo Usage Guide</div><div>05</div></div>
+</div>
+
+<!-- PAGE 6 · INCORRECT + FILES -->
+<div class="page">
+  <div class="top"><div class="brand">RIVA · Logo Usage Guide</div><div class="num">05 / Usage &amp; files</div></div>
+  <div class="kicker">05 · Incorrect usage</div>
+  <h1>What not to do.</h1>
+  <div class="wrongs" style="margin-top:5mm">
+    <div class="wrong"><div class="badge">×</div><div class="stage recolor"><img src="../../01-Primary-Logo/Light/riva-logo-light.svg"></div><div class="c"><b>Recolour</b>Only #101C2C or #FFFFFF.</div></div>
+    <div class="wrong"><div class="badge">×</div><div class="stage shadow"><img src="../../01-Primary-Logo/Light/riva-logo-light.svg"></div><div class="c"><b>Effects</b>No shadow, bevel or glow.</div></div>
+    <div class="wrong"><div class="badge">×</div><div class="stage stretch"><img src="../../01-Primary-Logo/Light/riva-logo-light.svg"></div><div class="c"><b>Distort</b>Never scale on one axis.</div></div>
+    <div class="wrong"><div class="badge">×</div><div class="stage rotate"><img src="../../01-Primary-Logo/Light/riva-logo-light.svg"></div><div class="c"><b>Rotate</b>The lockup stays horizontal.</div></div>
+    <div class="wrong"><div class="badge">×</div><div class="stage busy"><img src="../../01-Primary-Logo/Light/riva-logo-light.svg"></div><div class="c"><b>Busy ground</b>No pattern or photo behind it.</div></div>
+    <div class="wrong"><div class="badge">×</div><div class="stage crop"><img src="../../01-Primary-Logo/Light/riva-logo-light.svg"></div><div class="c"><b>Crop or crowd</b>Keep the clear space intact.</div></div>
+  </div>
+  <div class="rule"></div>
+  <div class="kicker">06 · File formats</div>
+  <h2>Choose by surface, not by habit.</h2>
+  <table class="table">
+    <tr><th>Format</th><th>Use it for</th><th>Technical note</th></tr>
+    <tr><td>SVG</td><td>Web, product UI, design systems</td><td>Transparent, editable paths, explicit fill, one colour.</td></tr>
+    <tr><td>PDF</td><td>Print, documents, supplier hand-off</td><td>Vector; exact artboard; dark variant carries a Deep Navy page.</td></tr>
+    <tr><td>EPS</td><td>Print production, Illustrator exchange</td><td>PostScript outlines; open directly in Illustrator.</td></tr>
+    <tr><td>PNG</td><td>Raster UI, slides, email</td><td>Transparent RGBA; 1× / 2× / 3× plus high-resolution.</td></tr>
+    <tr><td>WebP</td><td>Web performance</td><td>Lossless with alpha; same geometry as PNG.</td></tr>
+    <tr><td>ICO</td><td>Windows, browser favicon</td><td>Multi-size 16–256 px.</td></tr>
+    <tr><td>AI</td><td>Native Illustrator editing</td><td>Not supplied — open the PDF, EPS or SVG in Illustrator and save as .ai.</td></tr>
+  </table>
+  <div class="rule"></div>
+  <div class="grid2">
+    <p class="small" style="margin:0">Every file is a real, validated asset. SVG, PDF and EPS share the same master geometry; raster exports are uniform downscales and are never stretched.</p>
+    <p class="small" style="margin:0;text-align:right">RIVA Logo Usage Guide · Version 1.0<br>November 2026 · For review and approval</p>
+  </div>
+  <div class="footer"><div>RIVA · Logo Usage Guide</div><div>06</div></div>
+</div>
+
+</body></html>

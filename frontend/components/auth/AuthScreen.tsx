@@ -108,20 +108,13 @@ export function AuthScreen() {
         {/* Brand mark and heading */}
         <section className="liquid-glass-intro">
           <div className="relative h-10 w-auto mb-6">
-            <Image
-              src="/brand/riva-logo.svg"
-              alt="RIVA"
-              width={96}
-              height={32}
-              className="dark:hidden"
-              priority
-            />
+            {/* The auth surface is fixed dark glass in both themes, so the
+                white lockup is correct here regardless of the page theme. */}
             <Image
               src="/brand/riva-logo-dark.svg"
               alt="RIVA"
               width={96}
               height={32}
-              className="hidden dark:block"
               priority
             />
           </div>

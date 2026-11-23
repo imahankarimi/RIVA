@@ -1,0 +1,25 @@
+/* RIVA brand tokens — standalone reference for the logo asset package.
+   These values mirror the RIVA product design system; this file is not
+   imported by the application. */
+
+:root {
+  /* Brand palette */
+  --riva-deep-navy:   #101C2C;  /* primary brand token: --c-signal-500 */
+  --riva-deep-ink:    #10131A;
+  --riva-warm-white:  #F7F7F3;
+  --riva-pure-white:  #FFFFFF;
+  --riva-steel-blue:  #71879B;
+  --riva-slate-blue:  #607D94;
+
+  /* Logo production */
+  --riva-logo-light:  #101C2C;  /* logo on light surfaces */
+  --riva-logo-dark:   #FFFFFF;  /* logo on dark surfaces  */
+
+  /* Recommended surfaces */
+  --riva-logo-surface-light: #F7F7F3;
+  --riva-logo-surface-dark:  #101C2C;
+
+  /* Contrast (logo on recommended surface) */
+  --riva-logo-contrast-light: 15.97;
+  --riva-logo-contrast-dark:  17.15;
+}

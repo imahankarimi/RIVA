@@ -6,6 +6,9 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import { BrandMark } from "@/components/landing/BrandMark";
+import { LandingThemeToggle } from "@/components/landing/LandingThemeToggle";
+import { rivaWebappUrl } from "@/lib/riva-links";
+import { useTheme } from "@/lib/theme/ThemeProvider";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
@@ -21,6 +24,8 @@ export function LandingNav() {
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const firstLinkRef = useRef<HTMLAnchorElement>(null);
   const reduceMotion = useReducedMotion();
+  const { resolved } = useTheme();
+  const webappHref = rivaWebappUrl(resolved);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -84,15 +89,28 @@ export function LandingNav() {
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
+          <a
+            href={webappHref}
+            className="group hidden h-9 items-center gap-2 whitespace-nowrap rounded-full border border-line bg-surface/50 px-4 text-[12.5px] font-semibold text-ink transition-colors duration-base ease-riva hover:border-signal-300 hover:bg-surfaceMuted/70 lg:inline-flex"
+          >
+            Get RIVA Webapp
+            <ArrowUpRight
+              size={12}
+              strokeWidth={2.2}
+              className="text-ink-faint transition-[transform,color] duration-base ease-riva group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink"
+              aria-hidden
+            />
+          </a>
+          <LandingThemeToggle />
           <Link
             href="/login"
-            className="hidden rounded-md px-3 py-2 text-[13px] font-medium text-ink-soft transition-colors hover:text-ink sm:inline-flex"
+            className="hidden whitespace-nowrap rounded-md px-3 py-2 text-[13px] font-medium text-ink-soft transition-colors hover:text-ink sm:inline-flex"
           >
             Sign in
           </Link>
           <Link
             href="/login"
-            className="group hidden h-9 items-center gap-1.5 rounded-lg bg-signal-500 px-4 text-[13px] font-semibold text-onSignal shadow-subtle transition-all duration-200 ease-riva hover:-translate-y-0.5 hover:bg-signal-600 sm:inline-flex"
+            className="group hidden h-9 whitespace-nowrap items-center gap-1.5 rounded-lg bg-signal-500 px-4 text-[13px] font-semibold text-onSignal shadow-subtle transition-all duration-200 ease-riva hover:-translate-y-0.5 hover:bg-signal-600 sm:inline-flex"
           >
             Get started
             <ArrowUpRight
@@ -142,6 +160,19 @@ export function LandingNav() {
                 ))}
               </ul>
               <div className="mt-6 flex flex-col gap-3">
+                <a
+                  href={webappHref}
+                  onClick={() => setOpen(false)}
+                  className="group inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-line bg-surface px-5 text-[14px] font-semibold text-ink transition-colors duration-base ease-riva hover:border-signal-300 hover:bg-surfaceMuted"
+                >
+                  Get RIVA Webapp
+                  <ArrowUpRight
+                    size={15}
+                    strokeWidth={2.2}
+                    className="text-ink-faint transition-[transform,color] duration-base ease-riva group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink"
+                    aria-hidden
+                  />
+                </a>
                 <Link
                   href="/login"
                   onClick={() => setOpen(false)}

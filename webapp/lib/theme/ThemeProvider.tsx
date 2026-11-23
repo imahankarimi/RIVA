@@ -2,10 +2,14 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
+import {
+  THEME_STORAGE_KEY,
+  clearThemeParam,
+  readThemeParam,
+} from "@/lib/theme/theme-sync";
+
 type ThemePreference = "light" | "dark" | "system";
 type ResolvedTheme = "light" | "dark";
-
-const STORAGE_KEY = "ledgerai.theme";
 
 type ThemeContextValue = {
   /** What the user picked: "light" | "dark" | "system". */
@@ -39,11 +43,33 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [resolved, setResolved] = useState<ResolvedTheme>("light");
 
   useEffect(() => {
-    const stored = (localStorage.getItem(STORAGE_KEY) as ThemePreference | null) ?? "dark";
+    // A valid `?theme=` parameter is a one-shot transfer from the other RIVA
+    // site. It wins over the stored preference, is persisted through the same
+    // key the provider already owns, and is then removed from the URL.
+    const incoming = readThemeParam(window.location.search);
+    if (incoming) {
+      try {
+        localStorage.setItem(THEME_STORAGE_KEY, incoming);
+      } catch {
+        // Storage can be unavailable; the theme still applies for this page.
+      }
+    }
+
+    let stored: ThemePreference | null = incoming;
+    if (!stored) {
+      try {
+        stored = localStorage.getItem(THEME_STORAGE_KEY) as ThemePreference | null;
+      } catch {
+        stored = null;
+      }
+    }
+    stored ??= "dark";
     setPreferenceState(stored);
     const next = stored === "system" ? getSystemTheme() : stored;
     setResolved(next);
     applyTheme(next);
+
+    if (incoming) clearThemeParam();
   }, []);
 
   useEffect(() => {
@@ -60,7 +86,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const setPreference = useCallback((p: ThemePreference) => {
     setPreferenceState(p);
-    localStorage.setItem(STORAGE_KEY, p);
+    localStorage.setItem(THEME_STORAGE_KEY, p);
     const next = p === "system" ? getSystemTheme() : p;
     setResolved(next);
     applyTheme(next);
@@ -88,11 +114,39 @@ export function useTheme() {
 export const THEME_BOOTSTRAP_SCRIPT = `
 (function(){
   try {
-    var v = localStorage.getItem('${STORAGE_KEY}');
-    var dark = v !== 'light';
-    var theme = dark ? 'dark' : 'light';
-    if (dark) document.documentElement.classList.add('dark');
-    document.documentElement.setAttribute('data-theme', theme);
+    var key = '${THEME_STORAGE_KEY}';
+    var stored = null;
+    try { stored = localStorage.getItem(key); } catch (e) {}
+
+    // A valid theme carried from the other RIVA site is applied before paint
+    // and persisted through the provider's normal storage key.
+    var incoming = null;
+    try {
+      var value = new URLSearchParams(window.location.search).get('theme');
+      if (value === 'light' || value === 'dark') incoming = value;
+    } catch (e) {}
+    if (incoming) {
+      stored = incoming;
+      try { localStorage.setItem(key, incoming); } catch (e) {}
+    }
+
+    var dark;
+    if (stored === 'light') {
+      dark = false;
+    } else if (stored === 'dark') {
+      dark = true;
+    } else if (stored === 'system') {
+      try {
+        dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      } catch (e) {
+        dark = true;
+      }
+    } else {
+      dark = true;
+    }
+
+    document.documentElement.classList.toggle('dark', dark);
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
   } catch (e) {}
 })();
 `;

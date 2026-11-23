@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 interface SidebarContextValue {
   /** Desktop "taskbar" collapsed state — persisted across sessions. */
@@ -26,14 +26,17 @@ const SidebarContext = createContext<SidebarContextValue | null>(null);
 const STORAGE_KEY = "ledgerai.sidebar_collapsed";
 
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
-  const [collapsed, setCollapsed] = useState(false);
+  // First-time visitors get the collapsed "taskbar" rail; a stored preference
+  // wins when present. This provider only mounts after auth resolves on the
+  // client, so reading storage in the initializer is safe and avoids a
+  // collapsed→expanded reflow on refresh.
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window === "undefined") return true;
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    return stored === null ? true : stored === "1";
+  });
   const [hovered, setHovered] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    setCollapsed(window.localStorage.getItem(STORAGE_KEY) === "1");
-  }, []);
 
   const toggleCollapsed = () => {
     setCollapsed((prev) => {

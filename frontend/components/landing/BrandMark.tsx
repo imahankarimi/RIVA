@@ -2,7 +2,7 @@ import Image from "next/image";
 
 import { cn } from "@/lib/utils";
 
-const LOGO_RATIO = 594.74 / 155.12;
+const LOGO_RATIO = 587.436 / 147; // approved lockup viewBox (4.076:1)
 
 /**
  * RIVA wordmark.
