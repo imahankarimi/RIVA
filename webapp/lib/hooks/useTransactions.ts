@@ -5,7 +5,7 @@ import {
   getBusinessTransactions,
   type BackendTransaction,
 } from "@/lib/api/transactions";
-import { ApiError } from "@/lib/api/client";
+import { ApiError, getStoredToken } from "@/lib/api/client";
 import { demoTransactions } from "@/lib/mock/demoData";
 import { TRANSACTIONS_CHANGED_EVENT } from "@/components/transactions/AddIncomeContext";
 import type { Transaction } from "@/lib/types";
@@ -57,7 +57,7 @@ export function useTransactions(businessId: string | null) {
   }, [refetch]);
 
   useEffect(() => {
-    if (!businessId) {
+    if (!businessId || !getStoredToken()) {
       setTransactions([]);
       setStatus("empty");
       setError(null);

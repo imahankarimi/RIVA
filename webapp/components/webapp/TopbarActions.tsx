@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/app/providers";
 import { useBusiness } from "@/app/providers";
+import { usePreview } from "@/components/preview/PreviewProvider";
+import { useI18n } from "@/lib/i18n";
 import { useTheme } from "@/lib/theme/ThemeProvider";
 import { Glass, Menu } from "@/components/glisse";
 import { CURRENCY_META } from "@/lib/currency";
@@ -17,6 +19,8 @@ export function TopbarActions() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const { business, businesses, setBusinessId } = useBusiness();
+  const { isGuest, openAuthPrompt } = usePreview();
+  const { t } = useI18n();
   const { resolved, toggle } = useTheme();
   const [businessMenuOpen, setBusinessMenuOpen] = useState(false);
   const businessButtonRef = useRef<HTMLButtonElement>(null);
@@ -58,11 +62,53 @@ export function TopbarActions() {
       icon: <LogOut size={16} strokeWidth={2} />,
       onSelect: () => {
         logout();
-        router.push("/login");
+        router.push("/home");
       },
       destructive: true,
     },
   ];
+
+  // Guest chrome: theme + one clear way in. No business switcher or profile —
+  // there is no account behind them yet.
+  if (isGuest) {
+    return (
+      <div className="flex items-center gap-2">
+        <Glass className="flex h-12 items-center gap-0.5 rounded-full px-0.5">
+          <button
+            onClick={toggle}
+            aria-label={resolved === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            className={cn(
+              "flex h-10 w-10 shrink-0 items-center justify-center rounded-full",
+              "text-deep-ink dark:text-warm-white",
+              "hover:bg-white/40 active:bg-white/60",
+              "dark:hover:bg-white/10 dark:active:bg-white/20",
+              "transition-colors duration-150"
+            )}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={resolved}
+                initial={{ opacity: 0, rotate: -90, scale: 0.6 }}
+                animate={{ opacity: 1, rotate: 0, scale: 1 }}
+                exit={{ opacity: 0, rotate: 90, scale: 0.6 }}
+                transition={{ duration: 0.12, ease: "easeOut" }}
+                className="flex"
+              >
+                {resolved === "dark" ? <Sun size={20} strokeWidth={2} /> : <Moon size={20} strokeWidth={2} />}
+              </motion.span>
+            </AnimatePresence>
+          </button>
+          <button
+            type="button"
+            onClick={() => openAuthPrompt({ reasonKey: "preview.signInToContinue" })}
+            className="h-10 shrink-0 rounded-full bg-signal-500 px-3.5 text-[12.5px] font-semibold text-onSignal transition-colors hover:bg-signal-600 active:bg-signal-700"
+          >
+            {t("preview.signIn")}
+          </button>
+        </Glass>
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center gap-2">

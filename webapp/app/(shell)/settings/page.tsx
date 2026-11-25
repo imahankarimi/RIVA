@@ -19,6 +19,8 @@ import { BusinessContextSection } from "@/components/settings/BusinessContextSec
 import { ImportExportModal } from "@/components/settings/ImportExportModal";
 import { useI18n, localeMeta, type Locale } from "@/lib/i18n";
 import { useBusiness, useAuth } from "@/app/providers";
+import { usePreview } from "@/components/preview/PreviewProvider";
+import { GuestLockedSectionView } from "@/components/preview/views/GuestLockedSectionView";
 import { changePassword } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/client";
 import { useTheme } from "@/lib/theme/ThemeProvider";
@@ -216,7 +218,7 @@ function ProfileTab() {
         </div>
       </SectionCard>
 
-      <SectionCard title={t("settings.logout")}><Button variant="ghost" onClick={() => { logout(); router.replace("/login"); }} className="gap-2 text-rose-700 hover:bg-rose-100/50 hover:text-rose-700"><LogOut size={14} />{t("settings.logout")}</Button></SectionCard>
+      <SectionCard title={t("settings.logout")}><Button variant="ghost" onClick={() => { logout(); router.replace("/home"); }} className="gap-2 text-rose-700 hover:bg-rose-100/50 hover:text-rose-700"><LogOut size={14} />{t("settings.logout")}</Button></SectionCard>
     </motion.div>
   );
 }
@@ -405,7 +407,21 @@ export default function SettingsPage() {
   const { t } = useI18n();
   const router = useRouter();
   const { logout } = useAuth();
+  const { isGuest } = usePreview();
   const [activeTab, setActiveTab] = useState<TabId>("profile");
+
+  if (isGuest) {
+    return (
+      <GuestLockedSectionView
+        eyebrow={t("nav.settings")}
+        title={t("settings.title")}
+        description={t("settings.subtitle")}
+        icon={User}
+        reasonKey="preview.signInForSettings"
+        body={t("preview.settingsBody")}
+      />
+    );
+  }
 
   const tabIcons: Record<TabId, typeof User> = { profile: User, business: Shield, ai: Sparkle, appearance: Palette, language: Globe, data: HardDrive };
   const tabContent: Record<TabId, React.ReactNode> = {
@@ -444,7 +460,7 @@ export default function SettingsPage() {
           })}
           <Separator className="my-2" />
           <button
-            onClick={() => { logout(); router.replace("/login"); }}
+            onClick={() => { logout(); router.replace("/home"); }}
             className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium text-rose-700 hover:bg-rose-100/40"
           >
             <LogOut size={15} strokeWidth={1.8} />

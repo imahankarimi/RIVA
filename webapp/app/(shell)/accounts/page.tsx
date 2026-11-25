@@ -8,6 +8,8 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/StateViews";
 import { useI18n } from "@/lib/i18n";
 import { useBusiness } from "@/app/providers";
+import { usePreview } from "@/components/preview/PreviewProvider";
+import { GuestAccountsView } from "@/components/preview/views/GuestAccountsView";
 import { useAccounts } from "@/lib/hooks/useAccounts";
 
 function AccountsSkeleton() {
@@ -30,7 +32,10 @@ function AccountsSkeleton() {
 export default function AccountsPage() {
   const { t } = useI18n();
   const { business } = useBusiness();
+  const { isGuest } = usePreview();
   const { accounts, status, error, usingDemoData, refetch } = useAccounts(business?.id ?? null);
+
+  if (isGuest) return <GuestAccountsView />;
 
   return (
     <div className="mx-auto w-full max-w-content px-4 pb-8 pt-4 sm:px-6 sm:pt-5">

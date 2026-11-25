@@ -5,20 +5,32 @@ import { AssistantChatView } from "@/components/chat/AssistantChatView";
 import { ConversationSidebar } from "@/components/chat/ConversationSidebar";
 import { useChatHistory } from "@/lib/hooks/useChatHistory";
 import { useBusiness } from "@/app/providers";
+import { usePreview } from "@/components/preview/PreviewProvider";
+import { GuestAssistantView } from "@/components/preview/views/GuestAssistantView";
 
 /**
- * RIVA AI — ChatGPT-style interface with persistent conversation sidebar
+ * RIVA AI — ChatGPT-style interface with persistent conversation sidebar.
  *
- * Exposes sidebar toggle to window for Top Bar integration
+ * Guests get the product explanation and an authentication prompt instead of a
+ * fake chat: the assistant is an account-only workflow, and no anonymous model
+ * or conversation API is ever called.
  */
 export default function AssistantPage() {
   const { business } = useBusiness();
+  const { isGuest } = usePreview();
+
+  if (isGuest || !business) return <GuestAssistantView />;
+
+  return <AssistantWorkspace businessId={business.id} />;
+}
+
+function AssistantWorkspace({ businessId }: { businessId: string }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const history = useChatHistory(business.id);
+  const history = useChatHistory(businessId);
 
   // Expose toggle function to Top Bar via window
   useEffect(() => {
-    (window as any).__assistantToggleSidebar = () => setSidebarOpen(prev => !prev);
+    (window as any).__assistantToggleSidebar = () => setSidebarOpen((prev) => !prev);
     return () => {
       delete (window as any).__assistantToggleSidebar;
     };
@@ -40,8 +52,8 @@ export default function AssistantPage() {
       {/* Main Chat Area */}
       <div className="flex flex-1 flex-col overflow-hidden">
         <AssistantChatView
-          key={`${business.id}-wapp-assistant`}
-          businessId={business.id}
+          key={`${businessId}-wapp-assistant`}
+          businessId={businessId}
           initialMessages={history.activeMessages}
           conversationId={history.activeId}
           onConversationId={history.onConversationId}

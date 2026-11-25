@@ -9,6 +9,8 @@ import { Progress } from "@/components/ui/Progress";
 import { Alert } from "@/components/ui/Alert";
 import { useI18n } from "@/lib/i18n";
 import { useBusiness } from "@/app/providers";
+import { usePreview } from "@/components/preview/PreviewProvider";
+import { GuestLockedSectionView } from "@/components/preview/views/GuestLockedSectionView";
 import { formatCurrency } from "@/lib/currency";
 
 const debts = [
@@ -20,6 +22,21 @@ const debts = [
 export default function DebtsPage() {
   const { t, locale } = useI18n();
   const { business } = useBusiness();
+  const { isGuest } = usePreview();
+
+  if (isGuest) {
+    return (
+      <GuestLockedSectionView
+        eyebrow={t("nav.debts")}
+        title={t("nav.debts")}
+        description={t("comingSoon.debtsDesc")}
+        icon={CreditCard}
+        reasonKey="preview.signInToContinue"
+        body={t("preview.planningBody")}
+      />
+    );
+  }
+
   const currency = business.currency;
 
   return (

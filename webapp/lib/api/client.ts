@@ -53,6 +53,26 @@ export class ApiError extends Error {
   }
 }
 
+/** Endpoints that legitimately work without a session. Everything else is
+ *  account-scoped and must never be requested before authentication. */
+const PUBLIC_PATHS = new Set([
+  "/api/auth/login",
+  "/api/auth/signup",
+  "/api/auth/refresh",
+  "/api/auth/verify-email",
+  "/api/auth/request-password-reset",
+  "/api/auth/reset-password",
+]);
+
+/** Fired when a previously valid session could not be refreshed. The auth
+ *  provider listens for it to clear account state and show reauthentication. */
+export const AUTH_EXPIRED_EVENT = "riva:auth-expired";
+
+function notifyAuthExpired() {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent(AUTH_EXPIRED_EVENT));
+}
+
 interface RequestOptions {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: unknown;
@@ -119,6 +139,14 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   const base = API_URL ?? "";
   const token = options.token ?? getStoredToken();
 
+  // Defense in depth: a guest must never even send an account-scoped request.
+  // The backend still enforces authorization — this only prevents the request
+  // from leaving the device (and therefore from populating any client cache).
+  const pathname = path.split("?")[0] ?? path;
+  if (!token && !PUBLIC_PATHS.has(pathname)) {
+    throw new ApiError("Authentication required", 401);
+  }
+
   // Apply a default timeout unless the caller supplied its own signal, so a
   // hung server fails fast instead of leaving the fetch open indefinitely.
   // `AbortSignal.timeout` (newer browsers) is preferred; fall back to a manual
@@ -155,6 +183,9 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
         }
         clearStoredToken();
         clearStoredRefreshToken();
+        // The session is gone: let the auth provider tear down account state
+        // and surface reauthentication instead of silently showing stale data.
+        if (token) notifyAuthExpired();
       }
       throw new ApiError(detail, res.status);
     }

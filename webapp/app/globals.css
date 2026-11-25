@@ -658,3 +658,52 @@ textarea {
 [dir="rtl"] .cash-import-export-slot :is(.lg-tab, .lg-tab-copy) {
   direction: rtl;
 }
+
+/* ----------------------------------------------------------------------------
+   GUEST AUTHENTICATION SHEET
+   ----------------------------------------------------------------------------
+   The contextual sign-in prompt reuses the existing AuthScreen form. The sheet
+   supplies a single static dark surface (no animated blurs) so opening it is
+   cheap on mobile; the form's stage becomes transparent inside it. */
+
+.liquid-glass-auth-sheet {
+  background: linear-gradient(
+    135deg,
+    rgb(var(--liquid-bg-dark-1)) 0%,
+    rgb(var(--liquid-bg-dark-2)) 50%,
+    rgb(var(--liquid-bg-dark-3)) 100%
+  );
+  border: 1px solid rgb(var(--c-warm-white) / 0.12);
+  border-bottom: 0;
+}
+
+.liquid-glass-auth-embedded {
+  position: relative;
+  width: 100%;
+  padding: 0.25rem 1rem max(1.25rem, env(safe-area-inset-bottom));
+}
+
+.liquid-glass-auth-embedded .liquid-glass-stage {
+  width: 100%;
+  max-width: 26rem;
+  margin: 0 auto;
+  padding: 1.25rem;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  animation: none;
+}
+
+.liquid-glass-auth-embedded .liquid-glass-title {
+  font-size: 1.4rem;
+}
+
+.liquid-glass-auth-embedded .liquid-glass-form {
+  gap: 1.15rem;
+}
+
+.liquid-glass-auth-embedded .liquid-glass-fields {
+  gap: 1rem;
+}

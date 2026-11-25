@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useCallback, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { usePreview } from "@/components/preview/PreviewProvider";
 import { AddIncomeModal } from "./AddIncomeModal";
 
 interface AddIncomeContextValue {
@@ -15,17 +16,37 @@ export const TRANSACTIONS_CHANGED_EVENT = "riva:transactions-changed";
 
 export function AddIncomeProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const { isGuest, openAuthPrompt } = usePreview();
 
-  const openAddIncome = useCallback(() => setOpen(true), []);
+  // Every "Add transaction" entry point in the app goes through this context.
+  // For a guest it becomes an authentication trigger, never a form — there is
+  // no account to post against.
+  const openAddIncome = useCallback(() => {
+    if (isGuest) {
+      openAuthPrompt({
+        reasonKey: "preview.signInToAddTransaction",
+        intent: { kind: "add-transaction" },
+      });
+      return;
+    }
+    setOpen(true);
+  }, [isGuest, openAuthPrompt]);
+
   const close = useCallback(() => setOpen(false), []);
   const handleSaved = useCallback(() => {
     window.dispatchEvent(new CustomEvent(TRANSACTIONS_CHANGED_EVENT));
   }, []);
 
+  // Session expiry/logout while the form is open must not leave a write form
+  // sitting over the guest experience.
+  useEffect(() => {
+    if (isGuest) setOpen(false);
+  }, [isGuest]);
+
   return (
     <AddIncomeContext.Provider value={{ openAddIncome }}>
       {children}
-      <AddIncomeModal open={open} onClose={close} onSaved={handleSaved} />
+      {!isGuest && <AddIncomeModal open={open} onClose={close} onSaved={handleSaved} />}
     </AddIncomeContext.Provider>
   );
 }

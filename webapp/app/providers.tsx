@@ -26,12 +26,20 @@ import {
   clearStoredToken,
   setStoredRefreshToken,
   clearStoredRefreshToken,
+  ApiError,
+  AUTH_EXPIRED_EVENT,
 } from "@/lib/api/client";
+import { purgePrivateClientData } from "@/lib/auth/privateData";
+import { PreviewProvider } from "@/components/preview/PreviewProvider";
 import { ToastProvider } from "@/components/ui/Toast";
 import type { Business } from "@/lib/types";
 import type { BackendCurrency } from "@/lib/currency";
 
 type AuthStatus = "loading" | "authenticated" | "unauthenticated";
+
+/** Why the previous session ended. `expired` triggers reauthentication; a
+ *  normal `logout` deliberately returns to the guest experience. */
+export type SessionEndedReason = "logout" | "expired" | null;
 
 export interface AuthUserProfile {
   id: string;
@@ -47,6 +55,8 @@ interface AuthContextValue {
   businesses: Business[];
   /** True once logged in but first/last name haven't been set yet — drives the first-run profile modal. */
   needsProfileSetup: boolean;
+  /** Set when the session ended without an explicit user logout. */
+  sessionEnded: SessionEndedReason;
   login: (email: string, password: string) => Promise<AuthResponse>;
   signup: (email: string, password: string, businessName: string, baseCurrency: BackendCurrency) => Promise<AuthResponse>;
   logout: () => void;
@@ -91,14 +101,22 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUserProfile | null>(null);
   const [business, setBusiness] = useState<Business | null>(null);
   const [businesses, setBusinesses] = useState<Business[]>([]);
+  const [sessionEnded, setSessionEnded] = useState<SessionEndedReason>(null);
 
-  const clear = useCallback(() => {
+  /**
+   * Tear down every trace of the previous account. Tokens and account-scoped
+   * local caches are removed together so a later guest render can never show
+   * the previous session's data.
+   */
+  const clear = useCallback((reason: SessionEndedReason = null) => {
     clearStoredToken();
     clearStoredRefreshToken();
+    purgePrivateClientData();
     setUser(null);
     setBusiness(null);
     setBusinesses([]);
     setStatus("unauthenticated");
+    setSessionEnded(reason);
   }, []);
 
   useEffect(() => {
@@ -115,7 +133,19 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
         setBusinesses(applied.businesses);
         setStatus("authenticated");
       })
-      .catch(clear);
+      .catch((err) => {
+        // A 401 means the stored session is no longer valid. A network failure
+        // is not evidence of expiry, so it lands in the guest experience
+        // without claiming the session expired.
+        clear(err instanceof ApiError && err.status === 401 ? "expired" : null);
+      });
+  }, [clear]);
+
+  // Any request that loses its session mid-use (failed refresh) reports here.
+  useEffect(() => {
+    const onExpired = () => clear("expired");
+    window.addEventListener(AUTH_EXPIRED_EVENT, onExpired);
+    return () => window.removeEventListener(AUTH_EXPIRED_EVENT, onExpired);
   }, [clear]);
 
   const applyAuthResponse = useCallback((response: AuthResponse) => {
@@ -125,6 +155,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     setBusiness(toBusiness(response.business, response.business.id));
     setBusinesses([toBusiness(response.business, response.business.id)]);
     setStatus("authenticated");
+    setSessionEnded(null);
     return response;
   }, []);
 
@@ -135,6 +166,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       business,
       businesses,
       needsProfileSetup: status === "authenticated" && !!user && (!user.firstName || !user.lastName),
+      sessionEnded,
       login: async (email, password) => {
         return applyAuthResponse(await loginRequest(email, password));
       },
@@ -145,7 +177,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
         // Revoke the server-side session (best-effort) before clearing local
         // state — deleting client tokens alone is not a server-side logout.
         void logoutRequest().catch(() => undefined);
-        clear();
+        clear("logout");
       },
       updateProfile: async (firstName, lastName) => {
         const response = await updateProfileRequest(firstName, lastName);
@@ -187,7 +219,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
         setBusinesses((prev) => prev.map((b) => (b.id === updated.id ? { ...updated, isCurrent: true } : b)));
       },
     }),
-    [status, user, business, businesses, clear, applyAuthResponse]
+    [status, user, business, businesses, sessionEnded, clear, applyAuthResponse]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -236,6 +268,15 @@ export function useBusiness() {
   return ctx;
 }
 
+function PreviewLayer({ children }: { children: React.ReactNode }) {
+  const { status, sessionEnded } = useAuth();
+  return (
+    <PreviewProvider status={status} sessionEnded={sessionEnded}>
+      {children}
+    </PreviewProvider>
+  );
+}
+
 export function Providers({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const cleanup = installLiquidLens();
@@ -247,9 +288,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <PreferencesProvider>
         <I18nProvider>
           <AuthProvider>
-            <BusinessProvider>
-              <ToastProvider>{children}</ToastProvider>
-            </BusinessProvider>
+            <PreviewLayer>
+              <BusinessProvider>
+                <ToastProvider>{children}</ToastProvider>
+              </BusinessProvider>
+            </PreviewLayer>
           </AuthProvider>
         </I18nProvider>
       </PreferencesProvider>

@@ -10,6 +10,8 @@ import { WebappHeader } from "@/components/webapp/WebappHeader";
 import { WebappNotice } from "@/components/webapp/WebappNotice";
 import { useI18n } from "@/lib/i18n";
 import { useBusiness } from "@/app/providers";
+import { usePreview } from "@/components/preview/PreviewProvider";
+import { GuestTransactionsView } from "@/components/preview/views/GuestTransactionsView";
 import { useTransactions } from "@/lib/hooks/useTransactions";
 import { useAccounts } from "@/lib/hooks/useAccounts";
 import { TransactionRow } from "@/components/transactions/TransactionRow";
@@ -24,6 +26,7 @@ const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 export default function CashPage() {
   const { t, locale } = useI18n();
   const { business } = useBusiness();
+  const { isGuest } = usePreview();
   const { openAddIncome } = useAddIncome();
   const { transactions, status, error, usingDemoData, refetch } = useTransactions(business?.id ?? null);
   const { accounts } = useAccounts(business?.id ?? null);
@@ -55,6 +58,8 @@ export default function CashPage() {
   function formatMoney(value: number, opts: { signed?: boolean } = {}) {
     return formatCurrency(value, business.currency, locale, opts);
   }
+
+  if (isGuest) return <GuestTransactionsView mode="all" />;
 
   return (
     <div className="mx-auto w-full max-w-content px-4 pb-8 pt-4 sm:px-6 sm:pt-5">

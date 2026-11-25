@@ -8,6 +8,8 @@ import { WebappNotice } from "@/components/webapp/WebappNotice";
 import { CashSubnav } from "@/components/webapp/CashSubnav";
 import { useI18n } from "@/lib/i18n";
 import { useBusiness } from "@/app/providers";
+import { usePreview } from "@/components/preview/PreviewProvider";
+import { GuestTransactionsView } from "@/components/preview/views/GuestTransactionsView";
 import { useTransactions } from "@/lib/hooks/useTransactions";
 import { TransactionRow } from "@/components/transactions/TransactionRow";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -21,6 +23,7 @@ const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 export default function IncomePage() {
   const { t, locale } = useI18n();
   const { business } = useBusiness();
+  const { isGuest } = usePreview();
   const { transactions, status, error, usingDemoData, refetch } = useTransactions(business?.id ?? null);
   const [search, setSearch] = useState("");
   const [importExportOpen, setImportExportOpen] = useState(false);
@@ -43,6 +46,8 @@ export default function IncomePage() {
   function formatMoney(value: number, opts: { signed?: boolean } = {}) {
     return formatCurrency(value, business.currency, locale, opts);
   }
+
+  if (isGuest) return <GuestTransactionsView mode="income" />;
 
   return (
     <div className="mx-auto w-full max-w-content px-4 pb-8 pt-4 sm:px-6 sm:pt-5">

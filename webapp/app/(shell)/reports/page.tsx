@@ -14,6 +14,8 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/StateViews";
 import { useI18n } from "@/lib/i18n";
 import { useBusiness } from "@/app/providers";
+import { usePreview } from "@/components/preview/PreviewProvider";
+import { GuestReportsView } from "@/components/preview/views/GuestReportsView";
 import { useReports, PERIOD_OPTIONS, type PeriodMonths } from "@/lib/hooks/useReports";
 import { deriveAnalytics, detectRecurring } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
@@ -27,6 +29,7 @@ const PERIOD_LABEL_KEY: Record<PeriodMonths, string> = {
 export default function ReportsPage() {
   const { t } = useI18n();
   const { business } = useBusiness();
+  const { isGuest } = usePreview();
   const [period, setPeriod] = useState<PeriodMonths>(6);
 
   const { data, transactions, status, error, usingDemoData, refetch, isEmpty } =
@@ -47,6 +50,8 @@ export default function ReportsPage() {
     () => detectRecurring(transactions),
     [transactions]
   );
+
+  if (isGuest) return <GuestReportsView />;
 
   return (
     <div className="mx-auto w-full max-w-content px-4 pb-8 pt-4 sm:px-6 sm:pt-5">

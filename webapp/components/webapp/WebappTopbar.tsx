@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useI18n } from "@/lib/i18n";
 import { TopbarActions } from "@/components/webapp/TopbarActions";
+import { usePreview } from "@/components/preview/PreviewProvider";
 import { Glass, Button } from "@/components/glisse";
 import { cn } from "@/lib/utils";
 
@@ -26,7 +27,10 @@ import { cn } from "@/lib/utils";
 export function WebappTopbar() {
   const { t } = useI18n();
   const pathname = usePathname();
-  const isAssistant = pathname === "/assistant" || pathname?.startsWith("/assistant/");
+  const { isGuest } = usePreview();
+  // The conversation drawer only exists for a signed-in assistant workspace.
+  const isAssistant =
+    !isGuest && (pathname === "/assistant" || pathname?.startsWith("/assistant/"));
 
   const handleMenuToggle = () => {
     if (typeof window !== "undefined" && (window as any).__assistantToggleSidebar) {

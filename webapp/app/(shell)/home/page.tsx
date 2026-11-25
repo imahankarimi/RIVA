@@ -5,6 +5,8 @@ import { Wallet, TrendingUp, TrendingDown, ArrowLeftRight, Sparkle, ChevronRight
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n";
 import { useBusiness, useAuth } from "@/app/providers";
+import { usePreview } from "@/components/preview/PreviewProvider";
+import { GuestDashboardView } from "@/components/preview/views/GuestDashboardView";
 import { useOverview } from "@/lib/hooks/useOverview";
 import { useReports, momTrend } from "@/lib/hooks/useReports";
 import { formatCurrency } from "@/lib/currency";
@@ -82,6 +84,7 @@ export default function HomePage() {
   const { t, locale } = useI18n();
   const { business } = useBusiness();
   const { user } = useAuth();
+  const { isGuest } = usePreview();
   const { openAddIncome } = useAddIncome();
   const {
     stats,
@@ -104,6 +107,9 @@ export default function HomePage() {
     },
     status !== "loading"
   );
+
+  // Guests explore the real dashboard structure; no account data is requested.
+  if (isGuest) return <GuestDashboardView />;
 
   function formatMoney(value: number, opts: { signed?: boolean } = {}) {
     return formatCurrency(value, business.currency, locale, opts);

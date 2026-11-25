@@ -8,6 +8,8 @@ import { RecurringRow } from "@/components/demo/DemoScreen";
 import { Alert } from "@/components/ui/Alert";
 import { useI18n } from "@/lib/i18n";
 import { useBusiness } from "@/app/providers";
+import { usePreview } from "@/components/preview/PreviewProvider";
+import { GuestLockedSectionView } from "@/components/preview/views/GuestLockedSectionView";
 import { formatCurrency } from "@/lib/currency";
 
 const subscriptions = [
@@ -20,8 +22,22 @@ const subscriptions = [
 export default function SubscriptionsPage() {
   const { t, locale } = useI18n();
   const { business } = useBusiness();
+  const { isGuest } = usePreview();
   const total = subscriptions.reduce((s, x) => s + x.amount, 0);
   const monthly = subscriptions.filter((s) => s.cadence === "monthly").reduce((s, x) => s + x.amount, 0);
+
+  if (isGuest) {
+    return (
+      <GuestLockedSectionView
+        eyebrow={t("nav.subscriptions")}
+        title={t("nav.subscriptions")}
+        description={t("comingSoon.subscriptionsDesc")}
+        icon={RefreshCw}
+        reasonKey="preview.signInToContinue"
+        body={t("preview.planningBody")}
+      />
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-content px-4 pb-8 pt-4 sm:px-6 sm:pt-5">

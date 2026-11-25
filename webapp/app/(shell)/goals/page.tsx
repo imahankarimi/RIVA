@@ -7,6 +7,8 @@ import { Alert } from "@/components/ui/Alert";
 import { GoalCard } from "@/components/demo/DemoScreen";
 import { useI18n } from "@/lib/i18n";
 import { useBusiness } from "@/app/providers";
+import { usePreview } from "@/components/preview/PreviewProvider";
+import { GuestLockedSectionView } from "@/components/preview/views/GuestLockedSectionView";
 
 const goalProjects = [
   { name: "Emergency Fund", icon: "🛡️", current: 8400, target: 12000, monthly: 800, deadline: "2026-12" },
@@ -17,6 +19,20 @@ const goalProjects = [
 export default function GoalsPage() {
   const { t } = useI18n();
   const { business } = useBusiness();
+  const { isGuest } = usePreview();
+
+  if (isGuest) {
+    return (
+      <GuestLockedSectionView
+        eyebrow={t("nav.goals")}
+        title={t("nav.goals")}
+        description={t("comingSoon.goalsDesc")}
+        icon={Target}
+        reasonKey="preview.signInToContinue"
+        body={t("preview.planningBody")}
+      />
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-content px-4 pb-8 pt-4 sm:px-6 sm:pt-5">

@@ -1,50 +1,12 @@
-import { AuthGate } from "@/components/auth/AuthGate";
-import { WebappTopbar } from "@/components/webapp/WebappTopbar";
-import { WebappDesktopBar } from "@/components/webapp/WebappDesktopBar";
-import { WebappSidebar } from "@/components/webapp/WebappSidebar";
-import { MobileTabBar } from "@/components/webapp/MobileTabBar";
-import { AddIncomeProvider } from "@/components/transactions/AddIncomeContext";
+import { WebappShell } from "@/components/webapp/WebappShell";
 
 /**
- * RIVA Web authenticated shell. Reuses RIVA's providers (theme, i18n, auth,
- * business, toast) from the root layout and its own AuthGate.
+ * RIVA Web shell.
  *
- * RIVA Web maintains its Liquid Glass identity across all screen sizes:
- *  · Mobile → floating glass topbar + bottom tab bar (5 items, RIVA AI centered)
- *  · Tablet/Desktop → floating glass sidebar + floating utility bar
- *  · At NO breakpoint does RIVA Web become RIVA Main
- *
- * The desktop shell uses translucent floating surfaces with backdrop blur,
- * soft borders, subtle shadows, and refined spacing — unmistakably RIVA Web.
- *
- * Mobile UX enhancements:
- * - Optimized padding and spacing system
- * - Proper safe area handling for notched devices
- * - Enhanced scroll behavior (momentum scrolling)
- * - Touch-optimized layout with breathing room
- * - Fixed scroll container hierarchy for proper mobile scroll tracking
+ * The real application chrome (Liquid Glass topbar, sidebar, floating tab bar)
+ * is shared by authenticated and guest states — see `WebappShell`. There is no
+ * separate guest application.
  */
 export default function ShellLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <AuthGate>
-      <AddIncomeProvider>
-        <div className="flex h-dvh flex-col bg-paper font-sans text-ink antialiased md:h-screen">
-          <div className="flex min-h-0 flex-1 md:overflow-hidden">
-            <WebappSidebar />
-            <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-              <WebappDesktopBar />
-              <main
-                id="webapp-main-scroll"
-                className="relative min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain pt-[5rem] pb-[calc(env(safe-area-inset-bottom)+76px)] md:overflow-y-auto md:overscroll-contain md:pb-8 md:pt-0"
-              >
-                {children}
-              </main>
-            </div>
-          </div>
-          <WebappTopbar />
-          <MobileTabBar />
-        </div>
-      </AddIncomeProvider>
-    </AuthGate>
-  );
+  return <WebappShell>{children}</WebappShell>;
 }

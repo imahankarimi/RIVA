@@ -7,6 +7,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronsUpDown,
+  LogIn,
   LogOut,
   PanelLeftClose,
   PanelLeftOpen,
@@ -15,6 +16,8 @@ import {
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useBusiness, useAuth } from "@/app/providers";
+import { usePreview } from "@/components/preview/PreviewProvider";
+import { Button } from "@/components/glisse";
 import { useAddIncome } from "@/components/transactions/AddIncomeContext";
 import { cn } from "@/lib/utils";
 import {
@@ -155,6 +158,7 @@ export function WebappSidebar() {
   const { t } = useI18n();
   const { business, businesses, setBusinessId } = useBusiness();
   const { user, logout } = useAuth();
+  const { isGuest, openAuthPrompt } = usePreview();
   const { openAddIncome } = useAddIncome();
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
@@ -171,7 +175,8 @@ export function WebappSidebar() {
 
   async function handleLogout() {
     await logout();
-    router.replace("/login");
+    // Logout returns to the guest experience, not a login wall.
+    router.replace("/home");
   }
 
   return (
@@ -314,7 +319,46 @@ export function WebappSidebar() {
         </div>
 
         <div className="relative shrink-0 border-t border-line/40 p-3">
+          {isGuest && (
+            <div className={cn("relative mb-2 space-y-2", collapsed && "space-y-1")}>
+              {!collapsed && (
+                <div className="px-1">
+                  <p className="text-[11.5px] font-semibold text-deep-ink/70 dark:text-warm-white/70">
+                    {t("preview.bannerTitle")}
+                  </p>
+                  <p className="mt-0.5 text-[11px] leading-relaxed text-deep-ink/50 dark:text-warm-white/50">
+                    {t("preview.bannerBody")}
+                  </p>
+                </div>
+              )}
+              <Button
+                variant="filled"
+                onClick={() => openAuthPrompt({ reasonKey: "preview.signInToContinue" })}
+                className={cn("w-full rounded-lg text-[12.5px]", collapsed ? "min-h-[36px] px-0" : "min-h-[38px]")}
+                aria-label={t("preview.signIn")}
+              >
+                {collapsed ? <LogIn size={15} strokeWidth={2.2} /> : t("preview.signIn")}
+              </Button>
+              {!collapsed && (
+                <Button
+                  variant="glass"
+                  onClick={() =>
+                    openAuthPrompt({
+                      reasonKey: "preview.signInToContinue",
+                      mode: "signup",
+                      intent: { kind: "general" },
+                    })
+                  }
+                  className="w-full min-h-[38px] rounded-lg text-[12.5px]"
+                >
+                  {t("preview.createAccount")}
+                </Button>
+              )}
+            </div>
+          )}
+
           {/* Business switcher */}
+          {business && (
           <button
             onClick={() => {
               if (collapsed || businesses.length < 2) return;
@@ -349,6 +393,7 @@ export function WebappSidebar() {
               <ChevronsUpDown size={14} className="relative text-deep-ink/40 dark:text-warm-white/40" />
             )}
           </button>
+          )}
 
           {/* Profile / account */}
           {user && (

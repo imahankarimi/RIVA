@@ -12,11 +12,14 @@ import { Alert } from "@/components/ui/Alert";
 import { PiggyBank } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useBusiness } from "@/app/providers";
+import { usePreview } from "@/components/preview/PreviewProvider";
+import { GuestLockedSectionView } from "@/components/preview/views/GuestLockedSectionView";
 import { demoBudgets, demoSavingsGoals, buildDailySpending } from "@/components/budgets/demoData";
 
 export default function BudgetsPage() {
   const { t, locale } = useI18n();
   const { business } = useBusiness();
+  const { isGuest } = usePreview();
 
   const dailySpending = useMemo(() => buildDailySpending(9000), []);
 
@@ -24,6 +27,19 @@ export default function BudgetsPage() {
     month: "long",
     year: "numeric",
   }).format(new Date());
+
+  if (isGuest) {
+    return (
+      <GuestLockedSectionView
+        eyebrow={t("nav.budgets")}
+        title={t("nav.budgets")}
+        description={t("budgets.monthlyBudgets")}
+        icon={PiggyBank}
+        reasonKey="preview.signInToContinue"
+        body={t("preview.planningBody")}
+      />
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-content px-4 pb-8 pt-4 sm:px-6 sm:pt-5">

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { getBusinessAccounts } from "@/lib/api/businesses";
-import { ApiError } from "@/lib/api/client";
+import { ApiError, getStoredToken } from "@/lib/api/client";
 import { demoAccounts } from "@/lib/mock/demoData";
 import type { Account } from "@/lib/types";
 
@@ -30,7 +30,15 @@ export function useAccounts(businessId: string | null) {
   const refetch = useCallback(() => setVersion((v) => v + 1), []);
 
   useEffect(() => {
-    if (!businessId) return;
+    // Never request account data without a session — the guest experience must
+    // not even attempt the call, let alone hide its result behind a blur.
+    if (!businessId || !getStoredToken()) {
+      setAccounts([]);
+      setStatus("empty");
+      setError(null);
+      setUsingDemoData(false);
+      return;
+    }
     let cancelled = false;
     setStatus("loading");
     setError(null);

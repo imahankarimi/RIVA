@@ -2,7 +2,7 @@
 
 import { FormEvent, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Loader2, Lock } from "lucide-react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useI18n } from "@/lib/i18n";
@@ -14,14 +14,37 @@ import { CurrencySelect, CurrencyLockWarning } from "@/components/settings/Curre
 import { Button } from "@/components/glisse";
 import { installLiquidLens } from "@/lib/motion/liquidLens";
 import { DURATION, EASE_OUT } from "@/lib/motion/tokens";
+import {
+  clearPreviewReturnTo,
+  isSafeInternalPath,
+  readPreviewReturnTo,
+} from "@/lib/preview/intent";
 
 type Mode = "login" | "signup" | "forgot";
 
-export function AuthScreen() {
+interface AuthScreenProps {
+  /** Rendered inside the guest bottom sheet instead of taking over the viewport. */
+  embedded?: boolean;
+  initialMode?: Mode;
+  /** Contextual line explaining why authentication is being requested. */
+  contextNote?: string;
+  /** Where to continue after a successful full-page sign-in. */
+  returnTo?: string;
+  /** Sheet callers handle the transition themselves instead of navigating. */
+  onSuccess?: () => void;
+}
+
+export function AuthScreen({
+  embedded = false,
+  initialMode = "login",
+  contextNote,
+  returnTo,
+  onSuccess,
+}: AuthScreenProps = {}) {
   const { t, locale } = useI18n();
   const { login, signup } = useAuth();
   const router = useRouter();
-  const [mode, setMode] = useState<Mode>("login");
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [email, setEmail] = useState("");
   const [businessName, setBusinessName] = useState("");
   const [baseCurrency, setBaseCurrency] = useState<BackendCurrency>(defaultCurrencyFor(locale));
@@ -61,7 +84,14 @@ export function AuthScreen() {
     try {
       const response =
         mode === "login" ? await login(email, password) : await signup(email, password, businessName, baseCurrency);
-      router.replace("/home");
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        // Continue where the guest was, not on a generic landing route.
+        const target = returnTo ?? readPreviewReturnTo() ?? "/home";
+        clearPreviewReturnTo();
+        router.replace(isSafeInternalPath(target) ? target : "/home");
+      }
     } catch (reason) {
       if (reason instanceof ApiError) {
         setError(reason.message);
@@ -97,13 +127,16 @@ export function AuthScreen() {
   };
 
   return (
-    <main className="liquid-glass-auth-page">
-      {/* Animated gradient background */}
-      <div className="liquid-glass-bg">
-        <div className="liquid-glass-gradient-1" />
-        <div className="liquid-glass-gradient-2" />
-        <div className="liquid-glass-gradient-3" />
-      </div>
+    <main className={embedded ? "liquid-glass-auth-embedded" : "liquid-glass-auth-page"}>
+      {/* Animated gradient background (full-page only — the guest sheet provides
+          its own static surface so it never pays for three large blurs). */}
+      {!embedded && (
+        <div className="liquid-glass-bg">
+          <div className="liquid-glass-gradient-1" />
+          <div className="liquid-glass-gradient-2" />
+          <div className="liquid-glass-gradient-3" />
+        </div>
+      )}
 
       <motion.div className="liquid-glass-stage" layout transition={{ duration: DURATION.moderate, ease: EASE_OUT }}>
         {/* Brand mark and heading */}
@@ -119,6 +152,13 @@ export function AuthScreen() {
               priority
             />
           </div>
+
+          {contextNote && (
+            <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-warm-white/10 px-2.5 py-1 text-[11.5px] font-medium text-warm-white/80 ring-1 ring-inset ring-warm-white/15">
+              <Lock size={11} strokeWidth={2.2} aria-hidden />
+              <span>{contextNote}</span>
+            </div>
+          )}
 
           <AnimatePresence mode="wait">
             <motion.div

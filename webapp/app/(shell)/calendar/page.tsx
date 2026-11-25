@@ -6,9 +6,25 @@ import { CalendarDemo } from "@/components/calendar/CalendarDemo";
 import { Alert } from "@/components/ui/Alert";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { usePreview } from "@/components/preview/PreviewProvider";
+import { GuestLockedSectionView } from "@/components/preview/views/GuestLockedSectionView";
 
 export default function CalendarPage() {
   const { t } = useI18n();
+  const { isGuest } = usePreview();
+
+  if (isGuest) {
+    return (
+      <GuestLockedSectionView
+        eyebrow={t("nav.calendar")}
+        title={t("nav.calendar")}
+        description={t("comingSoon.calendarDesc")}
+        icon={CalendarIcon}
+        reasonKey="preview.signInToContinue"
+        body={t("preview.planningBody")}
+      />
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-content px-4 pb-8 pt-4 sm:px-6 sm:pt-5">
