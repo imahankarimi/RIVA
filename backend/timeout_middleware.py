@@ -72,7 +72,9 @@ async def timeout_middleware(request: Request, call_next):
                 "http://127.0.0.1:3002",
                 "http://192.168.1.38:3001",
                 # Official production origins: main website and web application.
+                # Must match CORS_ORIGINS in main.py (apex redirects to www).
                 "https://theriva.ir",
+                "https://www.theriva.ir",
                 "https://app.theriva.ir",
             }
             if origin in allowed_origins:

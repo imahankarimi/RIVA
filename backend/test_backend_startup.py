@@ -138,6 +138,29 @@ def test_app_imports_and_exposes_routes():
         assert required in routes, f"Missing route: {required} (has {sorted(routes)})"
 
 
+def test_production_cors_origins_are_allowlisted():
+    """Regression: the site's real browser Origin must be in the CORS allowlist.
+
+    Vercel 308-redirects https://theriva.ir to https://www.theriva.ir, so login
+    from the main site arrives with Origin: https://www.theriva.ir. While that
+    host was absent from CORS_ORIGINS every preflight returned 400 without
+    access-control-allow-origin, and both apps surfaced "Cannot connect to the
+    server" because fetch() rejected instead of returning the API's 401.
+    """
+    main = __import__("main")
+
+    required = {
+        "https://theriva.ir",
+        "https://www.theriva.ir",
+        "https://app.theriva.ir",
+    }
+    missing = required - set(main.CORS_ORIGINS)
+    assert not missing, (
+        f"CORS_ORIGINS is missing production browser origins: {sorted(missing)}. "
+        "The main site redirects apex -> www, so the browser never sends the apex origin."
+    )
+
+
 def test_main_has_console_entry_point():
     """Regression: `python main.py` must boot the server, not exit silently.
 
@@ -185,21 +208,23 @@ def test_backend_actually_serves_requests():
             body = resp.read().decode()
         assert "RIVA" in body, f"Unexpected root response: {body}"
 
-        # CORS preflight from the frontend origin
-        request = urllib.request.Request(
-            f"http://127.0.0.1:{port}/api/businesses",
-            method="OPTIONS",
-            headers={
-                "Origin": "http://localhost:3000",
-                "Access-Control-Request-Method": "GET",
-            },
-        )
-        with urllib.request.urlopen(request, timeout=5) as resp:
-            assert resp.status == 200
-            assert resp.headers.get("access-control-allow-origin"), (
-                "CORS preflight from http://localhost:3000 missing "
-                "access-control-allow-origin header"
+        # CORS preflight from the dev origin and from the real production
+        # origin the browser uses after Vercel's apex -> www redirect.
+        for origin in ("http://localhost:3000", "https://www.theriva.ir"):
+            request = urllib.request.Request(
+                f"http://127.0.0.1:{port}/api/businesses",
+                method="OPTIONS",
+                headers={
+                    "Origin": origin,
+                    "Access-Control-Request-Method": "GET",
+                },
             )
+            with urllib.request.urlopen(request, timeout=5) as resp:
+                allow_origin = resp.headers.get("access-control-allow-origin")
+                assert resp.status == 200 and allow_origin == origin, (
+                    f"CORS preflight from {origin} returned {resp.status} with "
+                    f"access-control-allow-origin={allow_origin!r}"
+                )
     finally:
         proc.terminate()
         try:
@@ -219,6 +244,7 @@ def main() -> int:
         test_env_file_has_required_keys,
         test_database_url_is_not_a_placeholder,
         test_app_imports_and_exposes_routes,
+        test_production_cors_origins_are_allowlisted,
         test_main_has_console_entry_point,
         test_backend_actually_serves_requests,
     ]

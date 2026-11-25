@@ -113,7 +113,10 @@ CORS_ORIGINS = [
     "http://127.0.0.1:3002",
     "http://192.168.1.38:3001",
     # Official production origins: main website and web application.
+    # Vercel 308-redirects the apex to www, so the browser's real Origin on the
+    # main site is https://www.theriva.ir — both hosts must be allowed.
     "https://theriva.ir",
+    "https://www.theriva.ir",
     "https://app.theriva.ir",
 ]
 
