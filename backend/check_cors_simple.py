@@ -17,8 +17,8 @@ print()
 
 CORS_ORIGINS = [
     "http://localhost:3000",
-    "https://riva-snowy-beta.vercel.app",
-    "https://riva-app-inky.vercel.app",
+    "https://theriva.ir",
+    "https://app.theriva.ir",
 ]
 
 app = FastAPI(title="CORS Test")
@@ -55,14 +55,14 @@ client = TestClient(app)
 
 print("TEST 1: Successful response")
 print("-" * 80)
-r = client.get('/health', headers={'Origin': 'https://riva-snowy-beta.vercel.app'})
+r = client.get('/health', headers={'Origin': 'https://theriva.ir'})
 print(f"Status: {r.status_code}, CORS: {r.headers.get('access-control-allow-origin', 'MISSING')}")
-assert r.headers.get('access-control-allow-origin') == 'https://riva-snowy-beta.vercel.app'
+assert r.headers.get('access-control-allow-origin') == 'https://theriva.ir'
 print("✅ PASS\n")
 
 print("TEST 2: HTTPException 401 (CRITICAL TEST)")
 print("-" * 80)
-r = client.post('/test-error', headers={'Origin': 'https://riva-snowy-beta.vercel.app'})
+r = client.post('/test-error', headers={'Origin': 'https://theriva.ir'})
 cors = r.headers.get('access-control-allow-origin')
 creds = r.headers.get('access-control-allow-credentials')
 www = r.headers.get('www-authenticate')
@@ -73,7 +73,7 @@ print(f"WWW-Authenticate: {www if www else 'MISSING ❌'}")
 if not cors:
     print("\n❌ FAILURE: HTTPException missing CORS header!")
     sys.exit(1)
-assert cors == 'https://riva-snowy-beta.vercel.app'
+assert cors == 'https://theriva.ir'
 assert creds == 'true'
 assert www == 'Bearer'
 print("✅ PASS\n")

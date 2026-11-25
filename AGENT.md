@@ -88,7 +88,7 @@ ledger-ai/
 | Auth entry after login | `/overview` | `/home` |
 | Route group | `app/(app)/` | `app/(shell)/` |
 | Nav | Sidebar + floating `MobileNav` pill | Liquid Glass topbar + `MobileTabBar` (Home, Cash, Sparkle/Assistant, Reports, More) + `WebappSidebar` |
-| Production | riva-snowy-beta.vercel.app | riva-app-inky.vercel.app |
+| Production | `https://theriva.ir` | `https://app.theriva.ir` |
 | Code sharing | — | **Physical copy** of `lib/`, `components/ui/`, `components/motion/` and selected feature components from `frontend/`. No monorepo tooling. `webapp/node_modules` is a symlink to `frontend/node_modules`. |
 
 **Critical implication:** there is no shared package. When you change a shared primitive (`components/ui/*`, `lib/api/*`, `lib/i18n/*`, `lib/motion/*`), you must **apply the same change to both copies** and keep their public APIs in sync. The dictionaries intentionally diverge (webapp has `webapp.*` keys; frontend has `advisor.*` etc.) — only add keys to the app that needs them, but never break the shared `Dictionary` type.

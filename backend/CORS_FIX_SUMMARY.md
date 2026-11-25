@@ -19,7 +19,7 @@
 ### Request Flow That Failed
 
 ```
-Browser (https://riva-snowy-beta.vercel.app)
+Browser (https://theriva.ir)
   ↓
   POST /api/auth/login with wrong password
   ↓
@@ -65,8 +65,8 @@ Added a custom exception handler that explicitly includes CORS headers on ALL er
    CORS_ORIGINS = [
        "http://localhost:3000",
        # ... all origins
-       "https://riva-snowy-beta.vercel.app",
-       "https://riva-app-inky.vercel.app",
+       "https://theriva.ir",
+       "https://app.theriva.ir",
    ]
    ```
 
@@ -110,7 +110,7 @@ After deploying to Render:
 ### 1. Test with Chrome DevTools
 
 ```javascript
-// Go to: https://riva-snowy-beta.vercel.app
+// Go to: https://theriva.ir
 // Open DevTools Console and run:
 
 // Test successful request
@@ -133,13 +133,13 @@ fetch('https://riva-kwbg.onrender.com/api/auth/login', {
 
 **Expected Results:**
 - ✅ Response status: 401
-- ✅ CORS header present: `access-control-allow-origin: https://riva-snowy-beta.vercel.app`
+- ✅ CORS header present: `access-control-allow-origin: https://theriva.ir`
 - ✅ No CORS error in console
 - ✅ Error message visible: "Invalid email or password"
 
 ### 2. Test Login Flow
 
-1. Go to `https://riva-snowy-beta.vercel.app`
+1. Go to `https://theriva.ir`
 2. Try to login with wrong credentials
 3. **Expected:** Error message displays properly (no "Authentication is not configured" message)
 4. Try to login with correct credentials
@@ -201,7 +201,7 @@ Render is configured to auto-deploy from the `main` branch. After pushing:
 
 After Render shows "Live":
 
-1. Open `https://riva-snowy-beta.vercel.app` in Chrome
+1. Open `https://theriva.ir` in Chrome
 2. Open DevTools Network tab
 3. Try to login (wrong password first to test error case)
 4. **Verify:** Login request shows `access-control-allow-origin` header in response

@@ -25,7 +25,7 @@ try:
     print("-" * 80)
     response = client.get(
         '/health',
-        headers={'Origin': 'https://riva-snowy-beta.vercel.app'}
+        headers={'Origin': 'https://theriva.ir'}
     )
     print(f'✓ Status Code: {response.status_code}')
     print(f'✓ Response Body: {response.json()}')
@@ -39,7 +39,7 @@ try:
     response = client.post(
         '/api/auth/login',
         json={'email': 'test@example.com', 'password': 'wrongpassword'},
-        headers={'Origin': 'https://riva-snowy-beta.vercel.app'}
+        headers={'Origin': 'https://theriva.ir'}
     )
     print(f'✓ Status Code: {response.status_code}')
     print(f'✓ Response Body: {response.json()}')
@@ -64,7 +64,7 @@ try:
     response = client.post(
         '/api/auth/login',
         json={'email': 'test@example.com'},
-        headers={'Origin': 'https://riva-snowy-beta.vercel.app'}
+        headers={'Origin': 'https://theriva.ir'}
     )
     print(f'✓ Status Code: {response.status_code}')
     print(f'✓ Response Body: {response.json()}')
@@ -78,7 +78,7 @@ try:
     response = client.options(
         '/api/auth/login',
         headers={
-            'Origin': 'https://riva-snowy-beta.vercel.app',
+            'Origin': 'https://theriva.ir',
             'Access-Control-Request-Method': 'POST',
             'Access-Control-Request-Headers': 'content-type'
         }

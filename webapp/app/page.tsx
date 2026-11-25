@@ -2,9 +2,16 @@ import type { Metadata } from "next";
 
 import { LandingPage } from "@/components/landing/LandingPage";
 
+// Canonical public origin for metadata. Production must never resolve to the
+// raw Vercel deployment host: the official web app is app.theriva.ir. Preview
+// deployments keep their own deployment origin.
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3001");
+  (process.env.VERCEL_ENV === "production"
+    ? "https://app.theriva.ir"
+    : process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3001");
 
 const title = "RIVA Web — Beyond Accounting. Into Intelligence.";
 const description =

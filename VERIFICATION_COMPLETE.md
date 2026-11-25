@@ -25,8 +25,8 @@ CORS_ORIGINS = [
     "http://127.0.0.1:3001",
     "http://127.0.0.1:3002",
     "http://192.168.1.38:3001",
-    "https://riva-snowy-beta.vercel.app",  ← Production desktop
-    "https://riva-app-inky.vercel.app",    ← Production mobile
+    "https://theriva.ir",  ← Production desktop
+    "https://app.theriva.ir",    ← Production mobile
 ]
 ```
 
@@ -72,17 +72,17 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException) 
 ## Test Results ✅
 
 ### Test 1: Successful Response (200)
-**Request:** GET /health with Origin: https://riva-snowy-beta.vercel.app  
+**Request:** GET /health with Origin: https://theriva.ir\
 **Result:**
 - ✅ Status: 200
-- ✅ Access-Control-Allow-Origin: https://riva-snowy-beta.vercel.app
+- ✅ Access-Control-Allow-Origin: https://theriva.ir
 - ✅ Access-Control-Allow-Credentials: true
 
 ### Test 2: HTTPException 401 (THE CRITICAL TEST)
-**Request:** POST /test-error with Origin: https://riva-snowy-beta.vercel.app  
+**Request:** POST /test-error with Origin: https://theriva.ir\
 **Result:**
 - ✅ Status: 401
-- ✅ Access-Control-Allow-Origin: https://riva-snowy-beta.vercel.app
+- ✅ Access-Control-Allow-Origin: https://theriva.ir
 - ✅ Access-Control-Allow-Credentials: true
 - ✅ WWW-Authenticate: Bearer (preserved)
 

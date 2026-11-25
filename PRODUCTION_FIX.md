@@ -11,12 +11,12 @@ This causes login requests to be sent to the Vercel app itself (which has no bac
 
 Add the following environment variable to **both** Vercel projects:
 
-### RIVA Desktop (riva-snowy-beta.vercel.app)
+### RIVA Desktop (https://theriva.ir)
 ```
 NEXT_PUBLIC_API_URL=https://riva-kwbg.onrender.com
 ```
 
-### RIVA App (riva-app-inky.vercel.app)
+### RIVA App (https://app.theriva.ir)
 ```
 NEXT_PUBLIC_API_URL=https://riva-kwbg.onrender.com
 ```
@@ -42,10 +42,10 @@ NEXT_PUBLIC_API_URL=https://riva-kwbg.onrender.com
 After redeploying both apps with the environment variable:
 
 1. Open browser DevTools
-2. Navigate to https://riva-snowy-beta.vercel.app
+2. Navigate to https://theriva.ir
 3. Attempt login
 4. Check Network tab - the request should go to `https://riva-kwbg.onrender.com/api/auth/login`
-5. Repeat for https://riva-app-inky.vercel.app
+5. Repeat for https://app.theriva.ir
 
 ## Why Previous CORS Fixes Didn't Work
 

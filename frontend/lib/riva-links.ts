@@ -5,7 +5,7 @@ import { type ThemeMode, withThemeParam } from "@/lib/theme/theme-sync";
  * production origin is the safe fallback so the cross-app CTA never silently
  * disappears when the environment variable is absent or malformed.
  */
-const DEFAULT_RIVA_WEBAPP_URL = "https://riva-app-inky.vercel.app/";
+const DEFAULT_RIVA_WEBAPP_URL = "https://app.theriva.ir/";
 
 function resolveRivaWebappUrl(): string {
   const configured = process.env.NEXT_PUBLIC_RIVA_WEBAPP_URL?.trim();

@@ -14,7 +14,7 @@ print("=" * 60)
 response = client.options(
     "/api/auth/login",
     headers={
-        "Origin": "https://riva-snowy-beta.vercel.app",
+        "Origin": "https://theriva.ir",
         "Access-Control-Request-Method": "POST",
         "Access-Control-Request-Headers": "content-type",
     }
@@ -34,7 +34,7 @@ response = client.post(
     "/api/auth/login",
     json={"email": "test@example.com", "password": "wrongpassword"},
     headers={
-        "Origin": "https://riva-snowy-beta.vercel.app",
+        "Origin": "https://theriva.ir",
         "Content-Type": "application/json",
     }
 )
@@ -51,7 +51,7 @@ print("=" * 60)
 response = client.options(
     "/api/auth/login",
     headers={
-        "Origin": "https://riva-app-inky.vercel.app",
+        "Origin": "https://app.theriva.ir",
         "Access-Control-Request-Method": "POST",
         "Access-Control-Request-Headers": "content-type",
     }

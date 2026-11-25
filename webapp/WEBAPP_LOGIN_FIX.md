@@ -73,8 +73,8 @@ CORS_ORIGINS = [
     "http://127.0.0.1:3001",
     "http://127.0.0.1:3002",
     "http://192.168.1.38:3001",
-    "https://riva-snowy-beta.vercel.app",
-    "https://riva-app-inky.vercel.app",
+    "https://theriva.ir",
+    "https://app.theriva.ir",
 ]
 ```
 

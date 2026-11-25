@@ -77,8 +77,8 @@ npm run dev
 ## Production Deployment
 
 Both apps will show Liquid Glass after deployment:
-- Frontend: `https://riva-snowy-beta.vercel.app/login`
-- Webapp: `https://riva-app-inky.vercel.app/login`
+- Frontend: `https://theriva.ir/login`
+- Webapp: `https://app.theriva.ir/login`
 
 Vercel automatically rebuilds and clears caches on deploy.
 
